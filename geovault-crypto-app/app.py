@@ -206,6 +206,7 @@ def screen_identity(status: dongle_guard.DongleStatus) -> None:
             with st.container(border=True):
                 st.markdown("### Faktor 2 - Wajah")
                 face = _capture_face("li")
+                st.caption(f"Posisikan wajah menghadap kamera. Sistem menggunakan penyelarasan spasial multi-skala (ambang batas: {auth_biometric.MATCH_THRESHOLD:.0%}).")
         if st.button("Verifikasi dan masuk", type="primary", use_container_width=True):
             if not (user and pw and face):
                 st.warning("Isi nama pengguna, kata sandi, dan ambil citra wajah terlebih dahulu.")
@@ -220,7 +221,7 @@ def screen_identity(status: dongle_guard.DongleStatus) -> None:
                     st.session_state.page = "Ringkasan"
                     st.rerun()
                 else:
-                    sim = f" Skor kemiripan wajah: {res.similarity:.1%}." if res.similarity is not None else ""
+                    sim = f" Skor kemiripan wajah: {res.similarity:.1%} (ambang batas: {auth_biometric.MATCH_THRESHOLD:.0%})." if res.similarity is not None else ""
                     ui.log("AUTH", f"Login ditolak untuk {user}: {res.message}", digest, "CRIT")
                     st.error(res.message + sim)
 
@@ -236,7 +237,7 @@ def screen_identity(status: dongle_guard.DongleStatus) -> None:
             with st.container(border=True):
                 st.markdown("### Pendaftaran wajah")
                 rface = _capture_face("rg")
-                st.caption("Gunakan pencahayaan dan posisi yang sama saat login nanti agar skor kemiripan tinggi.")
+                st.caption("Posisikan wajah di depan kamera. Algoritma penyelarasan multi-skala mentolerir pergeseran wajar posisi duduk.")
         if st.button("Daftarkan operator", type="primary", use_container_width=True):
             if rp != rp2:
                 st.error("Kedua kata sandi tidak sama.")

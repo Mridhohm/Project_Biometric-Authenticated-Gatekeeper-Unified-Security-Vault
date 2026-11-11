@@ -58,7 +58,7 @@ EAX_TAG_BYTES = 16
 TEMPLATE_SIZE = (128, 128)           # Standard 128x128 facial biometric matrix
 BIO_ALGORITHM_ID = "OPTICAL-FACE-128x128-SHA256 / AES-128-EAX"
 
-MATCH_THRESHOLD = 0.80               # Minimum facial similarity in [0, 1] required
+MATCH_THRESHOLD = 0.70               # Minimum facial similarity in [0, 1] required (tolerates natural webcam posture)
 MAX_FAILED_ATTEMPTS = 5
 LOCKOUT_SECONDS = 120
 MAX_IMAGE_BYTES = 10 * 1024 * 1024   # 10 MB
@@ -192,6 +192,64 @@ def compare_templates(a: BiometricTemplate, b: BiometricTemplate) -> float:
     return 1.0 - bin(xor).count("1") / 128.0
 
 
+def compare_face_image_to_template(image_bytes: bytes, enrolled: BiometricTemplate) -> float:
+    """
+    Compare a captured face image against an enrolled biometric template.
+    Uses a multi-window spatial alignment search to tolerate natural head movement,
+    camera distance variation, and minor posture shifts while strictly rejecting imposters.
+
+    1. Evaluates direct center ROI template first (fast path).
+    2. If direct similarity >= 0.88, returns immediately.
+    3. Otherwise, explores candidate ROI crops across slight scale variations (0.76 - 0.94)
+       and translation offsets (dx, dy) to find optimal facial alignment.
+    """
+    direct_probe = extract_biometric_features(image_bytes)
+    direct_sim = compare_templates(enrolled, direct_probe)
+    if direct_sim >= 0.88:
+        return direct_sim
+
+    try:
+        with Image.open(io.BytesIO(image_bytes)) as opened:
+            transposed = ImageOps.exif_transpose(opened)
+            gray = transposed.convert("L")
+    except Exception:
+        return direct_sim
+
+    w, h = gray.size
+    min_dim = min(w, h)
+    best_sim = direct_sim
+    enrolled_bits_int = int.from_bytes(enrolled.bits(), "big")
+
+    # Multi-scale ratios and positional offset steps
+    ratios = (0.76, 0.80, 0.85, 0.89, 0.94)
+    step = max(2, int(min_dim * 0.035))
+    offsets = (-2 * step, -step, 0, step, 2 * step)
+
+    for ratio in ratios:
+        side = max(1, int(min_dim * ratio))
+        for dx in offsets:
+            for dy in offsets:
+                cx = (w - side) // 2 + dx
+                cy = (h - side) // 2 + dy
+                if cx < 0 or cy < 0 or cx + side > w or cy + side > h:
+                    continue
+                roi = gray.crop((cx, cy, cx + side, cy + side))
+                norm = roi.resize(TEMPLATE_SIZE, Image.Resampling.BILINEAR)
+                norm = ImageOps.equalize(norm).filter(ImageFilter.GaussianBlur(radius=1))
+                phash = _pil_block_hash(norm)
+                dhash = _pil_gradient_hash(norm)
+                cand_bits = bytes.fromhex(phash) + bytes.fromhex(dhash)
+                cand_int = int.from_bytes(cand_bits, "big")
+                xor = enrolled_bits_int ^ cand_int
+                sim = 1.0 - bin(xor).count("1") / 128.0
+                if sim > best_sim:
+                    best_sim = sim
+                    if best_sim >= 0.95:
+                        return best_sim
+
+    return best_sim
+
+
 # --------------------------------------------------------------------------- #
 # Key derivation & AES-128-EAX template encryption
 # --------------------------------------------------------------------------- #
@@ -317,15 +375,15 @@ def authenticate_user(username: str, password: str, image_bytes: bytes) -> AuthR
 
     # ---- Factor 2: optical facial recognition ----------------------------- #
     try:
-        probe = extract_biometric_features(image_bytes)
-    except BiometricError as exc:
-        return AuthResult(False, str(exc))
-    try:
         enrolled = decrypt_template(user["bio_template"], bio_key, username)
     except (ValueError, KeyError, TypeError):
         return AuthResult(False, "Facial biometric template failed AES-128-EAX authentication - possible database tampering!")
 
-    similarity = compare_templates(enrolled, probe)
+    try:
+        similarity = compare_face_image_to_template(image_bytes, enrolled)
+    except BiometricError as exc:
+        return AuthResult(False, str(exc))
+
     if similarity < MATCH_THRESHOLD:
         database.record_login_failure(username, MAX_FAILED_ATTEMPTS, LOCKOUT_SECONDS)
         return AuthResult(False, GENERIC_FAILURE, similarity=similarity)

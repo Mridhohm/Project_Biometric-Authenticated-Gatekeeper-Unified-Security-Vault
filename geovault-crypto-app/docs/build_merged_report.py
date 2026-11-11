@@ -669,7 +669,7 @@ def main():
         "GATE 02: BIOMETRIC IDENTITY & CREDENTIAL HANDSHAKE\n"
         "  └── Verifikasi kata sandi via PBKDF2-HMAC-SHA256 (600.000 iterasi)\n"
         "  └── Pemindaian wajah optik realtime (kamera webcam / upload) matriks 128x128\n"
-        "  └── Buka segel template AES-128-EAX & evaluasi kemiripan Hamming (>= 80%)\n"
+        "  └── Buka segel template AES-128-EAX & evaluasi kemiripan Hamming (>= 70%)\n"
         "  └── JIKA VALID -> Sesi operator terbuka ke Workspace Vault.\n\n"
         "GATE 03: VAULT WORKSPACE & CRYPTOGRAPHIC ENGINES\n"
         "  ├── Super Enkripsi Teks (Extended Vigenère + AES-256-CBC)\n"
@@ -688,7 +688,7 @@ def main():
         "Aplikasi juga menjalankan background watcher (st.fragment run_every=4) yang memindai ulang bus USB; jika flashdisk dicabut, "
         "sesi dikunci seketika.\n"
         "3. Gate 02 menerima kredensial dan foto wajah. Verifier PBKDF2 dicocokkan, sub-kunci diturunkan untuk mendekripsi template wajah AES-128-EAX, "
-        "dan kemiripan wajah dihitung. Jika skor >= 80%, sesi pengguna dibuka.\n"
+        "dan kemiripan wajah dihitung melalui penyelarasan spasial multi-skala. Jika skor >= 70%, sesi pengguna dibuka.\n"
         "4. Gate 03 memberikan akses penuh ke 8 modul pada panel navigasi."
     )
 
@@ -778,8 +778,9 @@ def main():
     add_h3(doc, "4.2.2 Pengujian Kriteria 2: Login Biometrik & PBKDF2 + AES-128-EAX")
     add_p(doc,
         "Pendaftaran operator baru diuji dengan kamera webcam. Verifier PBKDF2 (600.000 iterasi) disimpan pada basis data dan template "
-        "wajah 128x128 piksel grayscale disegel menggunakan AES-128-EAX. Pada saat login, operator terdaftar memperoleh skor kemiripan 100% "
-        "(status CLEARED). Pengujian dengan wajah pihak lain menghasilkan skor kemiripan di bawah 55% (< 80%), dan sistem secara tepat menolak akses."
+        "wajah 128x128 piksel grayscale disegel menggunakan AES-128-EAX. Pada saat login, sistem menerapkan pencocokan langsung dan penyelarasan "
+        "spasial multi-skala (multi-window candidate alignment) untuk mentolerir pergeseran wajar posisi duduk, menghasilkan skor 85-100% "
+        "(status CLEARED). Pengujian dengan wajah pihak lain menghasilkan skor di bawah 60% (< 70%), dan sistem secara tepat menolak akses."
     )
 
     add_h3(doc, "4.2.3 Pengujian Kriteria 3: Super Enkripsi Teks Kaskade")

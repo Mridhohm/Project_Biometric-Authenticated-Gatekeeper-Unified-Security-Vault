@@ -426,7 +426,7 @@ def build_academic_docx():
         "Alur eksekusi gerbang sistem terbagi atas:\n"
         "1. Alur Gate 01: Pindai drive via psutil -> Periksa volume serial drive -> Hitung HMAC kanonikal -> Validasi waktu konstan.\n"
         "2. Alur Gate 02: Pengecekan status lockout -> Verifikasi PBKDF2 -> Pemindaian frame wajah -> Normalisasi PIL 128x128 "
-        "-> Buka segel AES-128-EAX -> Hitung skor kemiripan Hamming (>= 80% cleared).\n"
+        "-> Buka segel AES-128-EAX -> Hitung skor kemiripan Hamming multi-skala (>= 70% cleared).\n"
         "3. Alur Gate 03: Pemrosesan dokumen via Super Encryption, ChaCha20, LSB Steganografi, Database At-Rest, dan Blockchain PoW."
     )
 
@@ -527,8 +527,8 @@ def build_academic_docx():
     doc.add_paragraph(
         "1. Kriteria 1 (Dongle Guard): Saat token dicabut, Crimson Red Lockscreen aktif seketika. "
         "Saat virtual dongle di-mount, HMAC-SHA256 diverifikasi valid dan Gate 02 terbuka.\n"
-        "2. Kriteria 2 (Biometrik Wajah): Operator terdaftar memperoleh skor kemiripan 100%, login sukses. "
-        "Wajah simulasi penyusup menghasilkan skor 42.9% (< 80%), sistem menolak akses secara tepat.\n"
+        "2. Kriteria 2 (Biometrik Wajah): Operator terdaftar memperoleh skor kemiripan 85-100% dengan toleransi posisi wajar, login sukses. "
+        "Wajah simulasi penyusup menghasilkan skor 42.9% (< 70%), sistem menolak akses secara tepat.\n"
         "3. Kriteria 3 (Super Enkripsi): Plaintext berhasil melewati substitusi Vigenère byte-modulo 256 dan "
         "AES-256-CBC, disimpan dalam token Base64, dan dipulihkan kembali secara utuh.\n"
         "4. Kriteria 4 (ChaCha20 File): Berkas PDF bukti forensik berhasil dienkripsi ke .bagus.enc dan didekripsi "

@@ -147,7 +147,18 @@ class TestBAGUSVaultCryptography(unittest.TestCase):
         self.assertIsNotNone(auth_ok.similarity)
         self.assertGreaterEqual(auth_ok.similarity, auth_biometric.MATCH_THRESHOLD)
 
-        # Autentikasi dengan wajah penyusup / tidak cocok (Harus Ditolak, similarity < 80%)
+        # Autentikasi dengan wajah asli yang bergeser posisi (Simulasi gerak wajar kepala 10px)
+        with Image.open(io.BytesIO(face_sample)) as img:
+            shifted = Image.new("L", (128, 128), color=30)
+            shifted.paste(img, (8, 6))
+            buf = io.BytesIO()
+            shifted.save(buf, format="PNG")
+            shifted_sample = buf.getvalue()
+        auth_shifted = auth_biometric.authenticate_user(username, passkey, shifted_sample)
+        self.assertTrue(auth_shifted.success, f"Shifted face failed: {auth_shifted.message}")
+        self.assertGreaterEqual(auth_shifted.similarity, auth_biometric.MATCH_THRESHOLD)
+
+        # Autentikasi dengan wajah penyusup / tidak cocok (Harus Ditolak, similarity < MATCH_THRESHOLD)
         intruder_face = auth_biometric.generate_optical_face_sample(username, seed_variant=888)
         auth_intruder = auth_biometric.authenticate_user(username, passkey, intruder_face)
         self.assertFalse(auth_intruder.success)
