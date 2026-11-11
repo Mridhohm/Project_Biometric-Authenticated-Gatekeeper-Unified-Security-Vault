@@ -109,6 +109,8 @@ def main():
     try:
         import webview
 
+        # Enable native SaveFileDialog downloads for st.download_button inside WebView2
+        webview.settings["ALLOW_DOWNLOADS"] = True
         print("[+] Membuka jendela Desktop Native (PyWebView 1340x860)...")
         webview.create_window(
             title="Krypt Vault // Forensic Security Suite",

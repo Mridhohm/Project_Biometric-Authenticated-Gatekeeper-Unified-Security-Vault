@@ -142,6 +142,8 @@ def main() -> None:
     try:
         import webview
 
+        # Enable native SaveFileDialog downloads for st.download_button inside WebView2
+        webview.settings["ALLOW_DOWNLOADS"] = True
         print("// [SYS] Opening native desktop viewport (1280x800)...")
         window = webview.create_window(
             title="Krypt Vault // Forensic Security Suite",

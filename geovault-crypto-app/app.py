@@ -98,6 +98,13 @@ def _format_bytes(num: int) -> str:
     return f"{num / (1024 * 1024):.2f} MB"
 
 
+def _safe_download_name(name: object, fallback: str = "vault_file.bin") -> str:
+    """Sanitize a filename for Windows SaveFileDialog and browser downloads."""
+    base = re.split(r"[\\/]+", str(name or ""))[-1]
+    cleaned = re.sub(r'[<>:"/\\|?*\x00-\x1f]+', "_", base).strip(" .")
+    return cleaned or fallback
+
+
 def _password_strength(pw: str) -> tuple[float, str, str]:
     if not pw:
         return 0.0, "warn", "Masukkan minimal 8 karakter dengan huruf dan angka."
@@ -811,7 +818,15 @@ def page_files(user: str) -> None:
                     ("Pratinjau Ciphertext", bundle.ciphertext[:32].hex() + "..."),
                 ])
                 st.write("")
-                st.download_button(f"Unduh {name}.krypt.enc", pkg, file_name=f"{name}.krypt.enc", type="primary")
+                st.download_button(
+                    f"Unduh {name}.krypt.enc",
+                    pkg,
+                    file_name=_safe_download_name(f"{name}.krypt.enc", "encrypted.krypt.enc"),
+                    mime="application/octet-stream",
+                    key="fe_dl",
+                    on_click="ignore",
+                    type="primary",
+                )
 
     with t_dec:
         enc = st.file_uploader("Unggah berkas .krypt.enc", type=["enc"], key="fd_up")
@@ -830,7 +845,15 @@ def page_files(user: str) -> None:
         if fd:
             plain, meta = fd
             st.success(f"Integritas SHA-256 terverifikasi: {meta['original_name']} ({_format_bytes(len(plain))}).")
-            st.download_button(f"Unduh {meta['original_name']}", plain, file_name=meta["original_name"], type="primary")
+            st.download_button(
+                f"Unduh {meta['original_name']}",
+                plain,
+                file_name=_safe_download_name(meta.get("original_name"), "decrypted_file.bin"),
+                mime=meta.get("mime_type") or "application/octet-stream",
+                key="fd_dl",
+                on_click="ignore",
+                type="primary",
+            )
 
     with t_vault:
         if not files:
@@ -869,9 +892,10 @@ def page_files(user: str) -> None:
                     st.download_button(
                         f"Unduh {f['original_name']}",
                         plain,
-                        file_name=f["original_name"],
+                        file_name=_safe_download_name(f.get("original_name"), "vault_file.bin"),
                         mime=f["mime_type"] or "application/octet-stream",
                         key=f"vdl{f['id']}",
+                        on_click="ignore",
                         type="primary",
                     )
 
@@ -931,7 +955,15 @@ def page_stego() -> None:
                 a, b = st.columns(2)
                 a.image(so[0], caption=f"Citra Asli ({_format_bytes(len(so[0]))})", use_container_width=True)
                 b.image(so[1], caption=f"Citra Stego PNG ({_format_bytes(len(so[1]))})", use_container_width=True)
-                st.download_button("Unduh Citra Stego (krypt_stego.png)", so[1], file_name="krypt_stego.png", mime="image/png", type="primary")
+                st.download_button(
+                    "Unduh Citra Stego (krypt_stego.png)",
+                    so[1],
+                    file_name="krypt_stego.png",
+                    mime="image/png",
+                    key="sg_dl",
+                    on_click="ignore",
+                    type="primary",
+                )
 
     with t_out:
         img = st.file_uploader("Unggah citra stego (PNG/BMP)", type=["png", "bmp"], key="sg_ext")
@@ -1036,7 +1068,15 @@ def page_ledger(user: str) -> None:
         ui.log("LEDGER", f"Verifikasi rantai: valid={report.valid}", level="OK" if report.valid else "CRIT")
         st.toast("Audit rantai selesai." if report.valid else "Temuan integritas terdeteksi!")
         st.rerun()
-    c3.download_button("Ekspor JSON", blockchain.export_chain_json(), file_name="krypt_ledger.json", use_container_width=True)
+    c3.download_button(
+        "Ekspor JSON",
+        blockchain.export_chain_json(),
+        file_name="krypt_ledger.json",
+        mime="application/json",
+        key="bc_dl",
+        on_click="ignore",
+        use_container_width=True,
+    )
 
     if not report.valid:
         for i in report.issues:
@@ -1169,7 +1209,15 @@ def page_logs() -> None:
         f"{r['time']} [{r['level']}] {r['subsys']} - {r['msg']}" + (f" (sha256:{r['digest']})" if r.get("digest") else "")
         for r in st.session_state.get("kv_logs", [])
     )
-    c3.download_button("Ekspor .txt", raw_txt or "-", file_name="krypt_vault_audit.txt", use_container_width=True)
+    c3.download_button(
+        "Ekspor .txt",
+        raw_txt or "-",
+        file_name="krypt_vault_audit.txt",
+        mime="text/plain",
+        key="log_dl",
+        on_click="ignore",
+        use_container_width=True,
+    )
     if c4.button("Bersihkan", use_container_width=True, key="log_clear"):
         st.session_state.kv_logs = []
         ui.log("SYSTEM", "Riwayat log dibersihkan oleh operator", level="INFO")
