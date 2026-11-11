@@ -59,10 +59,12 @@ if "custom_dongle_path" not in st.session_state:
     st.session_state.custom_dongle_path = ""
 if "last_logged_dongle_state" not in st.session_state:
     st.session_state.last_logged_dongle_state = None
+if "active_nav_tab" not in st.session_state:
+    st.session_state.active_nav_tab = "📊 Dashboard"
 
 
 # --------------------------------------------------------------------------- #
-# Top HUD Navigation & Gatekeeper Badges
+# Top HUD Navigation & Gatekeeper Badges (Used in Gate 01 & 02)
 # --------------------------------------------------------------------------- #
 def render_hud_topbar(current_step: int, dongle_mounted: bool = True) -> None:
     dongle_color = "#10B981" if dongle_mounted else "#EF4444"
@@ -75,18 +77,18 @@ def render_hud_topbar(current_step: int, dongle_mounted: bool = True) -> None:
             background: linear-gradient(135deg, #0F172A 0%, #111827 100%);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 14px;
-            padding: 18px 24px;
+            padding: 16px 22px;
             margin-bottom: 16px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            gap: 16px;
+            gap: 14px;
         ">
             <div>
-                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
-                    <span style="font-size: 1.5rem; font-weight: 800; color: #F8FAFC; letter-spacing: -0.02em;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 2px;">
+                    <span style="font-size: 1.4rem; font-weight: 800; color: #F8FAFC; letter-spacing: -0.02em;">
                         ⚡ KRYPT VAULT
                     </span>
                     <span style="
@@ -97,13 +99,11 @@ def render_hud_topbar(current_step: int, dongle_mounted: bool = True) -> None:
                         border-radius: 9999px;
                         font-size: 0.72rem;
                         font-weight: 700;
-                        letter-spacing: 0.05em;
-                    ">ENTERPRISE FORENSIC EDITION</span>
+                    ">FORENSIC SECURITY SUITE</span>
                 </div>
                 <div style="
                     color: #94A3B8;
-                    font-size: 0.82rem;
-                    font-weight: 500;
+                    font-size: 0.8rem;
                 ">Sistem Pengamanan Bukti Forensik Siber &amp; Dokumen Intelijen Strategis</div>
             </div>
             <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
@@ -111,22 +111,19 @@ def render_hud_topbar(current_step: int, dongle_mounted: bool = True) -> None:
                     background: {dongle_bg};
                     color: {dongle_color};
                     border: 1px solid {dongle_color};
-                    padding: 6px 14px;
+                    padding: 5px 12px;
                     border-radius: 9999px;
                     font-size: 0.78rem;
                     font-weight: 700;
-                    letter-spacing: 0.04em;
-                    white-space: nowrap;
                 ">{dongle_label}</span>
                 <span style="
                     background: rgba(14, 165, 233, 0.1);
                     color: #38BDF8;
                     border: 1px solid rgba(14, 165, 233, 0.25);
-                    padding: 6px 14px;
+                    padding: 5px 12px;
                     border-radius: 9999px;
                     font-size: 0.78rem;
                     font-weight: 600;
-                    white-space: nowrap;
                 ">CIPHER: AES-256 / CHACHA20 / SHA-256 / LSB</span>
             </div>
         </div>
@@ -144,11 +141,11 @@ def render_hud_topbar(current_step: int, dongle_mounted: bool = True) -> None:
         if num < current_step:
             border = "rgba(16, 185, 129, 0.5)"
             bg = "linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, #111827 100%)"
-            badge = "<span style='color:#10B981; font-weight:700;'>● ONLINE / CLEARED</span>"
+            badge = "<span style='color:#10B981; font-weight:700;'>● SELESAI / CLEARED</span>"
         elif num == current_step:
             border = "rgba(14, 165, 233, 0.8)"
             bg = "linear-gradient(135deg, rgba(14, 165, 233, 0.12) 0%, #111827 100%)"
-            badge = "<span style='color:#38BDF8; font-weight:700;'>⚡ AKTIF / VERIFIKASI</span>"
+            badge = "<span style='color:#38BDF8; font-weight:700;'>⚡ VERIFIKASI AKTIF</span>"
         else:
             border = "rgba(255, 255, 255, 0.06)"
             bg = "#0B0F19"
@@ -161,16 +158,15 @@ def render_hud_topbar(current_step: int, dongle_mounted: bool = True) -> None:
                     background: {bg};
                     border: 1px solid {border};
                     border-radius: 10px;
-                    padding: 12px 16px;
+                    padding: 10px 14px;
                     margin-bottom: 14px;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
                 ">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; font-size:11px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px; font-size:11px;">
                         <span style="color:#94A3B8; font-weight:700;">{tag}</span>
                         {badge}
                     </div>
-                    <div style="font-size:13px; color:#F8FAFC; font-weight:700; margin-bottom:2px;">{title}</div>
-                    <div style="font-size:11px; color:#64748B;">{desc}</div>
+                    <div style="font-size:12.5px; color:#F8FAFC; font-weight:700;">{title}</div>
+                    <div style="font-size:10.5px; color:#64748B;">{desc}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -182,125 +178,110 @@ def render_hud_topbar(current_step: int, dongle_mounted: bool = True) -> None:
 # --------------------------------------------------------------------------- #
 def render_dongle_lock_screen(status: dongle_guard.DongleStatus) -> None:
     render_hud_topbar(current_step=1, dongle_mounted=False)
-    ui_cyberpunk.render_dongle_breach_banner(
-        reason=status.message,
-        has_tamper_failure=bool(status.failures),
+
+    st.markdown(
+        """
+        <div style="
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, #111827 100%);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-left: 5px solid #EF4444;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        ">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <div style="font-size:1.25rem; font-weight:700; color:#EF4444; display:flex; align-items:center; gap:8px;">
+                    <span>🔒</span> GERBANG 1: PEMERIKSAAN KUNCI HARDWARE USB
+                </div>
+                <span style="
+                    background: rgba(239,68,68,0.18);
+                    color:#EF4444;
+                    border:1px solid rgba(239,68,68,0.4);
+                    padding:3px 12px;
+                    border-radius:9999px;
+                    font-size:0.75rem;
+                    font-weight:700;
+                ">SISTEM TERKUNCI</span>
+            </div>
+            <div style="color:#CBD5E1; font-size:0.92rem; line-height:1.5;">
+                Aplikasi <strong>Krypt Vault</strong> dilindungi oleh otentikasi perangkat keras fisik.
+                Pilih salah satu metode di bawah ini untuk membuka akses:
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
-    # 1. Real Physical USB Detection & Provisioning
-    st.markdown("### 🔌 PENDETEKSI & INISIALISASI HARDWARE KEY USB FISIK")
-    st.caption(
-        "Krypt Vault memerlukan flashdisk fisik sebagai kunci otorisasi. "
-        "Sistem membaca Volume Serial partisi fisik Windows dan menyematkan token `.krypt_dongle` ber-tanda tangan HMAC-SHA256."
-    )
+    col_demo, col_phys = st.columns([1, 1.2])
 
-    all_drives = dongle_guard.list_all_drives_for_provisioning()
-    usb_drives = [d for d in all_drives if d.get("is_usb")]
-
-    card_col1, card_col2 = st.columns([1.2, 1])
-
-    with card_col1:
-        st.markdown("#### 💾 Status Flashdisk Port USB")
-        if usb_drives:
-            st.success(f"🟢 **Terdeteksi {len(usb_drives)} Flashdisk USB di Komputer:**")
-            for u in usb_drives:
-                st.markdown(
-                    f"- **Drive `{u['drive']}`** ({u['type_name']}) — Serial: `{u['volume_serial']}`"
-                )
-
-            target_usb = st.selectbox(
-                "Pilih Flashdisk Untuk Diinisialisasi Sebagai Kunci Hardware",
-                [u["drive"] for u in usb_drives],
-                key="target_usb_select",
-            )
-            key_label = st.text_input(
-                "Label Kunci Hardware",
-                value="Analis Forensik Hardware Key",
-                key="usb_key_label_input",
-            )
-
-            if st.button("🔑 INISIALISASI FLASHDISK INI SEBAGAI HARDWARE KEY", type="primary", use_container_width=True):
-                ok, msg = dongle_guard.provision_drive(target_usb, label=key_label)
-                if ok:
-                    ui_cyberpunk.log_cli("DONGLE_GUARD", f"Physical USB provisioned at {target_usb}", level="OK")
-                    st.success(msg)
-                    st.rerun()
-                else:
-                    ui_cyberpunk.log_cli("DONGLE_GUARD", f"Provisioning failed: {msg}", level="CRIT")
-                    st.error(msg)
-        else:
-            st.warning("⚠️ **Tidak ada Flashdisk Removable USB yang terdeteksi.**")
-            st.markdown(
-                """
-                1. Tancapkan **Flashdisk USB fisik** apa saja ke port USB komputer Anda.
-                2. Tunggu beberapa detik hingga Windows mengenali drive flashdisk Anda.
-                3. Klik tombol **Pindai Ulang Port USB** di sebelah kanan.
-                """
-            )
-
-            # Allow provisioning any drive if user has an external drive or wants manual selection
-            with st.expander("🔍 Inisialisasi Drive Lain (Harddisk Eksternal / Partisi Khusus)"):
-                other_drives = [d["drive"] for d in all_drives]
-                if other_drives:
-                    manual_drive = st.selectbox("Pilih Drive", other_drives, key="manual_drive_select")
-                    if st.button(f"🔑 Buat Kunci di Drive {manual_drive}", key="btn_manual_prov"):
-                        ok, msg = dongle_guard.provision_drive(manual_drive, label="Custom Drive Key")
-                        if ok:
-                            ui_cyberpunk.log_cli("DONGLE_GUARD", f"Hardware key written to {manual_drive}", level="OK")
-                            st.success(msg)
-                            st.rerun()
-                        else:
-                            st.error(msg)
-
-    with card_col2:
-        st.markdown("#### ⚡ Aksi Kontrol & Pindai")
-        if st.button("🔄 PINDAI ULANG PORT USB (RE-SCAN)", type="primary", use_container_width=True):
-            ui_cyberpunk.log_cli("DONGLE_GUARD", "Manual USB bus re-scan requested by operator", level="INFO")
+    with col_demo:
+        st.markdown(
+            """
+            <div style="background:#131B2E; border:1px solid rgba(16,185,129,0.3); border-radius:12px; padding:18px; margin-bottom:12px;">
+                <div style="font-size:1.05rem; font-weight:700; color:#10B981; margin-bottom:6px;">
+                    🚀 OPSI A: MASUK CEPAT / MODE DEMO
+                </div>
+                <div style="color:#94A3B8; font-size:0.86rem; line-height:1.5;">
+                    Gunakan opsi ini jika Anda ingin langsung mendemonstrasikan atau menguji seluruh fitur brankas kriptografi tanpa harus mencari dan mencolokkan flashdisk fisik.
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("🟢 BUKA AKSES MODE DEMO (1-CLICK MASUK)", type="primary", use_container_width=True):
+            res = dongle_guard.mount_virtual_dongle(label="Demo Forensic Hardware Key")
+            ui_cyberpunk.log_cli("DONGLE_GUARD", f"Virtual dongle mounted: {res.path}", level="OK")
             st.session_state.last_logged_dongle_state = None
             st.rerun()
 
-        st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
-        with st.expander("🛠️ Mode Cadangan / Virtual Dongle (Pengujian Tanpa Flashdisk)"):
-            st.caption(
-                "Gunakan opsi ini jika Anda sedang tidak membawa flashdisk fisik saat presentasi/pengujian. "
-                "Fitur ini membuat folder token virtual lokal untuk mensimulasikan flashdisk."
+    with col_phys:
+        all_drives = dongle_guard.list_all_drives_for_provisioning()
+        usb_drives = [d for d in all_drives if d.get("is_usb")]
+
+        st.markdown(
+            """
+            <div style="background:#131B2E; border:1px solid rgba(14,165,233,0.3); border-radius:12px; padding:18px; margin-bottom:12px;">
+                <div style="font-size:1.05rem; font-weight:700; color:#38BDF8; margin-bottom:6px;">
+                    🔌 OPSI B: FLASHDISK USB FISIK (OTORISASI NYATA)
+                </div>
+                <div style="color:#94A3B8; font-size:0.86rem; line-height:1.5;">
+                    Tancapkan flashdisk USB fisik Anda ke port laptop. Sistem akan mengunci nomor seri fisik partisi Windows dengan tanda tangan HMAC-SHA256.
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+
+        if usb_drives:
+            st.success(f"🟢 Terdeteksi {len(usb_drives)} Flashdisk USB di port komputer:")
+            for u in usb_drives:
+                st.markdown(f"- **Drive `{u['drive']}`** ({u['type_name']}) — Serial: `{u['volume_serial']}`")
+
+            target_usb = st.selectbox(
+                "Pilih Flashdisk Untuk Diinisialisasi Sebagai Kunci",
+                [u["drive"] for u in usb_drives],
+                key="target_usb_sel",
             )
-            v_mounted = dongle_guard.is_virtual_dongle_mounted()
-            if v_mounted:
-                st.success("🟢 VIRTUAL DONGLE: **TERPASANG (MOUNTED)**")
-                if st.button("🔴 CABUT VIRTUAL DONGLE (KUNCI SISTEM)", use_container_width=True):
-                    dongle_guard.unmount_virtual_dongle()
-                    ui_cyberpunk.log_cli("DONGLE_GUARD", "Virtual dongle unmounted", level="WARN")
-                    st.session_state.last_logged_dongle_state = None
+            lbl = st.text_input("Label Kunci Hardware", value="Analis Forensik Hardware Key", key="usb_lbl_input")
+            if st.button("🔑 INISIALISASI FLASHDISK INI SEBAGAI HARDWARE KEY", use_container_width=True):
+                ok, msg = dongle_guard.provision_drive(target_usb, label=lbl)
+                if ok:
+                    ui_cyberpunk.log_cli("DONGLE_GUARD", f"Physical USB provisioned: {target_usb}", level="OK")
+                    st.success(msg)
                     st.rerun()
-            else:
-                st.info("🔴 VIRTUAL DONGLE: **TIDAK AKTIF**")
-                if st.button("🟢 PASANG VIRTUAL DONGLE (BUKA SISTEM)", use_container_width=True):
-                    res = dongle_guard.mount_virtual_dongle(label="Virtual Forensic Hardware Key")
-                    ui_cyberpunk.log_cli("DONGLE_GUARD", f"Virtual dongle mounted: {res.path}", level="OK")
-                    st.session_state.last_logged_dongle_state = None
-                    st.rerun()
+                else:
+                    st.error(msg)
+        else:
+            st.info("⚠️ Belum ada flashdisk USB removable yang terpasang.")
+            st.caption("Colokkan flashdisk Anda ke port USB laptop, lalu klik tombol Pindai Ulang di bawah.")
 
-    # Telemetry Table
-    st.markdown("#### 📡 Telemetri Port Penyimpanan Sistem")
-    diagnostics = dongle_guard.get_usb_diagnostics()
-    if diagnostics:
-        cols_hdr = st.columns([1.2, 1.8, 1.2, 1.8, 2.5])
-        cols_hdr[0].markdown("**DRIVE**")
-        cols_hdr[1].markdown("**TIPE PERANGKAT**")
-        cols_hdr[2].markdown("**VOL SERIAL**")
-        cols_hdr[3].markdown("**FILE TOKEN**")
-        cols_hdr[4].markdown("**STATUS HMAC-SHA256**")
+        if st.button("🔄 PINDAI ULANG PORT USB (RE-SCAN)", use_container_width=True):
+            ui_cyberpunk.log_cli("DONGLE_GUARD", "Re-scanning USB ports", level="INFO")
+            st.session_state.last_logged_dongle_state = None
+            st.rerun()
 
-        for d in diagnostics:
-            c1, c2, c3, c4, c5 = st.columns([1.2, 1.8, 1.2, 1.8, 2.5])
-            c1.code(d["mount"])
-            c2.write(f"`{d['type']}`")
-            c3.write(f"`{d['volume_serial']}`")
-            c4.write(f"`{d['token_file']}`")
-            c5.markdown(f"<span style='color:{d['status_color']};font-weight:600;'>{d['hmac_challenge']}</span>", unsafe_allow_html=True)
-
-    ui_cyberpunk.render_cli_console("GATE_01 // HARDWARE DONGLE INTERCEPT TELEMETRY")
+    with st.expander("💻 Log Telemetri Kriptografi & Terminal TTY", expanded=False):
+        ui_cyberpunk.render_cli_console("GATE_01 // HARDWARE DONGLE INTERCEPT TELEMETRY")
 
 
 # --------------------------------------------------------------------------- #
@@ -373,7 +354,7 @@ def render_auth_screen(dongle: dongle_guard.DongleStatus) -> None:
             background: #111827;
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 10px;
-            padding: 10px 18px;
+            padding: 12px 18px;
             margin-bottom: 16px;
             display: flex;
             flex-wrap: wrap;
@@ -395,7 +376,7 @@ def render_auth_screen(dongle: dongle_guard.DongleStatus) -> None:
     ])
 
     with tab_login:
-        st.info("💡 **Akun Default Pengujian**: Username: `analyst_01` | Passkey: `KryptVault2026!` (atau daftarkan akun baru pada tab [02] Registrasi)")
+        st.info("💡 **Akun Default Pengujian**: Username: `analyst_01` | Passkey: `KryptVault2026!` (Siap langsung digunakan)")
         c1, c2 = st.columns([1, 1])
         with c1:
             st.markdown("#### FAKTOR 01 // KREDENSIAL PBKDF2-SHA256")
@@ -415,45 +396,54 @@ def render_auth_screen(dongle: dongle_guard.DongleStatus) -> None:
             if scan_mode == "Unggah Citra Wajah (.PNG / .JPG)":
                 uploaded_face = st.file_uploader("Pilih Berkas Foto Wajah", type=["png", "jpg", "jpeg"], key="face_upload_login")
 
-        if st.button("⚡ OTORISASI AKSES OPERATOR (VERIFIKASI 2FA)", type="primary", use_container_width=True):
-            if not login_user or not login_pw:
-                st.warning("Masukkan Operator Identifier dan Passkey sebelum inisialisasi.")
-            else:
-                user_norm = login_user.strip().lower()
-                with st.spinner("MEMVERIFIKASI KREDENSIAL PBKDF2 & DEKRIPSI VEKTOR BIOMETRIK AES-128-EAX..."):
-                    if uploaded_face is not None:
-                        face_bytes = uploaded_face.getvalue()
-                    else:
-                        face_bytes = _capture_optical_face_auto(user_norm, simulate_mismatch=sim_mismatch)
-                    img_digest = ui_cyberpunk.sha256_hex(face_bytes)
-
-                    ui_cyberpunk.log_cli(
-                        "FACE_AUTH",
-                        f"Optical scan captured ({len(face_bytes)} B) — Unsealing AES-128-EAX template for '{user_norm}'",
-                        digest=img_digest,
-                        level="INFO",
-                    )
-                    res = auth_biometric.authenticate_user(user_norm, login_pw, face_bytes)
-
-                if res.success:
-                    ui_cyberpunk.log_cli(
-                        "FACE_AUTH",
-                        f"Optical face verification GRANTED for '{res.username}' (similarity={res.similarity:.1%})",
-                        digest=img_digest,
-                        level="OK",
-                    )
-                    st.session_state.authenticated_user = res.username
-                    st.session_state.auth_similarity = res.similarity
-                    st.rerun()
+        c_submit, c_back = st.columns([3, 1])
+        with c_submit:
+            if st.button("⚡ OTORISASI AKSES OPERATOR (VERIFIKASI 2FA)", type="primary", use_container_width=True):
+                if not login_user or not login_pw:
+                    st.warning("Masukkan Operator Identifier dan Passkey sebelum inisialisasi.")
                 else:
-                    sim_txt = f" (Skor Kemiripan: {res.similarity:.1%})" if res.similarity is not None else ""
-                    ui_cyberpunk.log_cli(
-                        "FACE_AUTH",
-                        f"Optical verification REJECTED for '{user_norm}': {res.message}{sim_txt}",
-                        digest=img_digest,
-                        level="CRIT",
-                    )
-                    st.error(f"❌ {res.message}{sim_txt}")
+                    user_norm = login_user.strip().lower()
+                    with st.spinner("MEMVERIFIKASI KREDENSIAL PBKDF2 & DEKRIPSI VEKTOR BIOMETRIK AES-128-EAX..."):
+                        if uploaded_face is not None:
+                            face_bytes = uploaded_face.getvalue()
+                        else:
+                            face_bytes = _capture_optical_face_auto(user_norm, simulate_mismatch=sim_mismatch)
+                        img_digest = ui_cyberpunk.sha256_hex(face_bytes)
+
+                        ui_cyberpunk.log_cli(
+                            "FACE_AUTH",
+                            f"Optical scan captured ({len(face_bytes)} B) — Unsealing AES-128-EAX template for '{user_norm}'",
+                            digest=img_digest,
+                            level="INFO",
+                        )
+                        res = auth_biometric.authenticate_user(user_norm, login_pw, face_bytes)
+
+                    if res.success:
+                        ui_cyberpunk.log_cli(
+                            "FACE_AUTH",
+                            f"Optical face verification GRANTED for '{res.username}' (similarity={res.similarity:.1%})",
+                            digest=img_digest,
+                            level="OK",
+                        )
+                        st.session_state.authenticated_user = res.username
+                        st.session_state.auth_similarity = res.similarity
+                        st.session_state.active_nav_tab = "📊 Dashboard"
+                        st.rerun()
+                    else:
+                        sim_txt = f" (Skor Kemiripan: {res.similarity:.1%})" if res.similarity is not None else ""
+                        ui_cyberpunk.log_cli(
+                            "FACE_AUTH",
+                            f"Optical verification REJECTED for '{user_norm}': {res.message}{sim_txt}",
+                            digest=img_digest,
+                            level="CRIT",
+                        )
+                        st.error(f"❌ {res.message}{sim_txt}")
+
+        with c_back:
+            if st.button("⬅️ Ganti Kunci USB", use_container_width=True):
+                dongle_guard.unmount_virtual_dongle()
+                st.session_state.last_logged_dongle_state = None
+                st.rerun()
 
     with tab_register:
         c1, c2 = st.columns([1, 1])
@@ -501,53 +491,310 @@ def render_auth_screen(dongle: dongle_guard.DongleStatus) -> None:
                     ui_cyberpunk.log_cli("FACE_AUTH", f"Enrollment error: {res.message}", digest=img_digest, level="WARN")
                     st.error(f"❌ {res.message}")
 
-    ui_cyberpunk.render_cli_console("GATE_02 // OPTICAL BIOMETRIC & PBKDF2-SHA256 TELEMETRY STREAM")
+    with st.expander("💻 Log Telemetri Kriptografi & Terminal TTY", expanded=False):
+        ui_cyberpunk.render_cli_console("GATE_02 // OPTICAL BIOMETRIC & PBKDF2-SHA256 TELEMETRY STREAM")
 
 
 # --------------------------------------------------------------------------- #
-# TAB 00: Overview & Cryptographic Architecture Telemetry
+# Top Persistent App Header (Authenticated Mode)
 # --------------------------------------------------------------------------- #
-def render_overview_tab(username: str, dongle: dongle_guard.DongleStatus) -> None:
+def render_app_header(username: str, dongle: dongle_guard.DongleStatus) -> None:
+    mount_info = dongle.path or "USB Key"
+    if len(mount_info) > 30:
+        mount_info = "..." + mount_info[-25:]
+
+    st.markdown(
+        f"""
+        <div style="
+            background: linear-gradient(135deg, #0F172A 0%, #111827 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 14px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+        ">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span style="font-size: 1.4rem; font-weight: 800; color: #F8FAFC; letter-spacing: -0.02em;">
+                    ⚡ KRYPT VAULT
+                </span>
+                <span style="
+                    background: rgba(14, 165, 233, 0.15);
+                    color: #38BDF8;
+                    border: 1px solid rgba(14, 165, 233, 0.3);
+                    padding: 2px 10px;
+                    border-radius: 9999px;
+                    font-size: 0.72rem;
+                    font-weight: 700;
+                ">FORENSIC SECURITY SUITE</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+                <span style="
+                    background: rgba(16, 185, 129, 0.12);
+                    color: #10B981;
+                    border: 1px solid rgba(16, 185, 129, 0.35);
+                    padding: 5px 12px;
+                    border-radius: 9999px;
+                    font-size: 0.78rem;
+                    font-weight: 600;
+                ">🔑 {html.escape(dongle.label or 'Hardware Key')} ({html.escape(mount_info)})</span>
+                <span style="
+                    background: rgba(56, 189, 248, 0.12);
+                    color: #38BDF8;
+                    border: 1px solid rgba(56, 189, 248, 0.35);
+                    padding: 5px 12px;
+                    border-radius: 9999px;
+                    font-size: 0.78rem;
+                    font-weight: 600;
+                ">👤 {username.upper()}</span>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# --------------------------------------------------------------------------- #
+# TAB 00: Interactive Dashboard Hub
+# --------------------------------------------------------------------------- #
+def render_dashboard_hub(username: str, dongle: dongle_guard.DongleStatus) -> None:
     blockchain.ensure_genesis()
     stats = database.get_user_stats(username)
     report = blockchain.verify_chain()
 
-    st.subheader("📡 KRYPT VAULT // ARSITEKTUR KEAMANAN & TELEMETRI KRIPTOGRAFIS")
+    # 4 Top Telemetry Metrics
     m1, m2, m3, m4 = st.columns(4)
-    m1.metric("CHAIN_OF_CUSTODY_BLOCKS", stats["ledger_blocks"])
-    m2.metric("LEDGER_INTEGRITY", "VALID_OK" if report.valid else "TAMPER_DETECTED!")
-    m3.metric("INTEL_DISPATCHES (SUPER_ENC)", stats["secret_messages"])
-    m4.metric("EVIDENCE_FILES (CHACHA20)", stats["encrypted_files"])
+    m1.metric("⛓️ BLOK BLOCKCHAIN", stats["ledger_blocks"], help="Total blok bukti digital pada SQLite ledger")
+    m2.metric("🛡️ INTEGRITAS LEDGER", "VALID (100%)" if report.valid else "TERKOMPROMI!", help="Status verifikasi hash SHA-256 dan Proof-of-Work")
+    m3.metric("📝 LAPORAN SUPER ENKRIPSI", stats["secret_messages"], help="Jumlah dokumen teks dengan proteksi Vigenère + AES-256")
+    m4.metric("📁 BERKAS BUKTI CHACHA20", stats["encrypted_files"], help="Jumlah berkas terenkripsi mandiri .krypt.enc")
 
     if not report.valid:
         st.error(
-            f"🚨 **[PERINGATAN INTEGRITAS LEDGER]** Terdeteksi {len(report.issues)} anomali pada SQLite blockchain! "
-            "Buka tab **[05] CHAIN OF CUSTODY LEDGER** untuk audit blok terkompromi."
+            f"🚨 **[PERINGATAN INTEGRITAS LEDGER]** Terdeteksi {len(report.issues)} pelanggaran hash pada blockchain! "
+            "Klik kartu **Blockchain Ledger** di bawah untuk melakukan audit detail."
         )
+
+    st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+    st.markdown("### 🎛️ PUSAT NAVIGASI & KONTROL BUKTI KRIPTOGRAFI")
+    st.caption("Pilih modul di bawah ini untuk mengakses fungsionalitas enkripsi, steganografi, dan audit:")
+
+    # Row 1: 3 Cards
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        st.markdown(
+            """
+            <div class="kv-feature-card">
+                <div>
+                    <div class="kv-card-icon">📝</div>
+                    <div class="kv-card-title">Super Enkripsi Teks</div>
+                    <div class="kv-card-badge">KLASIK + MODERN</div>
+                    <div class="kv-card-desc">
+                        Dua lapis proteksi: Substitusi Polialfabetik Extended Vigenère Cipher dilapisi AES-256-CBC dengan random IV &amp; PKCS#7 padding.
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("🚀 Buka Modul Teks", key="btn_open_super_enc", use_container_width=True, type="primary"):
+            st.session_state.active_nav_tab = "📝 Super Enkripsi Teks"
+            st.rerun()
+
+    with c2:
+        st.markdown(
+            """
+            <div class="kv-feature-card">
+                <div>
+                    <div class="kv-card-icon">📁</div>
+                    <div class="kv-card-title">Enkripsi Berkas Dokumen</div>
+                    <div class="kv-card-badge">CHACHA20 STREAM CIPHER</div>
+                    <div class="kv-card-desc">
+                        Enkripsi biner berkecepatan tinggi untuk dokumen (PDF, DOCX, ZIP) menggunakan ChaCha20 dan dibungkus menjadi paket mandiri .krypt.enc.
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("🚀 Buka Modul Berkas", key="btn_open_file_crypto", use_container_width=True, type="primary"):
+            st.session_state.active_nav_tab = "📁 Enkripsi Berkas (ChaCha20)"
+            st.rerun()
+
+    with c3:
+        st.markdown(
+            """
+            <div class="kv-feature-card">
+                <div>
+                    <div class="kv-card-icon">🖼️</div>
+                    <div class="kv-card-title">Steganografi Citra</div>
+                    <div class="kv-card-badge">LSB PNG LOSSLESS</div>
+                    <div class="kv-card-desc">
+                        Penyisipan dan ekstraksi pesan atau koordinat rahasia secara kasat mata ke dalam Least Significant Bit (LSB) channel RGB citra PNG.
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("🚀 Buka Steganografi", key="btn_open_stego", use_container_width=True, type="primary"):
+            st.session_state.active_nav_tab = "🖼️ Steganografi Citra (LSB)"
+            st.rerun()
+
+    st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+
+    # Row 2: 3 Cards
+    c4, c5, c6 = st.columns(3)
+    with c4:
+        st.markdown(
+            """
+            <div class="kv-feature-card">
+                <div>
+                    <div class="kv-card-icon">🔍</div>
+                    <div class="kv-card-title">Inspeksi Basis Data SQLite</div>
+                    <div class="kv-card-badge">AT-REST ENCRYPTION</div>
+                    <div class="kv-card-desc">
+                        Audit forensik independen: membuktikan bahwa seluruh data sensitif tersimpan dalam format Ciphertext saat at-rest di storage/vault.db.
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("🚀 Buka Inspeksi Database", key="btn_open_db_inspect", use_container_width=True, type="primary"):
+            st.session_state.active_nav_tab = "🔍 Inspeksi Database SQLite"
+            st.rerun()
+
+    with c5:
+        st.markdown(
+            """
+            <div class="kv-feature-card">
+                <div>
+                    <div class="kv-card-icon">⛓️</div>
+                    <div class="kv-card-title">Blockchain Chain-of-Custody</div>
+                    <div class="kv-card-badge">SHA-256 POW + AES-GCM</div>
+                    <div class="kv-card-desc">
+                        Buku besar bukti digital tidak dapat diubah (Immutable Ledger) dengan penambangan Proof-of-Work SHA-256 (prefix '00') &amp; segel AES-256-GCM.
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("🚀 Buka Blockchain Ledger", key="btn_open_blockchain", use_container_width=True, type="primary"):
+            st.session_state.active_nav_tab = "⛓️ Blockchain Ledger (PoW)"
+            st.rerun()
+
+    with c6:
+        st.markdown(
+            """
+            <div class="kv-feature-card">
+                <div>
+                    <div class="kv-card-icon">🔑</div>
+                    <div class="kv-card-title">Hardware Dongle USB</div>
+                    <div class="kv-card-badge">HMAC-SHA256 TOKEN</div>
+                    <div class="kv-card-desc">
+                        Manajemen flashdisk USB otorisasi, penandatanganan token HMAC-SHA256, pengikatan Volume Serial fisik Windows, dan status gatekeeper.
+                    </div>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+        if st.button("🚀 Kelola Kunci USB", key="btn_open_dongle_mgr", use_container_width=True, type="primary"):
+            st.session_state.active_nav_tab = "🔑 Pengaturan Kunci USB"
+            st.rerun()
+
+    # Spesifikasi Ringkas Modul
+    st.markdown("<div style='height: 18px;'></div>", unsafe_allow_html=True)
+    with st.expander("🛡️ Tabel Pemetaan 7 Kriteria Kriptografi Pak Bagus (UPN 'Veteran' Yogyakarta)"):
+        st.markdown(
+            """
+            | No | Kriteria Tugas Akhir | Implementasi Teknis Krypt Vault | Algoritma Utama |
+            | :--- | :--- | :--- | :--- |
+            | **1** | **Login Biometric & Dongle Hardware** | Sistem terkunci total hingga USB fisik ber-token HMAC-SHA256 terdeteksi | `HMAC-SHA256` + Win32 Volume Serial |
+            | **2** | **Login Menggunakan Algoritma Kriptografi** | Autentikasi 2FA: Kredensial PBKDF2 (600k iter) + Vektor Wajah 128x128 disegel AES-128-EAX | `PBKDF2-HMAC-SHA256` + `AES-128-EAX` |
+            | **3** | **Super Enkripsi Teks (Klasik + Modern)** | Enkripsi pesan berjenjang: Lapisan 1 Vigenère Cipher $\\rightarrow$ Lapisan 2 AES-256-CBC | `Extended Vigenère` + `AES-256-CBC` |
+            | **4** | **Enkripsi File (Beda dari Teks)** | Aliran biner file dokumen/arsip dikunci dengan stream cipher kecepatan tinggi | `ChaCha20 Stream` (256-bit key) |
+            | **5** | **Enkripsi Basis Data (At-Rest)** | Seluruh kolom sensitif SQLite `vault.db` tersimpan dalam format ciphertext saat di disk | `Ciphertext At-Rest` + Dual-View Audit |
+            | **6** | **Steganografi Citra** | Menyisipkan pesan ke bit terkecil RGB citra PNG lossless dengan delimiter `<<<END>>>` | `LSB (Least Significant Bit)` |
+            | **7** | **Blockchain Sederhana Aset Penting** | Rantai blok ledger bukti digital dengan Proof-of-Work & segel AES-256-GCM | `SHA-256 PoW ('00')` + `AES-256-GCM` |
+            """
+        )
+
+
+# --------------------------------------------------------------------------- #
+# TAB 06: Hardware Dongle Settings & Telemetry
+# --------------------------------------------------------------------------- #
+def render_usb_settings_tab(dongle: dongle_guard.DongleStatus) -> None:
+    st.subheader("🔑 PENGATURAN & TELEMETRI KUNCI HARDWARE DONGLE USB")
+    st.caption(
+        "Krypt Vault menggunakan tanda tangan digital HMAC-SHA256 yang diikat dengan nomor seri fisik partisi Windows. "
+        "Pada halaman ini Anda dapat memeriksa status kunci, memformat flashdisk USB baru, atau mengaktifkan mode simulasi."
+    )
+
+    all_drives = dongle_guard.list_all_drives_for_provisioning()
+    usb_drives = [d for d in all_drives if d.get("is_usb")]
 
     c1, c2 = st.columns(2)
     with c1:
-        st.markdown("#### 🔑 HARDWARE_DONGLE // HMAC-SHA256 TOKEN SPECIFICATION")
+        st.markdown("#### 💾 Status Kunci Aktif Saat Ini")
         st.json({
-            "product": "Krypt Vault Forensic Edition",
             "dongle_label": dongle.label,
             "dongle_id": dongle.dongle_id,
             "mount_path": dongle.path,
-            "volume_serial": dongle.volume_serial or "VIRTUAL_UNBOUND",
+            "volume_serial": dongle.volume_serial or "UNBOUND_VIRTUAL",
             "auth_algorithm": "HMAC-SHA256 (HKDF domain: dongle/hmac-sha256)",
-            "anti_cloning_protection": "Volume Serial Binding Active",
+            "anti_cloning_protection": "Volume Serial Hardware Binding",
         })
+
     with c2:
-        st.markdown("#### 🛡️ SPESIFIKASI 7 MODUL KRIPTOGRAFI KRYPT VAULT")
-        st.markdown(
-            "- **[01] Hardware Dongle**: Token `.geovault_dongle` / `.cyberdeck_dongle` + `HMAC-SHA256`\n"
-            "- **[02] Optical Face 2FA**: `PBKDF2-HMAC-SHA256` (600k iter) + `PIL 128x128 SHA-256` + `AES-128-EAX`\n"
-            "- **[03] Laporan Intelijen**: Super Enkripsi Dua Lapis `Vigenère Cipher` + `AES-256-CBC (PKCS#7)`\n"
-            "- **[04] Berkas Barang Bukti**: Enkripsi Stream Cipher `ChaCha20` + Self-Contained `.bagus.enc` Envelope\n"
-            "- **[05] Citra Steganografi**: Least Significant Bit (`LSB`) Lossless PNG + Delimiter `<<<END>>>`\n"
-            "- **[06] Inspeksi Basis Data**: Komparasi Side-by-Side SQLite At-Rest vs Decrypted View\n"
-            "- **[07] Chain of Custody Ledger**: `SHA-256 Proof-of-Work ('00')` + `AES-256-GCM` + `HMAC Tip Anchor`"
-        )
+        st.markdown("#### ⚡ Kontrol Kunci & Pengujian")
+        if st.button("🔄 Pindai Ulang Port USB", type="primary", use_container_width=True):
+            ui_cyberpunk.log_cli("DONGLE_GUARD", "Manual re-scan requested by operator", level="INFO")
+            st.session_state.last_logged_dongle_state = None
+            st.rerun()
+
+        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+        v_mounted = dongle_guard.is_virtual_dongle_mounted()
+        if v_mounted:
+            st.success("🟢 Mode Kunci: **VIRTUAL DONGLE (TERPASANG)**")
+            if st.button("🔴 Cabut Kunci Virtual (Simulasikan USB Dicabut)", use_container_width=True):
+                dongle_guard.unmount_virtual_dongle()
+                ui_cyberpunk.log_cli("DONGLE_GUARD", "Virtual dongle hot-unplugged", level="CRIT")
+                st.session_state.last_logged_dongle_state = None
+                st.rerun()
+        else:
+            st.info("ℹ️ Mode Kunci: **FLASHDISK FISIK / DRIVE PORT**")
+            if st.button("🟢 Pasang Kunci Virtual Tambahan", use_container_width=True):
+                dongle_guard.mount_virtual_dongle()
+                ui_cyberpunk.log_cli("DONGLE_GUARD", "Virtual dongle mounted", level="OK")
+                st.session_state.last_logged_dongle_state = None
+                st.rerun()
+
+    st.markdown("---")
+    st.markdown("#### 🔌 Inisialisasi Flashdisk USB Fisik Baru")
+    if usb_drives:
+        st.success(f"Terdeteksi {len(usb_drives)} Flashdisk Removable USB:")
+        for u in usb_drives:
+            st.markdown(f"- **Drive `{u['drive']}`** ({u['type_name']}) — Volume Serial: `{u['volume_serial']}`")
+
+        target_usb = st.selectbox("Pilih Drive USB", [u["drive"] for u in usb_drives], key="prov_usb_sel")
+        lbl = st.text_input("Label Kunci", value="Analis Forensik Hardware Key", key="prov_lbl_in")
+        if st.button("🔑 Inisialisasi Token HMAC-SHA256 Pada Flashdisk Ini", type="primary"):
+            ok, msg = dongle_guard.provision_drive(target_usb, label=lbl)
+            if ok:
+                st.success(msg)
+                ui_cyberpunk.log_cli("DONGLE_GUARD", f"Provisioned {target_usb}", level="OK")
+                st.rerun()
+            else:
+                st.error(msg)
+    else:
+        st.info("Tidak ada flashdisk USB removable yang terpasang saat ini.")
 
 
 # --------------------------------------------------------------------------- #
@@ -1153,7 +1400,7 @@ def render_blockchain_tab(username: str) -> None:
 
 
 # --------------------------------------------------------------------------- #
-# Main Router
+# Main Router & Unified Top Navigation
 # --------------------------------------------------------------------------- #
 def main() -> None:
     extra = [st.session_state.custom_dongle_path] if st.session_state.custom_dongle_path else None
@@ -1173,7 +1420,7 @@ def main() -> None:
         else:
             ui_cyberpunk.log_cli(
                 "DONGLE_GUARD",
-                f"CRITICAL_SECURITY_HALT: {dongle_status.message}",
+                f"SECURITY_HALT: {dongle_status.message}",
                 digest=ui_cyberpunk.sha256_hex(dongle_status.message),
                 level="CRIT",
             )
@@ -1191,56 +1438,96 @@ def main() -> None:
 
     # GATE 03: Authenticated Vault Core
     username = st.session_state.authenticated_user
-    with st.sidebar:
-        st.markdown("## ⚡ Krypt Vault")
-        st.caption("FORENSIC & INTELLIGENCE EVIDENCE VAULT")
-        st.success(f"👤 ANALYST: **{username.upper()}**")
-        if st.session_state.auth_similarity is not None:
-            st.caption(f"🧬 FACE_MATCH: **{st.session_state.auth_similarity:.1%}** (`AES-128-EAX`)")
-        st.caption(f"🔑 DONGLE: **{dongle_status.label}**")
-        st.divider()
 
-        menu = st.radio(
-            "NAVIGASI SUBSISTEM FORENSIK",
-            [
-                "📡 [00] RINGKASAN SISTEM & TELEMETRI",
-                "📝 [01] LAPORAN INTELIJEN (Super Enkripsi Teks)",
-                "📁 [02] BERKAS BARANG BUKTI (Enkripsi File ChaCha20)",
-                "🖼️ [03] CITRA FORENSIK STEGANOGRAFI (LSB PNG)",
-                "🔍 [04] INSPEKSI BASIS DATA (Encrypted SQLite At-Rest)",
-                "⛓️ [05] CHAIN OF CUSTODY LEDGER (PoW Blockchain)",
-            ],
+    # Render Executive Header
+    render_app_header(username, dongle_status)
+
+    NAV_OPTIONS = [
+        "📊 Dashboard",
+        "📝 Super Enkripsi Teks",
+        "📁 Enkripsi Berkas (ChaCha20)",
+        "🖼️ Steganografi Citra (LSB)",
+        "🔍 Inspeksi Database SQLite",
+        "⛓️ Blockchain Ledger (PoW)",
+        "🔑 Pengaturan Kunci USB",
+    ]
+
+    current_tab = st.session_state.get("active_nav_tab", NAV_OPTIONS[0])
+    if current_tab not in NAV_OPTIONS:
+        current_tab = NAV_OPTIONS[0]
+
+    # Clean Horizontal Navigation Bar
+    c_nav, c_lock = st.columns([5.5, 1.2])
+    with c_nav:
+        selected_tab = st.pills(
+            "Navigasi Modul",
+            options=NAV_OPTIONS,
+            default=current_tab,
+            label_visibility="collapsed",
+            key="pills_nav_tab",
         )
+        if selected_tab and selected_tab != current_tab:
+            st.session_state.active_nav_tab = selected_tab
+            st.rerun()
+
+    with c_lock:
+        if st.button("🚪 Kunci Sesi", use_container_width=True, help="Kunci sesi vault dan keluar"):
+            ui_cyberpunk.log_cli("KERNEL", f"Analyst '{username}' locked Krypt Vault session", level="WARN")
+            st.session_state.authenticated_user = None
+            st.session_state.auth_similarity = None
+            st.rerun()
+
+    # Back to Dashboard button on sub-screens
+    if current_tab != "📊 Dashboard":
+        c_back, _ = st.columns([2, 5])
+        with c_back:
+            if st.button("⬅️ Kembali ke Dashboard Utama", key="btn_back_to_dash_sub"):
+                st.session_state.active_nav_tab = "📊 Dashboard"
+                st.rerun()
+        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+
+    # Optional Clean Sidebar for quick overview
+    with st.sidebar:
+        st.markdown("### ⚡ Krypt Vault")
+        st.caption("FORENSIC SECURITY SUITE")
+        st.success(f"👤 ANALIS: **{username.upper()}**")
+        if st.session_state.auth_similarity is not None:
+            st.caption(f"🧬 KECOCOKAN WAJAH: **{st.session_state.auth_similarity:.1%}** (`AES-128-EAX`)")
+        st.caption(f"🔑 HARDWARE KEY: **{dongle_status.label}**")
         st.divider()
-        c_flush, c_exit = st.columns(2)
-        with c_flush:
-            if st.button("🧹 BERSIHKAN TTY", use_container_width=True):
-                st.session_state.cli_logs = []
-                ui_cyberpunk.log_cli("KERNEL", "Console buffer flushed by analyst", level="INFO")
-                st.rerun()
-        with c_exit:
-            if st.button("🚪 KUNCI VAULT", use_container_width=True):
-                ui_cyberpunk.log_cli("KERNEL", f"Analyst '{username}' locked Krypt Vault session", level="WARN")
-                st.session_state.authenticated_user = None
-                st.session_state.auth_similarity = None
+
+        st.markdown("#### 🚀 Lompat Cepat")
+        for opt in NAV_OPTIONS:
+            if st.button(opt, key=f"sidebar_btn_{opt}", use_container_width=True):
+                st.session_state.active_nav_tab = opt
                 st.rerun()
 
-    render_hud_topbar(current_step=3, dongle_mounted=True)
+        st.divider()
+        if st.button("🧹 Bersihkan Buffer Log", use_container_width=True):
+            st.session_state.cli_logs = []
+            ui_cyberpunk.log_cli("KERNEL", "Console buffer flushed", level="INFO")
+            st.rerun()
 
-    if menu.startswith("📡"):
-        render_overview_tab(username, dongle_status)
-    elif menu.startswith("📝"):
+    # Route screen content based on active tab
+    if current_tab == "📊 Dashboard":
+        render_dashboard_hub(username, dongle_status)
+    elif current_tab == "📝 Super Enkripsi Teks":
         render_super_encryption_tab(username)
-    elif menu.startswith("📁"):
+    elif current_tab == "📁 Enkripsi Berkas (ChaCha20)":
         render_file_crypto_tab(username)
-    elif menu.startswith("🖼️"):
+    elif current_tab == "🖼️ Steganografi Citra (LSB)":
         render_steganography_tab()
-    elif menu.startswith("🔍"):
+    elif current_tab == "🔍 Inspeksi Database SQLite":
         render_database_inspection_tab(username)
-    elif menu.startswith("⛓️"):
+    elif current_tab == "⛓️ Blockchain Ledger (PoW)":
         render_blockchain_tab(username)
+    elif current_tab == "🔑 Pengaturan Kunci USB":
+        render_usb_settings_tab(dongle_status)
 
-    ui_cyberpunk.render_cli_console("GATE_03 // KRYPT VAULT CRYPTOGRAPHIC OPERATIONS LOG")
+    # Bottom Collapsible TTY Telemetry Log
+    st.markdown("<div style='height: 24px;'></div>", unsafe_allow_html=True)
+    with st.expander("💻 Log Telemetri Kriptografi & Terminal TTY (Event Realtime)", expanded=False):
+        ui_cyberpunk.render_cli_console("GATE_03 // KRYPT VAULT TELEMETRY LOG")
 
 
 if __name__ == "__main__":

@@ -277,6 +277,91 @@ def inject_cyberpunk_css() -> None:
             color: #38BDF8;
             border: 1px solid rgba(14, 165, 233, 0.35);
         }
+
+        /* Modern Horizontal Navigation Pills */
+        [data-testid="stPills"] {
+            background-color: #0E1424 !important;
+            padding: 6px 8px !important;
+            border-radius: 12px !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            gap: 6px !important;
+            margin-bottom: 22px !important;
+        }
+
+        [data-testid="stPills"] button {
+            background: transparent !important;
+            color: #94A3B8 !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-size: 0.88rem !important;
+            padding: 7px 18px !important;
+            transition: all 0.2s ease !important;
+            border: 1px solid transparent !important;
+        }
+
+        [data-testid="stPills"] button:hover {
+            color: #F8FAFC !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        [data-testid="stPills"] button[aria-selected="true"] {
+            background: #0284C7 !important;
+            color: #FFFFFF !important;
+            box-shadow: 0 2px 12px rgba(14, 165, 233, 0.4) !important;
+            border-color: #38BDF8 !important;
+        }
+
+        /* Feature Dashboard Cards */
+        .kv-feature-card {
+            background: linear-gradient(135deg, #111827 0%, #162032 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 20px 22px;
+            margin-bottom: 16px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .kv-feature-card:hover {
+            border-color: rgba(14, 165, 233, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(14, 165, 233, 0.15);
+        }
+
+        .kv-card-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .kv-card-title {
+            font-size: 1.12rem;
+            font-weight: 700;
+            color: #F8FAFC;
+            margin-bottom: 6px;
+        }
+
+        .kv-card-desc {
+            color: #94A3B8;
+            font-size: 0.86rem;
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .kv-card-badge {
+            background: rgba(14, 165, 233, 0.15);
+            color: #38BDF8;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 10px;
+            border: 1px solid rgba(14, 165, 233, 0.3);
+        }
         </style>
         """,
         unsafe_allow_html=True,
