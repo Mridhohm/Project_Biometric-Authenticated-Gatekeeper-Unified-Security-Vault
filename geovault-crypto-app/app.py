@@ -16,10 +16,12 @@ Alur aplikasi:
 
 from __future__ import annotations
 
+import hashlib
 import html
 import json
 import re
 import secrets
+import time
 from typing import Optional
 
 import streamlit as st
@@ -50,8 +52,12 @@ for _k, _v in {
     "dongle_sig": None,
     "pnp_usb_serial": None,
     "last_auth_sim": None,
+    "last_auth_msg": None,
     "last_usb_snapshot": None,
     "li_last_auto_id": None,
+    "li_bad_cred_sig": None,
+    "li_cred_seen_sig": None,
+    "li_last_log_ts": 0.0,
 }.items():
     st.session_state.setdefault(_k, _v)
 
@@ -119,21 +125,40 @@ def _clear_identity_session(*, drop_user: bool = True) -> None:
     """Clear volatile identity state and cached live face snapshots."""
     if drop_user:
         st.session_state.user = None
+    st.session_state.last_auth_sim = None
+    st.session_state.last_auth_msg = None
     st.session_state.li_last_auto_id = None
+    st.session_state.li_bad_cred_sig = None
+    st.session_state.li_cred_seen_sig = None
+    st.session_state.li_last_log_ts = 0.0
     face_scanner.clear_live_cache("li")
     face_scanner.clear_live_cache("rg")
 
 
-def _capture_face(key: str) -> tuple[Optional[bytes], Optional[str]]:
-    """Acquire face image via live HUD scanner or uploaded file."""
-    mode = st.segmented_control(
+def _capture_face(
+    key: str,
+    *,
+    mode: str = "login",
+    ready: bool = True,
+    similarity: Optional[float] = None,
+    status_note: str = "",
+) -> tuple[Optional[bytes], Optional[str]]:
+    """Acquire face image via continuous live HUD scanner or uploaded file."""
+    source_mode = st.segmented_control(
         "Sumber citra wajah",
         ["Pindai Live", "Unggah foto"],
         default="Pindai Live",
         key=f"{key}_mode",
     ) or "Pindai Live"
-    if mode == "Pindai Live":
-        return face_scanner.render_live_face_scanner(key)
+    if source_mode == "Pindai Live":
+        return face_scanner.render_live_face_scanner(
+            key,
+            mode=mode,
+            ready=ready,
+            similarity=similarity,
+            status_note=status_note,
+            threshold=auth_biometric.MATCH_THRESHOLD,
+        )
     face_scanner.clear_live_cache(key)
     up = st.file_uploader("Foto wajah (PNG/JPG)", type=["png", "jpg", "jpeg"], key=f"{key}_up")
     return (up.getvalue() if up else None), None
@@ -376,17 +401,48 @@ def screen_identity(status: dongle_guard.DongleStatus) -> None:
     st.write("")
     tab_in, tab_up = st.tabs(["Masuk Operator", "Daftarkan Operator Baru"])
 
-    def _verify_operator_login(username: str, password: str, face_bytes: bytes) -> None:
+    def _verify_operator_login(
+        username: str,
+        password: str,
+        face_bytes: bytes,
+        *,
+        silent_fail: bool = False,
+        cred_sig: Optional[str] = None,
+    ) -> None:
+        digest = ui.sha256_hex(face_bytes)
+        if silent_fail:
+            res = auth_biometric.authenticate_user(username.strip().lower(), password, face_bytes)
+            if res.success:
+                _clear_identity_session(drop_user=False)
+                ui.log("AUTH", f"Login berhasil: {res.username} (kemiripan {res.similarity:.1%})", digest, "OK")
+                st.session_state.user = res.username
+                st.session_state.similarity = res.similarity
+                st.session_state.page = "Ringkasan"
+                st.toast(f"Selamat datang, {res.username}. Vault terbuka.")
+                st.rerun()
+            st.session_state.last_auth_sim = res.similarity
+            if res.similarity is None:
+                st.session_state.last_auth_msg = res.message
+                if cred_sig:
+                    st.session_state.li_bad_cred_sig = cred_sig
+            else:
+                st.session_state.last_auth_msg = (
+                    f"Kemiripan {res.similarity:.1%} (minimum {auth_biometric.MATCH_THRESHOLD:.0%})"
+                )
+                st.session_state.li_bad_cred_sig = None
+            now_ts = time.monotonic()
+            if now_ts - float(st.session_state.get("li_last_log_ts") or 0.0) >= 4.0:
+                ui.log("AUTH", f"Login ditolak untuk {username}: {res.message}", digest, "CRIT")
+                st.session_state.li_last_log_ts = now_ts
+            st.rerun()
+
         with st.status("Memverifikasi dua faktor autentikasi...", expanded=True) as st_box:
             st.write("Menghitung PBKDF2-HMAC-SHA256 (600.000 iterasi)...")
             res = auth_biometric.authenticate_user(username.strip().lower(), password, face_bytes)
-            digest = ui.sha256_hex(face_bytes)
             if res.success:
                 st.write("Mendekripsi template AES-128-EAX & mencocokkan wajah...")
                 st_box.update(label="Autentikasi berhasil", state="complete", expanded=False)
-                st.session_state.last_auth_sim = None
-                st.session_state.li_last_auto_id = None
-                face_scanner.clear_live_cache("li")
+                _clear_identity_session(drop_user=False)
                 ui.log("AUTH", f"Login berhasil: {res.username} (kemiripan {res.similarity:.1%})", digest, "OK")
                 st.session_state.user = res.username
                 st.session_state.similarity = res.similarity
@@ -396,7 +452,10 @@ def screen_identity(status: dongle_guard.DongleStatus) -> None:
             else:
                 st_box.update(label="Verifikasi ditolak", state="error", expanded=False)
                 st.session_state.last_auth_sim = res.similarity
+                st.session_state.last_auth_msg = res.message
+                st.session_state.li_bad_cred_sig = cred_sig if (res.similarity is None and cred_sig) else None
                 ui.log("AUTH", f"Login ditolak untuk {username}: {res.message}", digest, "CRIT")
+                st.session_state.li_last_log_ts = time.monotonic()
                 sim_note = (
                     f" (Kemiripan wajah: {res.similarity:.1%}, minimum {auth_biometric.MATCH_THRESHOLD:.0%})"
                     if res.similarity is not None
@@ -413,39 +472,61 @@ def screen_identity(status: dongle_guard.DongleStatus) -> None:
                 st.markdown("### Faktor 1 — Kredensial")
                 user = st.text_input("Nama pengguna", key="li_user", placeholder="contoh: analis_01")
                 pw = st.text_input("Kata sandi", type="password", key="li_pw", placeholder="Masukkan kata sandi")
+                cred_sig = (
+                    hashlib.sha256(f"{user.strip().lower()}\x00{pw}".encode("utf-8")).hexdigest()[:16]
+                    if (user and pw)
+                    else None
+                )
+                if cred_sig != st.session_state.get("li_cred_seen_sig"):
+                    st.session_state.li_cred_seen_sig = cred_sig
+                    st.session_state.li_bad_cred_sig = None
+                    st.session_state.last_auth_msg = None
+                    st.session_state.last_auth_sim = None
+
                 if st.session_state.get("last_auth_sim") is not None:
                     sim_val = float(st.session_state.last_auth_sim)
                     ui.meter(
-                        "Skor Kemiripan Wajah Terakhir",
+                        "Skor Kemiripan Wajah Live",
                         sim_val * 100.0,
                         threshold_pct=auth_biometric.MATCH_THRESHOLD * 100.0,
                         kind="ok" if sim_val >= auth_biometric.MATCH_THRESHOLD else "bad",
                         subtitle=f"Ambang batas sistem: {auth_biometric.MATCH_THRESHOLD:.0%} (garis penanda)",
                     )
+                elif st.session_state.get("last_auth_msg") and cred_sig == st.session_state.get("li_bad_cred_sig"):
+                    st.error(st.session_state.last_auth_msg)
         with c2:
             with st.container(border=True):
                 st.markdown("### Faktor 2 — Biometrik Wajah")
-                face, capture_id = _capture_face("li")
+                face, capture_id = _capture_face(
+                    "li",
+                    mode="login",
+                    ready=bool(user and pw),
+                    similarity=st.session_state.get("last_auth_sim"),
+                    status_note=st.session_state.get("last_auth_msg") or "",
+                )
                 st.caption(
-                    f"Posisikan wajah di bingkai oval untuk pemindaian otomatis, atau unggah foto (ambang batas: "
-                    f"{auth_biometric.MATCH_THRESHOLD:.0%})."
+                    f"Isi nama pengguna & kata sandi (tekan Enter), lalu hadapkan wajah — pemindai memverifikasi secara "
+                    f"live tanpa membekukan kamera (ambang batas: {auth_biometric.MATCH_THRESHOLD:.0%})."
                 )
 
+        is_manual_hud = bool(capture_id and capture_id.startswith("m-"))
+        cred_blocked = bool(cred_sig and st.session_state.get("li_bad_cred_sig") == cred_sig)
         auto_triggered = bool(
             capture_id
             and face
             and user
             and pw
             and capture_id != st.session_state.get("li_last_auto_id")
+            and (is_manual_hud or not cred_blocked)
         )
         if auto_triggered:
             st.session_state.li_last_auto_id = capture_id
-            _verify_operator_login(user, pw, face)
+            _verify_operator_login(user, pw, face, silent_fail=not is_manual_hud, cred_sig=cred_sig)
         elif st.button("Verifikasi dan Masuk ke Vault", type="primary", use_container_width=True, key="li_submit"):
             if not (user and pw and face):
                 st.warning("Lengkapi nama pengguna, kata sandi, dan citra wajah terlebih dahulu.")
             else:
-                _verify_operator_login(user, pw, face)
+                _verify_operator_login(user, pw, face, silent_fail=False, cred_sig=cred_sig)
 
     with tab_up:
         c1, c2 = st.columns([1, 1.15], gap="large")
@@ -460,8 +541,8 @@ def screen_identity(status: dongle_guard.DongleStatus) -> None:
         with c2:
             with st.container(border=True):
                 st.markdown("### Pendaftaran Template Wajah")
-                rface, _ = _capture_face("rg")
-                st.caption("Pastikan pencahayaan merata dan wajah berada di tengah bingkai pemindai/foto.")
+                rface, _ = _capture_face("rg", mode="register", ready=True)
+                st.caption("Kamera tetap live; sampel optimal dikunci otomatis atau klik Kunci Sampel pada HUD.")
 
         if st.button("Daftarkan Operator", type="primary", use_container_width=True, key="rg_submit"):
             if rp != rp2:
