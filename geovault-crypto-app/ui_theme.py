@@ -1,9 +1,10 @@
 """
-Krypt Vault - Modern Minimalist Presentation Layer
-================================================
-Combines clean minimalist ergonomics with a refined modern Obsidian/Slate
-dark security aesthetic (plus an instant Light Mode toggle), crisp SVG icons,
-interactive status meters, cipher pipeline visualizers, and telemetry logs.
+Krypt Vault - Cyberpunk 2077 Minimalist HUD Presentation Layer
+=============================================================
+Pairs minimalist, easy-to-navigate layout ergonomics with an authentic
+Cyberpunk 2077 HUD palette (#06070C void, #FCEE0A active yellow, #00F0FF
+electric cyan frames, #FF2A4B crimson telemetry, #00FF9D matrix green),
+segmented HUD meters, chamfered geometric accents, and a clean Light Mode toggle.
 """
 
 from __future__ import annotations
@@ -48,39 +49,60 @@ def icon(name: str, size: int = 16) -> str:
 
 THEMES: dict[str, dict[str, str]] = {
     "dark": {
-        "canvas": "#090D16",
-        "canvas_glow": "radial-gradient(ellipse 85% 42% at 50% -12%, rgba(56, 189, 248, 0.12), transparent 72%)",
-        "paper": "#111827",
-        "paper_2": "#172033",
-        "input_bg": "#0B1120",
-        "ink": "#F1F5F9",
-        "ink_2": "#CBD5E1",
-        "muted": "#94A3B8",
-        "line": "#1E293B",
-        "line_2": "#334155",
-        "accent": "#38BDF8",
-        "accent_soft": "rgba(56, 189, 248, 0.13)",
-        "accent_border": "rgba(56, 189, 248, 0.36)",
-        "btn_primary": "linear-gradient(135deg, #0EA5E9 0%, #2563EB 100%)",
-        "btn_primary_hover": "linear-gradient(135deg, #38BDF8 0%, #1D4ED8 100%)",
-        "mark_bg": "linear-gradient(135deg, #0EA5E9 0%, #2563EB 100%)",
-        "mark_fg": "#FFFFFF",
-        "ok": "#34D399",
-        "ok_soft": "rgba(16, 185, 129, 0.14)",
-        "ok_border": "rgba(52, 211, 153, 0.34)",
-        "bad": "#F87171",
-        "bad_soft": "rgba(239, 68, 68, 0.14)",
-        "bad_border": "rgba(248, 113, 113, 0.34)",
-        "warn": "#FBBF24",
-        "warn_soft": "rgba(245, 158, 11, 0.14)",
-        "warn_border": "rgba(251, 191, 36, 0.34)",
-        "log_bg": "#060911",
+        "canvas": "#06070C",
+        "canvas_bg_img": (
+            "radial-gradient(ellipse 85% 42% at 50% -10%, rgba(0, 240, 255, 0.085), transparent 70%), "
+            "radial-gradient(ellipse 55% 35% at 95% 15%, rgba(255, 42, 75, 0.06), transparent 65%), "
+            "linear-gradient(rgba(0, 240, 255, 0.025) 1px, transparent 1px), "
+            "linear-gradient(90deg, rgba(0, 240, 255, 0.025) 1px, transparent 1px)"
+        ),
+        "canvas_bg_size": "auto, auto, 28px 28px, 28px 28px",
+        "paper": "#0C0F19",
+        "paper_2": "#121728",
+        "input_bg": "#080A12",
+        "ink": "#EDF4FC",
+        "ink_2": "#B8C7DB",
+        "muted": "#7A8CA8",
+        "line": "#1B283C",
+        "line_2": "#25445E",
+        "accent": "#00F0FF",
+        "accent_soft": "rgba(0, 240, 255, 0.11)",
+        "accent_border": "rgba(0, 240, 255, 0.40)",
+        "hi": "#FCEE0A",
+        "hi_soft": "rgba(252, 238, 10, 0.11)",
+        "hi_border": "rgba(252, 238, 10, 0.45)",
+        "btn_primary": "linear-gradient(135deg, #FCEE0A 0%, #E5C100 100%)",
+        "btn_primary_fg": "#06070C",
+        "btn_primary_hover": "linear-gradient(135deg, #00F0FF 0%, #0EA5E9 100%)",
+        "btn_primary_hover_fg": "#06070C",
+        "btn_clip": "polygon(0 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%)",
+        "card_radius": "2px 10px 2px 10px",
+        "mark_bg": "#FCEE0A",
+        "mark_fg": "#06070C",
+        "ok": "#00FF9D",
+        "ok_soft": "rgba(0, 255, 157, 0.11)",
+        "ok_border": "rgba(0, 255, 157, 0.36)",
+        "bad": "#FF2A4B",
+        "bad_soft": "rgba(255, 42, 75, 0.13)",
+        "bad_border": "rgba(255, 42, 75, 0.42)",
+        "warn": "#FCEE0A",
+        "warn_soft": "rgba(252, 238, 10, 0.11)",
+        "warn_border": "rgba(252, 238, 10, 0.36)",
+        "nav_active_bg": "rgba(252, 238, 10, 0.10)",
+        "nav_active_fg": "#FCEE0A",
+        "nav_active_border": "rgba(252, 238, 10, 0.40)",
+        "nav_active_bar": "#FCEE0A",
+        "step_active_bg": "rgba(0, 240, 255, 0.08)",
+        "step_active_bar": "#FCEE0A",
+        "step_active_fg": "#00F0FF",
+        "log_bg": "#05070C",
         "log_fg": "#CBD5E1",
-        "shadow": "0 8px 28px rgba(2, 6, 23, 0.45)",
+        "shadow": "0 8px 26px rgba(0, 0, 0, 0.55)",
     },
     "light": {
         "canvas": "#F6F7F9",
-        "canvas_glow": "none",
+        "canvas_bg_img": "none",
+        "canvas_bg_size": "auto",
         "paper": "#FFFFFF",
         "paper_2": "#F8FAFC",
         "input_bg": "#FFFFFF",
@@ -92,8 +114,15 @@ THEMES: dict[str, dict[str, str]] = {
         "accent": "#1D4ED8",
         "accent_soft": "#EEF2FF",
         "accent_border": "#C7D2FE",
+        "hi": "#1D4ED8",
+        "hi_soft": "#EEF2FF",
+        "hi_border": "#C7D2FE",
         "btn_primary": "linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)",
+        "btn_primary_fg": "#FFFFFF",
         "btn_primary_hover": "linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)",
+        "btn_primary_hover_fg": "#FFFFFF",
+        "btn_clip": "none",
+        "card_radius": "10px",
         "mark_bg": "#0F172A",
         "mark_fg": "#FFFFFF",
         "ok": "#047857",
@@ -105,6 +134,13 @@ THEMES: dict[str, dict[str, str]] = {
         "warn": "#B45309",
         "warn_soft": "#FFFBEB",
         "warn_border": "#FDE68A",
+        "nav_active_bg": "#EEF2FF",
+        "nav_active_fg": "#1D4ED8",
+        "nav_active_border": "#C7D2FE",
+        "nav_active_bar": "#1D4ED8",
+        "step_active_bg": "#EEF2FF",
+        "step_active_bar": "#1D4ED8",
+        "step_active_fg": "#1D4ED8",
         "log_bg": "#0B1220",
         "log_fg": "#CBD5E1",
         "shadow": "0 4px 16px rgba(15, 23, 42, 0.05)",
@@ -127,7 +163,7 @@ def _build_css(mode: str) -> str:
     t = THEMES[mode]
     return f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 :root {{
   --canvas: {t['canvas']};
@@ -142,6 +178,9 @@ def _build_css(mode: str) -> str:
   --accent: {t['accent']};
   --accent-soft: {t['accent_soft']};
   --accent-border: {t['accent_border']};
+  --hi: {t['hi']};
+  --hi-soft: {t['hi_soft']};
+  --hi-border: {t['hi_border']};
   --ok: {t['ok']};
   --ok-soft: {t['ok_soft']};
   --ok-border: {t['ok_border']};
@@ -159,7 +198,8 @@ html, body, [class*="css"], .stApp, p, label, input, textarea, button, div {{
 
 .stApp {{
   background-color: var(--canvas);
-  background-image: {t['canvas_glow']};
+  background-image: {t['canvas_bg_img']};
+  background-size: {t['canvas_bg_size']};
   color: var(--ink);
 }}
 
@@ -182,7 +222,7 @@ header[data-testid="stHeader"] {{
 }}
 
 .block-container {{
-  padding-top: 1.25rem;
+  padding-top: 1.2rem;
   padding-bottom: 3rem;
   max-width: 1200px;
 }}
@@ -190,8 +230,8 @@ header[data-testid="stHeader"] {{
 /* Custom thin scrollbars */
 ::-webkit-scrollbar {{ width: 7px; height: 7px; }}
 ::-webkit-scrollbar-track {{ background: var(--canvas); }}
-::-webkit-scrollbar-thumb {{ background: var(--line-2); border-radius: 999px; }}
-::-webkit-scrollbar-thumb:hover {{ background: var(--muted); }}
+::-webkit-scrollbar-thumb {{ background: var(--line-2); border-radius: 3px; }}
+::-webkit-scrollbar-thumb:hover {{ background: var(--accent); }}
 
 /* Sidebar shell */
 section[data-testid="stSidebar"] {{
@@ -199,14 +239,14 @@ section[data-testid="stSidebar"] {{
   border-right: 1px solid var(--line) !important;
 }}
 section[data-testid="stSidebar"] .block-container {{
-  padding-top: 1.25rem;
+  padding-top: 1.2rem;
 }}
 section[data-testid="stSidebar"] div[role="radiogroup"] {{
-  gap: 4px;
+  gap: 5px;
 }}
 section[data-testid="stSidebar"] div[role="radiogroup"] label {{
   padding: 9px 12px;
-  border-radius: 8px;
+  border-radius: 4px;
   margin: 0;
   width: 100%;
   color: var(--ink-2);
@@ -217,57 +257,65 @@ section[data-testid="stSidebar"] div[role="radiogroup"] label {{
 }}
 section[data-testid="stSidebar"] div[role="radiogroup"] label p {{
   color: inherit !important;
+  font-family: 'Chakra Petch', 'Plus Jakarta Sans', sans-serif !important;
+  letter-spacing: 0.02em;
 }}
 section[data-testid="stSidebar"] div[role="radiogroup"] label:hover {{
-  background: var(--paper-2);
-  color: var(--ink);
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  color: var(--accent);
 }}
 section[data-testid="stSidebar"] div[role="radiogroup"] label > div:first-child {{
   display: none;
 }}
 section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {{
-  background: var(--accent-soft);
-  color: var(--accent);
-  border-color: var(--accent-border);
-  font-weight: 600;
+  background: {t['nav_active_bg']};
+  color: {t['nav_active_fg']};
+  border-color: {t['nav_active_border']};
+  box-shadow: inset 3px 0 0 {t['nav_active_bar']};
+  font-weight: 700;
 }}
 
 /* Typography */
 h1, h2, h3, h4 {{
+  font-family: 'Chakra Petch', 'Plus Jakarta Sans', sans-serif !important;
   color: var(--ink) !important;
-  letter-spacing: -0.015em;
-  font-weight: 600;
+  letter-spacing: 0.01em;
+  font-weight: 700;
 }}
-h1 {{ font-size: 1.55rem; }}
-h2 {{ font-size: 1.22rem; }}
-h3 {{ font-size: 1.02rem; }}
+h1 {{ font-size: 1.6rem; }}
+h2 {{ font-size: 1.25rem; }}
+h3 {{ font-size: 1.05rem; }}
 .stCaption, [data-testid="stCaptionContainer"] p {{
   color: var(--muted) !important;
 }}
 
-/* Cards */
+/* HUD Cards */
 div[data-testid="stVerticalBlockBorderWrapper"]:has(> div > div[data-testid="stVerticalBlock"]) {{
   background: var(--paper);
   border: 1px solid var(--line) !important;
-  border-radius: 12px;
+  border-radius: {t['card_radius']};
   box-shadow: {t['shadow']};
-  transition: border-color 180ms ease, transform 180ms ease;
+  transition: border-color 180ms ease;
 }}
 div[data-testid="stVerticalBlockBorderWrapper"]:has(> div > div[data-testid="stVerticalBlock"]):hover {{
-  border-color: var(--line-2) !important;
+  border-color: var(--accent-border) !important;
 }}
 
 /* Buttons */
 .stButton > button, .stDownloadButton > button, .stFormSubmitButton > button,
 div[data-testid="stPopover"] > button {{
-  border-radius: 8px;
-  font-weight: 500;
+  border-radius: 4px;
+  clip-path: {t['btn_clip']};
+  font-family: 'Chakra Petch', 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
   font-size: 0.88rem;
+  letter-spacing: 0.02em;
   border: 1px solid var(--line-2);
   background: var(--paper-2);
   color: var(--ink);
   box-shadow: none;
-  padding: 0.45rem 0.95rem;
+  padding: 0.48rem 1rem;
   transition: border-color 150ms ease, background 150ms ease, transform 120ms ease, color 150ms ease;
 }}
 .stButton > button:hover, .stDownloadButton > button:hover, .stFormSubmitButton > button:hover,
@@ -282,19 +330,23 @@ div[data-testid="stPopover"] > button:hover {{
 .stButton > button[kind="primary"], .stFormSubmitButton > button[kind="primary"],
 .stDownloadButton > button[kind="primary"] {{
   background: {t['btn_primary']};
-  color: #FFFFFF !important;
+  color: {t['btn_primary_fg']} !important;
   border: 1px solid transparent;
-  font-weight: 600;
+  font-weight: 700;
 }}
 .stButton > button[kind="primary"] p, .stFormSubmitButton > button[kind="primary"] p,
 .stDownloadButton > button[kind="primary"] p {{
-  color: #FFFFFF !important;
+  color: {t['btn_primary_fg']} !important;
 }}
 .stButton > button[kind="primary"]:hover, .stFormSubmitButton > button[kind="primary"]:hover,
 .stDownloadButton > button[kind="primary"]:hover {{
   background: {t['btn_primary_hover']};
+  color: {t['btn_primary_hover_fg']} !important;
   border-color: transparent;
-  color: #FFFFFF !important;
+}}
+.stButton > button[kind="primary"]:hover p, .stFormSubmitButton > button[kind="primary"]:hover p,
+.stDownloadButton > button[kind="primary"]:hover p {{
+  color: {t['btn_primary_hover_fg']} !important;
 }}
 
 /* Form Inputs, Selects, Uploaders, Modals, Popovers */
@@ -304,7 +356,12 @@ div[data-baseweb="select"] > div {{
   background: var(--input-bg) !important;
   border-color: var(--line-2) !important;
   color: var(--ink) !important;
-  border-radius: 8px !important;
+  border-radius: 4px !important;
+}}
+div[data-baseweb="input"] > div:focus-within,
+div[data-baseweb="textarea"] > div:focus-within,
+div[data-baseweb="select"] > div:focus-within {{
+  border-color: var(--accent) !important;
 }}
 input, textarea {{
   color: var(--ink) !important;
@@ -316,8 +373,8 @@ ul[role="listbox"],
 div[role="dialog"] > div {{
   background: var(--paper) !important;
   color: var(--ink) !important;
-  border: 1px solid var(--line-2) !important;
-  border-radius: 12px !important;
+  border: 1px solid var(--accent-border) !important;
+  border-radius: 6px !important;
 }}
 li[role="option"] {{
   color: var(--ink) !important;
@@ -328,7 +385,7 @@ li[role="option"]:hover {{
 section[data-testid="stFileUploadDropzone"] {{
   background: var(--input-bg) !important;
   border: 1px dashed var(--line-2) !important;
-  border-radius: 10px !important;
+  border-radius: 6px !important;
 }}
 section[data-testid="stFileUploadDropzone"]:hover {{
   border-color: var(--accent) !important;
@@ -336,17 +393,23 @@ section[data-testid="stFileUploadDropzone"]:hover {{
 div[data-testid="stExpander"] {{
   background: var(--paper) !important;
   border: 1px solid var(--line) !important;
-  border-radius: 10px !important;
+  border-radius: 6px !important;
 }}
 
-/* Segmented controls & Tabs */
+/* Cyberpunk HUD Tabs */
 button[data-baseweb="tab"] {{
-  font-weight: 500;
+  font-family: 'Chakra Petch', 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 600;
+  letter-spacing: 0.03em;
   color: var(--muted) !important;
 }}
 button[data-baseweb="tab"][aria-selected="true"] {{
-  color: var(--accent) !important;
-  font-weight: 600;
+  color: var(--hi) !important;
+  font-weight: 700;
+}}
+div[data-testid="stTabs"] [data-baseweb="tab-highlight"] {{
+  background-color: var(--hi) !important;
+  height: 3px !important;
 }}
 div[data-testid="stTabs"] [data-baseweb="tab-border"] {{
   background-color: var(--line) !important;
@@ -362,19 +425,22 @@ pre, code {{
 div[data-testid="stMetric"] {{
   background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 15px 18px;
+  border-top: 2px solid var(--accent-border);
+  border-radius: {t['card_radius']};
+  padding: 14px 18px;
   box-shadow: {t['shadow']};
 }}
 div[data-testid="stMetricLabel"] p {{
+  font-family: 'Chakra Petch', sans-serif !important;
   color: var(--muted) !important;
   font-size: 0.74rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
 }}
 div[data-testid="stMetricValue"] {{
-  font-size: 1.65rem;
+  font-family: 'Chakra Petch', sans-serif !important;
+  font-size: 1.7rem;
   font-weight: 700;
   color: var(--ink) !important;
 }}
@@ -382,16 +448,17 @@ div[data-testid="stMetricValue"] {{
 /* Animations */
 @keyframes kv-pulse {{
   0%, 100% {{ opacity: 1; transform: scale(1); }}
-  50% {{ opacity: 0.45; transform: scale(0.86); }}
+  50% {{ opacity: 0.42; transform: scale(0.84); }}
 }}
 .kv-dot {{
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 999px;
   display: inline-block;
   margin-right: 6px;
   background: currentColor;
-  animation: kv-pulse 2s infinite ease-in-out;
+  animation: kv-pulse 1.8s infinite ease-in-out;
+  flex-shrink: 0;
 }}
 
 /* Brand mark */
@@ -401,37 +468,43 @@ div[data-testid="stMetricValue"] {{
   gap: 11px;
 }}
 .kv-mark {{
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
+  width: 36px;
+  height: 36px;
+  border-radius: 3px;
+  clip-path: {t['btn_clip']};
   background: {t['mark_bg']};
   color: {t['mark_fg']};
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: 'Chakra Petch', sans-serif;
   font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.04em;
+  font-size: 14px;
+  letter-spacing: 0.05em;
   flex-shrink: 0;
 }}
 .kv-brand-name {{
+  font-family: 'Chakra Petch', sans-serif;
   font-weight: 700;
-  font-size: 1.02rem;
+  font-size: 1.12rem;
   color: var(--ink);
-  line-height: 1.15;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
 }}
 .kv-brand-sub {{
-  font-size: 0.7rem;
-  color: var(--muted);
-  letter-spacing: 0.07em;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.67rem;
+  color: var(--accent);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }}
 
 /* Page headings */
 .kv-eyebrow {{
-  font-size: 0.73rem;
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 0.76rem;
   color: var(--accent);
-  letter-spacing: 0.09em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
   font-weight: 700;
   margin-bottom: 4px;
@@ -440,29 +513,32 @@ div[data-testid="stMetricValue"] {{
   gap: 6px;
 }}
 .kv-title {{
-  font-size: 1.62rem;
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 1.68rem;
   font-weight: 700;
   color: var(--ink);
   margin: 0 0 6px 0;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.01em;
 }}
 .kv-lead {{
   color: var(--ink-2);
-  font-size: 0.93rem;
+  font-size: 0.92rem;
   max-width: 780px;
   margin-bottom: 20px;
   line-height: 1.6;
 }}
 
-/* Chips */
+/* Geometric HUD Chips (never wrap awkwardly!) */
 .kv-chip {{
   display: inline-flex;
   align-items: center;
   gap: 5px;
   padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 0.74rem;
+  border-radius: 3px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.73rem;
   font-weight: 600;
+  white-space: nowrap;
   border: 1px solid var(--line-2);
   color: var(--ink-2);
   background: var(--paper-2);
@@ -473,6 +549,7 @@ div[data-testid="stMetricValue"] {{
 .kv-chip.bad {{ color: var(--bad); background: var(--bad-soft); border-color: var(--bad-border); }}
 .kv-chip.warn {{ color: var(--warn); background: var(--warn-soft); border-color: var(--warn-border); }}
 .kv-chip.info {{ color: var(--accent); background: var(--accent-soft); border-color: var(--accent-border); }}
+.kv-chip.standby {{ color: var(--muted); background: var(--paper-2); border-color: var(--line-2); }}
 
 /* Key-Value grid */
 .kv-kv {{
@@ -484,81 +561,110 @@ div[data-testid="stMetricValue"] {{
 .kv-kv .k {{ color: var(--muted); }}
 .kv-kv .v {{ color: var(--ink); font-family: 'IBM Plex Mono', monospace; word-break: break-all; }}
 
-/* 3-Step horizontal security stepper */
+/* 3-Step horizontal HUD stepper */
 .kv-steps {{
   display: flex;
   margin: 8px 0 22px 0;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 4px;
   background: var(--paper);
   overflow: hidden;
   box-shadow: {t['shadow']};
 }}
 .kv-step {{
   flex: 1;
-  padding: 13px 18px;
+  padding: 12px 18px;
   border-right: 1px solid var(--line);
   transition: background 180ms ease;
 }}
 .kv-step:last-child {{ border-right: none; }}
 .kv-step .n {{
-  font-size: 0.71rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
   color: var(--muted);
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-weight: 700;
+  font-weight: 600;
   display: flex;
   align-items: center;
   gap: 6px;
 }}
 .kv-step .t {{
-  font-size: 0.94rem;
-  font-weight: 600;
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 0.96rem;
+  font-weight: 700;
   color: var(--ink);
-  margin-top: 3px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
 }}
-.kv-step.done {{ background: var(--ok-soft); }}
+.kv-step.done {{ background: var(--ok-soft); box-shadow: inset 0 2px 0 var(--ok); }}
 .kv-step.done .n {{ color: var(--ok); }}
-.kv-step.active {{ background: var(--accent-soft); box-shadow: inset 0 -2px 0 var(--accent); }}
-.kv-step.active .n {{ color: var(--accent); }}
+.kv-step.active {{ background: {t['step_active_bg']}; box-shadow: inset 0 2px 0 {t['step_active_bar']}; }}
+.kv-step.active .n {{ color: {t['step_active_fg']}; }}
 
-/* Visual progress / score / capacity gauge */
-.kv-meter-wrap {{ margin: 8px 0 12px 0; }}
+/* Cyberpunk 2077 Segmented Healthbar-style Meter */
+.kv-meter-wrap {{ margin: 8px 0 14px 0; }}
 .kv-meter-head {{
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   font-size: 0.82rem;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }}
-.kv-meter-lbl {{ color: var(--ink-2); font-weight: 600; }}
-.kv-meter-val {{ font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: var(--ink); }}
+.kv-meter-lbl {{
+  font-family: 'Chakra Petch', sans-serif;
+  color: var(--ink-2);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}}
+.kv-meter-val {{
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  color: var(--hi);
+}}
 .kv-meter-track {{
   position: relative;
-  height: 9px;
+  height: 11px;
   background: var(--input-bg);
-  border: 1px solid var(--line);
-  border-radius: 999px;
+  border: 1px solid var(--line-2);
+  border-radius: 2px;
   overflow: visible;
 }}
-.kv-meter-fill {{
-  height: 100%;
-  border-radius: 999px;
-  transition: width 300ms ease;
+.kv-meter-track::after {{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 9px,
+    var(--canvas) 9px,
+    var(--canvas) 12px
+  );
+  pointer-events: none;
+  z-index: 2;
 }}
-.kv-meter-fill.ok {{ background: var(--ok); }}
-.kv-meter-fill.info {{ background: var(--accent); }}
+.kv-meter-fill {{
+  position: relative;
+  height: 100%;
+  border-radius: 1px;
+  transition: width 300ms ease;
+  z-index: 1;
+}}
+.kv-meter-fill.ok {{ background: var(--ok); box-shadow: 0 0 10px var(--ok-soft); }}
+.kv-meter-fill.info {{ background: var(--accent); box-shadow: 0 0 10px var(--accent-soft); }}
 .kv-meter-fill.warn {{ background: var(--warn); }}
 .kv-meter-fill.bad {{ background: var(--bad); }}
 .kv-meter-tick {{
   position: absolute;
-  top: -3px;
-  bottom: -3px;
+  top: -4px;
+  bottom: -4px;
   width: 2px;
-  background: var(--ink);
-  opacity: 0.75;
+  background: var(--hi);
+  z-index: 3;
 }}
-.kv-meter-sub {{ font-size: 0.76rem; color: var(--muted); margin-top: 5px; }}
+.kv-meter-sub {{ font-size: 0.76rem; color: var(--muted); margin-top: 6px; }}
 
 /* Horizontal crypto pipeline strip */
 .kv-pipeline {{
@@ -569,32 +675,36 @@ div[data-testid="stMetricValue"] {{
   padding: 12px 14px;
   background: var(--paper);
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 4px;
   margin-bottom: 18px;
 }}
 .kv-pipe-node {{
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: 3px;
   border: 1px solid var(--line-2);
   background: var(--paper-2);
   font-size: 0.8rem;
 }}
 .kv-pipe-node.on {{
-  border-color: var(--accent-border);
-  background: var(--accent-soft);
-  color: var(--accent);
+  border-color: var(--hi-border);
+  background: var(--hi-soft);
 }}
-.kv-pipe-node .pn-t {{ font-weight: 600; color: var(--ink); }}
-.kv-pipe-node.on .pn-t {{ color: var(--accent); }}
-.kv-pipe-node .pn-s {{ font-size: 0.71rem; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }}
-.kv-pipe-arrow {{ color: var(--muted); display: inline-flex; }}
+.kv-pipe-node .pn-t {{
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  color: var(--ink);
+}}
+.kv-pipe-node.on .pn-t {{ color: var(--hi); }}
+.kv-pipe-node .pn-s {{ font-size: 0.7rem; color: var(--muted); font-family: 'IBM Plex Mono', monospace; }}
+.kv-pipe-arrow {{ color: var(--accent); display: inline-flex; }}
 
 /* Activity console */
 .kv-log {{
   background: {t['log_bg']};
   color: {t['log_fg']};
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-left: 2px solid var(--accent);
+  border-radius: 4px;
   padding: 12px 14px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 12px;
@@ -603,29 +713,30 @@ div[data-testid="stMetricValue"] {{
   overflow-y: auto;
 }}
 .kv-log .t {{ color: #64748B; }}
-.kv-log .s {{ color: #7DD3FC; }}
-.kv-log .OK {{ color: #34D399; font-weight: 600; }}
-.kv-log .WARN {{ color: #FBBF24; font-weight: 600; }}
-.kv-log .CRIT {{ color: #F87171; font-weight: 600; }}
+.kv-log .s {{ color: #00F0FF; }}
+.kv-log .OK {{ color: #00FF9D; font-weight: 600; }}
+.kv-log .WARN {{ color: #FCEE0A; font-weight: 600; }}
+.kv-log .CRIT {{ color: #FF2A4B; font-weight: 600; }}
 .kv-log .INFO {{ color: #94A3B8; }}
 
 /* Data tables */
 .kv-table {{
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.86rem;
+  font-size: 0.85rem;
   background: var(--paper);
-  border-radius: 8px;
+  border-radius: 4px;
   overflow: hidden;
 }}
 .kv-table th {{
   text-align: left;
-  color: var(--muted);
-  font-weight: 600;
+  font-family: 'Chakra Petch', sans-serif;
+  color: var(--accent);
+  font-weight: 700;
   font-size: 0.73rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 1px solid var(--line);
+  letter-spacing: 0.07em;
+  border-bottom: 1px solid var(--line-2);
   padding: 9px 10px;
   background: var(--paper-2);
 }}
@@ -687,7 +798,7 @@ def steps(current: int) -> None:
         out.append(
             f"<div class='kv-step {cls}'>"
             f"<div class='n'>{prefix}<span>{label} - {state}</span></div>"
-            f"<div class='t'>{icon(ic, 15)} <span style='margin-left:4px;'>{title}</span></div>"
+            f"<div class='t'>{icon(ic, 15)} <span style='margin-left:5px;'>{title}</span></div>"
             "</div>"
         )
     st.markdown(f"<div class='kv-steps'>{''.join(out)}</div>", unsafe_allow_html=True)

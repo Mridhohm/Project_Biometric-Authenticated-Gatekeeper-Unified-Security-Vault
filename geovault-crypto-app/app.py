@@ -280,7 +280,7 @@ def screen_hardware_gate(status: dongle_guard.DongleStatus) -> None:
                     dot=row["is_valid"],
                 )
                 rows_html.append(
-                    f"<tr><td class='mono'>{html.escape(row['mount'])}</td>"
+                    f"<tr><td class='mono' title='{html.escape(row['mount'])}'>{html.escape(_short(row['mount'], 28))}</td>"
                     f"<td>{html.escape(row['type'])}</td>"
                     f"<td class='mono'>{html.escape(row['volume_serial'])}</td>"
                     f"<td>{badge}</td></tr>"

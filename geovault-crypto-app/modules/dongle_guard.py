@@ -489,23 +489,23 @@ def get_usb_diagnostics(pnp_volume_serial: Optional[str] = None) -> list[dict]:
 
         if (status and status.valid) or is_pnp_active:
             challenge_str = (
-                "AUTHENTICATED // PLUG-AND-PLAY SERIAL HMAC"
+                "Aktif (Serial PnP)"
                 if is_pnp_active and not (status and status.valid)
-                else "AUTHENTICATED // HMAC-SHA256 VERIFIED"
+                else "Aktif (HMAC OK)"
             )
-            state_color = "#34D399"
+            state_color = "#00FF9D"
             state_kind = "ok"
         elif token_path:
-            challenge_str = f"TAMPER_DETECTED // {status.message if status else 'INVALID'}"
-            state_color = "#F87171"
+            challenge_str = "Token Tidak Valid"
+            state_color = "#FF2A4B"
             state_kind = "bad"
         elif is_usb_drive:
-            challenge_str = "USB TERDETEKSI // SIAP OTORISASI"
-            state_color = "#FBBF24"
+            challenge_str = "USB Siap Otorisasi"
+            state_color = "#FCEE0A"
             state_kind = "warn"
         else:
-            challenge_str = "STANDBY // PARTISI LOKAL"
-            state_color = "#94A3B8"
+            challenge_str = "Partisi Lokal"
+            state_color = "#7A8CA8"
             state_kind = "standby"
 
         diagnostics.append({
@@ -534,8 +534,8 @@ def get_usb_diagnostics(pnp_volume_serial: Optional[str] = None) -> list[dict]:
         "type": "VIRTUAL_DONGLE",
         "volume_serial": "VIRTUAL_KEY",
         "token_file": v_token.name if v_token else "NOT_MOUNTED",
-        "hmac_challenge": "AUTHENTICATED // TOKEN VIRTUAL" if v_ok else "NONAKTIF // TOKEN VIRTUAL",
-        "status_color": "#34D399" if v_ok else "#94A3B8",
+        "hmac_challenge": "Aktif (Virtual)" if v_ok else "Nonaktif",
+        "status_color": "#00FF9D" if v_ok else "#7A8CA8",
         "state_kind": "ok" if v_ok else "standby",
         "is_usb": False,
         "is_valid": v_ok,
