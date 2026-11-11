@@ -161,14 +161,6 @@ def init_db() -> None:
     finally:
         conn.close()
 
-    # Auto-seed default operator analyst_01 for testing convenience
-    try:
-        if not user_exists("analyst_01"):
-            from modules import auth_biometric
-            face = auth_biometric.generate_optical_face_sample("analyst_01")
-            auth_biometric.register_user("analyst_01", "KryptVault2026!", face)
-    except Exception:
-        pass
 
 
 # --------------------------------------------------------------------------- #
