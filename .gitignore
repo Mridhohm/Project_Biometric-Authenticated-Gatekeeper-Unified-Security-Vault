@@ -2,6 +2,10 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+build/
+dist/
+geovault-crypto-app/build/
+geovault-crypto-app/dist/
 geovault-crypto-app/storage/*.db
 geovault-crypto-app/storage/*.db-journal
 geovault-crypto-app/storage/.master_secret

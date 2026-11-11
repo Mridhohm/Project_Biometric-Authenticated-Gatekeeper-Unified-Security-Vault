@@ -2,6 +2,8 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+build/
+dist/
 storage/*.db
 storage/*.db-journal
 storage/.master_secret

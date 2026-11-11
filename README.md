@@ -5,6 +5,10 @@
 **Fakultas Teknik Industri, Universitas Pembangunan Nasional "Veteran" Yogyakarta**  
 **Dosen Pengampu: Bagus Mahardika, S.Kom., M.T.**
 
+**Disusun oleh:**  
+Muhammad Ridho Hikmatul Maulana (123240218)  
+Achmad Daud Ashshidieqiya (123240209)
+
 ---
 
 ## 1. Ringkasan Eksekutif
@@ -42,12 +46,16 @@ Project_Biometric-Authenticated-Gatekeeper-Unified-Security-Vault-main/
 |-- README.md                        <- Dokumentasi terpadu dan panduan pengujian
 |-- geovault-crypto-app/             <- Direktori utama aplikasi Krypt Vault
     |-- app.py                       <- Antarmuka utama dan perutean 3-gerbang
+    |-- build_exe.bat                <- Skrip kompilasi standalone via PyInstaller
     |-- config.py                    <- Pengaturan jalur penyimpanan dan derivasi HKDF
     |-- database.py                  <- Lapisan abstraksi basis data SQLite
+    |-- desktop_launcher.py          <- Peluncur jendela desktop PyWebView mandiri
     |-- generate_dongle.py           <- Utilitas pembuatan dan inspeksi token USB
+    |-- KryptVault.spec              <- Spesifikasi build PyInstaller
     |-- reset_fresh.py               <- Utilitas pengembalian ke kondisi fresh
+    |-- run_desktop.bat              <- Peluncur batch desktop via desktop_launcher.py
     |-- run_desktop.py               <- Peluncur server dan browser app mode
-    |-- ui_theme.py                  <- Tema antarmuka executive document console
+    |-- ui_theme.py                  <- Tema antarmuka Cyberpunk HUD & mode terang
     |-- requirements.txt             <- Daftar dependensi Python
     |-- modules/                     <- Modul engine kriptografi mandiri
     |   |-- auth_biometric.py        <- Biometrik wajah optik & PBKDF2 + AES-128-EAX
@@ -103,6 +111,8 @@ Peluncur ini secara otomatis akan:
 1. Memeriksa ketersediaan Python pada sistem.
 2. Memeriksa paket dependensi (`streamlit`, `pycryptodome`, `pillow`, `psutil`). Jika ada paket yang belum terpasang, sistem langsung mengunduhnya secara otomatis via `pip`.
 3. Mengaktifkan server lokal dan membuka jendela antarmuka mandiri.
+
+Alternatif lain di dalam subfolder aplikasi: `geovault-crypto-app\run_desktop.bat` (meluncurkan [`desktop_launcher.py`](./geovault-crypto-app/desktop_launcher.py) via PyWebView) atau `geovault-crypto-app\build_exe.bat` untuk kompilasi PyInstaller.
 
 ### Cara 3: Eksekusi Manual melalui Terminal
 Buka PowerShell atau Command Prompt pada folder proyek:
@@ -226,14 +236,3 @@ OK
 - `test_05_at_rest_zero_plaintext_sqlite`: Audit kebocoran plaintext pada berkas fisik basis data `vault.db`.
 - `test_06_lsb_steganography_png`: Penyisipan bit LSB, proteksi passphrase, dan pembacaan delimiter `<<<END>>>`.
 - `test_07_blockchain_pow_integrity_and_tamper`: Penambangan PoW target `00`, verifikasi tautan hash, dan deteksi pemalsuan riwayat.
-
----
-
-## 10. Dokumen Laporan Akhir (Deliverables)
-
-Laporan akhir resmi telah disusun secara lengkap sesuai format akademik UPN "Veteran" Yogyakarta dengan ketentuan tipografi hitam standar, spasi 1.5, penjorokan paragraf 1 cm, dan daftar isi otomatis berpenuntun titik:
-- **Dokumen Word (.docx)**:
-  - [`Laporan_Tugas_Akhir_Kriptografi_Krypt_Vault.docx`](../Laporan_Tugas_Akhir_Kriptografi_Krypt_Vault.docx)
-  - Salinan arsip: [`geovault-crypto-app/docs/LAPORAN_AKHIR_KRIPTOGRAFI.docx`](./geovault-crypto-app/docs/LAPORAN_AKHIR_KRIPTOGRAFI.docx)
-- **Dokumen Markdown (.md)**:
-  - [`geovault-crypto-app/docs/LAPORAN_AKHIR_KRIPTOGRAFI.md`](./geovault-crypto-app/docs/LAPORAN_AKHIR_KRIPTOGRAFI.md)
