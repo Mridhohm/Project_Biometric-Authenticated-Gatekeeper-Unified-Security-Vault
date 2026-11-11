@@ -31,6 +31,7 @@ from modules import (
     auth_biometric,
     blockchain,
     dongle_guard,
+    face_scanner,
     file_crypto,
     steganography,
     super_encryption,
@@ -50,6 +51,7 @@ for _k, _v in {
     "pnp_usb_serial": None,
     "last_auth_sim": None,
     "last_usb_snapshot": None,
+    "li_last_auto_id": None,
 }.items():
     st.session_state.setdefault(_k, _v)
 
@@ -113,19 +115,28 @@ def _password_strength(pw: str) -> tuple[float, str, str]:
     return float(score), "bad", "Lemah - gunakan minimal 8 karakter campuran huruf dan angka."
 
 
-def _capture_face(key: str) -> Optional[bytes]:
-    """Real face acquisition: webcam snapshot or uploaded photo."""
+def _clear_identity_session(*, drop_user: bool = True) -> None:
+    """Clear volatile identity state and cached live face snapshots."""
+    if drop_user:
+        st.session_state.user = None
+    st.session_state.li_last_auto_id = None
+    face_scanner.clear_live_cache("li")
+    face_scanner.clear_live_cache("rg")
+
+
+def _capture_face(key: str) -> tuple[Optional[bytes], Optional[str]]:
+    """Acquire face image via live HUD scanner or uploaded file."""
     mode = st.segmented_control(
         "Sumber citra wajah",
-        ["Kamera", "Unggah foto"],
-        default="Kamera",
+        ["Pindai Live", "Unggah foto"],
+        default="Pindai Live",
         key=f"{key}_mode",
-    ) or "Kamera"
-    if mode == "Kamera":
-        shot = st.camera_input("Posisikan wajah di tengah bingkai, lalu ambil foto", key=f"{key}_cam")
-        return shot.getvalue() if shot else None
+    ) or "Pindai Live"
+    if mode == "Pindai Live":
+        return face_scanner.render_live_face_scanner(key)
+    face_scanner.clear_live_cache(key)
     up = st.file_uploader("Foto wajah (PNG/JPG)", type=["png", "jpg", "jpeg"], key=f"{key}_up")
-    return up.getvalue() if up else None
+    return (up.getvalue() if up else None), None
 
 
 def _active_dongle_status() -> dongle_guard.DongleStatus:
@@ -163,7 +174,7 @@ def _dongle_watch(expected_id: Optional[str]) -> None:
     status = _active_dongle_status()
     if not status.valid or status.dongle_id != expected_id:
         ui.log("DONGLE", "Kunci perangkat keras dicabut - sesi dikunci otomatis", level="CRIT")
-        st.session_state.user = None
+        _clear_identity_session()
         st.session_state.pnp_usb_serial = None
         st.rerun(scope="app")
 
@@ -357,12 +368,41 @@ def screen_identity(status: dongle_guard.DongleStatus) -> None:
     c_chips.markdown(chips, unsafe_allow_html=True)
     if c_sw.button("Ganti / Cabut Kunci", use_container_width=True, key="g2_unmount"):
         st.session_state.pnp_usb_serial = None
+        _clear_identity_session(drop_user=False)
         if dongle_guard.is_virtual_dongle_mounted():
             dongle_guard.unmount_virtual_dongle()
         st.rerun()
 
     st.write("")
     tab_in, tab_up = st.tabs(["Masuk Operator", "Daftarkan Operator Baru"])
+
+    def _verify_operator_login(username: str, password: str, face_bytes: bytes) -> None:
+        with st.status("Memverifikasi dua faktor autentikasi...", expanded=True) as st_box:
+            st.write("Menghitung PBKDF2-HMAC-SHA256 (600.000 iterasi)...")
+            res = auth_biometric.authenticate_user(username.strip().lower(), password, face_bytes)
+            digest = ui.sha256_hex(face_bytes)
+            if res.success:
+                st.write("Mendekripsi template AES-128-EAX & mencocokkan wajah...")
+                st_box.update(label="Autentikasi berhasil", state="complete", expanded=False)
+                st.session_state.last_auth_sim = None
+                st.session_state.li_last_auto_id = None
+                face_scanner.clear_live_cache("li")
+                ui.log("AUTH", f"Login berhasil: {res.username} (kemiripan {res.similarity:.1%})", digest, "OK")
+                st.session_state.user = res.username
+                st.session_state.similarity = res.similarity
+                st.session_state.page = "Ringkasan"
+                st.toast(f"Selamat datang, {res.username}. Vault terbuka.")
+                st.rerun()
+            else:
+                st_box.update(label="Verifikasi ditolak", state="error", expanded=False)
+                st.session_state.last_auth_sim = res.similarity
+                ui.log("AUTH", f"Login ditolak untuk {username}: {res.message}", digest, "CRIT")
+                sim_note = (
+                    f" (Kemiripan wajah: {res.similarity:.1%}, minimum {auth_biometric.MATCH_THRESHOLD:.0%})"
+                    if res.similarity is not None
+                    else ""
+                )
+                st.error(res.message + sim_note)
 
     with tab_in:
         if database.count_users() == 0:
@@ -385,40 +425,27 @@ def screen_identity(status: dongle_guard.DongleStatus) -> None:
         with c2:
             with st.container(border=True):
                 st.markdown("### Faktor 2 — Biometrik Wajah")
-                face = _capture_face("li")
+                face, capture_id = _capture_face("li")
                 st.caption(
-                    f"Penyelarasan spasial multi-skala toleran terhadap pergeseran alami (ambang batas: "
+                    f"Posisikan wajah di bingkai oval untuk pemindaian otomatis, atau unggah foto (ambang batas: "
                     f"{auth_biometric.MATCH_THRESHOLD:.0%})."
                 )
 
-        if st.button("Verifikasi dan Masuk ke Vault", type="primary", use_container_width=True, key="li_submit"):
+        auto_triggered = bool(
+            capture_id
+            and face
+            and user
+            and pw
+            and capture_id != st.session_state.get("li_last_auto_id")
+        )
+        if auto_triggered:
+            st.session_state.li_last_auto_id = capture_id
+            _verify_operator_login(user, pw, face)
+        elif st.button("Verifikasi dan Masuk ke Vault", type="primary", use_container_width=True, key="li_submit"):
             if not (user and pw and face):
                 st.warning("Lengkapi nama pengguna, kata sandi, dan citra wajah terlebih dahulu.")
             else:
-                with st.status("Memverifikasi dua faktor autentikasi...", expanded=True) as st_box:
-                    st.write("Menghitung PBKDF2-HMAC-SHA256 (600.000 iterasi)...")
-                    res = auth_biometric.authenticate_user(user.strip().lower(), pw, face)
-                    digest = ui.sha256_hex(face)
-                    if res.success:
-                        st.write("Mendekripsi template AES-128-EAX & mencocokkan wajah...")
-                        st_box.update(label="Autentikasi berhasil", state="complete", expanded=False)
-                        st.session_state.last_auth_sim = None
-                        ui.log("AUTH", f"Login berhasil: {res.username} (kemiripan {res.similarity:.1%})", digest, "OK")
-                        st.session_state.user = res.username
-                        st.session_state.similarity = res.similarity
-                        st.session_state.page = "Ringkasan"
-                        st.toast(f"Selamat datang, {res.username}. Vault terbuka.")
-                        st.rerun()
-                    else:
-                        st_box.update(label="Verifikasi ditolak", state="error", expanded=False)
-                        st.session_state.last_auth_sim = res.similarity
-                        ui.log("AUTH", f"Login ditolak untuk {user}: {res.message}", digest, "CRIT")
-                        sim_note = (
-                            f" (Kemiripan wajah: {res.similarity:.1%}, minimum {auth_biometric.MATCH_THRESHOLD:.0%})"
-                            if res.similarity is not None
-                            else ""
-                        )
-                        st.error(res.message + sim_note)
+                _verify_operator_login(user, pw, face)
 
     with tab_up:
         c1, c2 = st.columns([1, 1.15], gap="large")
@@ -433,8 +460,8 @@ def screen_identity(status: dongle_guard.DongleStatus) -> None:
         with c2:
             with st.container(border=True):
                 st.markdown("### Pendaftaran Template Wajah")
-                rface = _capture_face("rg")
-                st.caption("Pastikan pencahayaan merata dan wajah berada di tengah bingkai kamera/foto.")
+                rface, _ = _capture_face("rg")
+                st.caption("Pastikan pencahayaan merata dan wajah berada di tengah bingkai pemindai/foto.")
 
         if st.button("Daftarkan Operator", type="primary", use_container_width=True, key="rg_submit"):
             if rp != rp2:
@@ -448,6 +475,7 @@ def screen_identity(status: dongle_guard.DongleStatus) -> None:
                     ui.log("AUTH", f"Registrasi {ru}: {res.message}", digest, "OK" if res.success else "WARN")
                     if res.success:
                         st_box.update(label="Operator terdaftar", state="complete", expanded=False)
+                        face_scanner.clear_live_cache("rg")
                         st.toast("Pendaftaran operator berhasil. Silakan masuk di tab Masuk Operator.")
                         st.success(res.message + " Silakan masuk melalui tab Masuk Operator.")
                     else:
@@ -1042,7 +1070,7 @@ def page_hardware(status: dongle_guard.DongleStatus) -> None:
                     st.session_state.pnp_usb_serial = None
                     if dongle_guard.is_virtual_dongle_mounted():
                         dongle_guard.unmount_virtual_dongle()
-                    st.session_state.user = None
+                    _clear_identity_session()
                     st.rerun()
 
 
@@ -1084,7 +1112,7 @@ def main() -> None:
         )
 
     if not status.valid:
-        st.session_state.user = None
+        _clear_identity_session()
         screen_hardware_gate(status)
         return
     if not st.session_state.user:
@@ -1107,7 +1135,7 @@ def main() -> None:
         st.write("")
         if st.button("Kunci & Keluar", use_container_width=True, key="sb_logout"):
             ui.log("AUTH", f"Operator '{user}' mengunci sesi", level="INFO")
-            st.session_state.user = None
+            _clear_identity_session()
             st.toast("Sesi dikunci.")
             st.rerun()
 

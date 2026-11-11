@@ -58,6 +58,7 @@ Project_Biometric-Authenticated-Gatekeeper-Unified-Security-Vault-main/
     |   |-- auth_biometric.py        <- Biometrik wajah optik & PBKDF2 + AES-128-EAX
     |   |-- blockchain.py            <- Ledger rantai bukti PoW SHA-256
     |   |-- dongle_guard.py          <- Intersept hardware USB & verifikasi HMAC
+    |   |-- face_scanner.py          <- Pemindai wajah live HUD (Components v2)
     |   |-- file_crypto.py           <- Enkripsi berkas biner ChaCha20
     |   |-- steganography.py         <- Steganografi spasial LSB PNG lossless
     |   |-- super_encryption.py      <- Super enkripsi Extended Vigenere + AES-256-CBC
@@ -126,10 +127,10 @@ Saat pertama kali dibuka, aplikasi berada dalam kondisi pabrik (*fresh state*):
 4. *Opsi Tanpa Flashdisk*: Pada panel kanan di bawah "Mode presentasi tanpa flashdisk", klik tombol **"Aktifkan token virtual"**. Layar akan langsung terbuka ke Gerbang 2.
 
 ### Langkah 2: Registrasi dan Login Operator (Gerbang 2)
-1. Karena belum ada akun terdaftar, buka tab **"Daftarkan operator baru"**.
-2. Masukkan nama pengguna (contoh: `analyst_01`), kata sandi (minimal 8 karakter huruf dan angka), dan posisikan wajah menghadap webcam lalu ambil foto (atau unggah berkas foto wajah).
-3. Klik tombol **"Daftarkan operator"**. Kunci PBKDF2 diturunkan dan template wajah $128 \times 128$ disegel dengan AES-128-EAX.
-4. Pindah ke tab **"Masuk"**, masukkan kredensial yang baru didaftarkan, ambil foto wajah verifikasi, lalu klik **"Verifikasi dan masuk"**.
+1. Karena belum ada akun terdaftar, buka tab **"Daftarkan Operator Baru"**.
+2. Masukkan nama pengguna (contoh: `analis_01`), kata sandi (minimal 8 karakter huruf dan angka), lalu arahkan wajah ke bingkai **Pindai Live** hingga terkunci otomatis (atau pilih **Unggah foto**).
+3. Klik tombol **"Daftarkan Operator"**. Kunci PBKDF2 diturunkan dan template wajah $128 \times 128$ disegel dengan AES-128-EAX.
+4. Pindah ke tab **"Masuk Operator"**, isi kredensial yang baru didaftarkan, lalu arahkan wajah ke bingkai **Pindai Live** — setelah citra wajah terkunci otomatis, verifikasi berjalan otomatis (atau klik **"Verifikasi dan Masuk ke Vault"**).
 5. Algoritma penyelarasan spasial multi-skala akan mencocokkan wajah (ambang batas kelulusan $\ge 70\%$). Jika valid, ruang kerja brankas utama langsung terbuka.
 
 ### Langkah 3: Menjalankan Fitur Ruang Kerja (Gerbang 3)
