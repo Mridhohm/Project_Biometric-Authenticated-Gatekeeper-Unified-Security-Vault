@@ -44,9 +44,12 @@ html, body, [class*="css"], .stApp, p, label, input, textarea, button, div {
 .stApp { background: var(--canvas); color: var(--ink); }
 code, pre, .mono { font-family: 'IBM Plex Mono', Consolas, monospace !important; }
 
-/* Hide Streamlit chrome */
+/* Hide Streamlit chrome, branding, and status dialogs */
 #MainMenu, footer, [data-testid="stToolbar"], [data-testid="stDecoration"],
-[data-testid="stStatusWidget"], .stDeployButton { display: none !important; }
+[data-testid="stStatusWidget"], .stDeployButton, .stConnectionStatus,
+div[class*="StatusWidget"], div[class*="connection-status"],
+div[data-testid="stConnectionStatus"], div[role="dialog"]:has(pre),
+.viewerBadge_container__1QSob, .viewerBadge_link__1S137 { display: none !important; }
 header[data-testid="stHeader"] { background: transparent; height: 0; }
 
 .block-container { padding-top: 2.2rem; padding-bottom: 3rem; max-width: 1180px; }

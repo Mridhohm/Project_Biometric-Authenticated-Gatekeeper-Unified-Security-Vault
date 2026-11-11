@@ -33,7 +33,7 @@ from modules import (
 )
 
 st.set_page_config(
-    page_title="Krypt Vault",
+    page_title="Krypt Vault — Forensic Security Suite",
     layout="wide",
     initial_sidebar_state="expanded",
 )

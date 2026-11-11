@@ -94,12 +94,20 @@ namespace KryptVault
                     return;
                 }
 
+                string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                string profileDir = Path.Combine(localAppData, "KryptVault", "EdgeProfile");
+                try { Directory.CreateDirectory(profileDir); } catch { }
+
                 Process browserProcess = null;
                 if (!string.IsNullOrEmpty(browserPath))
                 {
                     ProcessStartInfo browserPsi = new ProcessStartInfo();
                     browserPsi.FileName = browserPath;
-                    browserPsi.Arguments = string.Format("--app={0} --window-size=1300,880", AppUrl);
+                    browserPsi.Arguments = string.Format(
+                        "--user-data-dir=\"{0}\" --app={1} --window-size=1320,880 --class=KryptVault",
+                        profileDir,
+                        AppUrl
+                    );
                     browserPsi.UseShellExecute = false;
                     browserProcess = Process.Start(browserPsi);
                 }
@@ -110,14 +118,25 @@ namespace KryptVault
 
                 if (browserProcess != null)
                 {
-                    browserProcess.WaitForExit();
+                    // If the browser process exits in less than 3 seconds (e.g. delegated to existing instance),
+                    // DO NOT kill the server process immediately!
+                    bool exitedEarly = browserProcess.WaitForExit(3000);
+                    if (!exitedEarly)
+                    {
+                        // Standalone app window: wait until the user closes the window
+                        browserProcess.WaitForExit();
+                        KillProcessTree(serverProcess);
+                    }
+                    else
+                    {
+                        // Delegated window: keep server process alive
+                        serverProcess.WaitForExit();
+                    }
                 }
                 else if (serverProcess != null)
                 {
                     serverProcess.WaitForExit();
                 }
-
-                KillProcessTree(serverProcess);
             }
             catch (Exception ex)
             {

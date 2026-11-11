@@ -21,7 +21,6 @@ URL = f"http://localhost:{PORT}"
 
 def find_browser_app_cmd() -> list[str] | None:
     """Find Microsoft Edge or Google Chrome to launch in application window mode."""
-    # Common paths for Edge and Chrome on Windows
     candidates = [
         os.path.expandvars(r"%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe"),
         os.path.expandvars(r"%ProgramFiles%\Microsoft\Edge\Application\msedge.exe"),
@@ -29,9 +28,14 @@ def find_browser_app_cmd() -> list[str] | None:
         os.path.expandvars(r"%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe"),
         os.path.expandvars(r"%LocalAppData%\Google\Chrome\Application\chrome.exe"),
     ]
+    profile_dir = Path(os.path.expandvars(r"%LOCALAPPDATA%\KryptVault\EdgeProfile"))
+    try:
+        profile_dir.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        pass
     for c in candidates:
         if os.path.isfile(c):
-            return [c, f"--app={URL}", "--window-size=1280,850"]
+            return [c, f"--user-data-dir={profile_dir}", f"--app={URL}", "--window-size=1320,880"]
     return None
 
 
