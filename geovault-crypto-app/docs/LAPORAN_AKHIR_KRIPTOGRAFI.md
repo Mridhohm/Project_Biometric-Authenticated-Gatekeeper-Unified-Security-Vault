@@ -30,7 +30,7 @@ Laporan Tugas Akhir ini menyajikan rancang bangun dan implementasi **Krypt Vault
 1. **Hardware Dongle Intercept**: Mekanisme gerbang fisik terluar (*Gate 01*) yang mengunci total akses aplikasi jika USB token bertanda tangan kriptografis kanonikal **HMAC-SHA256** dan terikat pada nomor seri volume Windows (*anti-cloning protection*) tidak terpasang.
 2. **Login Biometrik & Kriptografi**: Otentikasi dua faktor (*Gate 02*) yang memadukan peregangan kata sandi **PBKDF2-HMAC-SHA256 (600.000 iterasi)** dengan pemindaian optik wajah otomatis real-time beresolusi $128 \times 128$ grayscale yang vektor fiturnya disegel menggunakan algoritma **AES-128-EAX**.
 3. **Super Enkripsi Teks**: Perlindungan laporan intelijen menggunakan kaskade dua lapis: cipher substitusi polialfabetik klasik **Extended Vigenère Cipher (modulo 256)** dilanjutkan cipher blok simetris modern **AES-256-CBC** dengan vektor inisialisasi acak CSPRNG dan padding PKCS#7.
-4. **Enkripsi File Biner**: Pengamanan berkas barang bukti lintas format (PDF, DOCX, TXT, CSV, citra) menggunakan cipher aliran berkecepatan tinggi **ChaCha20 Stream Cipher** (256-bit key, 12-byte nonce) yang dibungkus dalam format amplop mandiri `.bagus.enc` ber-checksum **SHA-256**.
+4. **Enkripsi File Biner**: Pengamanan berkas barang bukti lintas format (PDF, DOCX, TXT, CSV, citra) menggunakan cipher aliran berkecepatan tinggi **ChaCha20 Stream Cipher** (256-bit key, 12-byte nonce) yang dibungkus dalam format amplop mandiri `.krypt.enc` ber-checksum **SHA-256**.
 5. **Enkripsi Basis Data At-Rest**: Penyimpanan persisten SQLite (`storage/vault.db`) yang menerapkan prinsip *Zero-Plaintext Persistence*, di mana seluruh kolom kredensial, vektor biometrik, laporan teks, dan berkas tersimpan secara eksklusif dalam bentuk hash, token Base64, atau BLOB terenkripsi, dilengkapi antarmuka audit forensik *side-by-side*.
 6. **Steganografi Citra Digital**: Penyisipan pesan koordinat rahasia ke dalam bit terendah (*Least Significant Bit / LSB*) kanal warna RGB citra PNG lossless berpenanda batas terminal `<<<END>>>` dengan opsi enkripsi muatan.
 7. **Blockchain Bukti Forensik**: Pencatatan rantai serah terima barang bukti digital (*chain of custody*) ke dalam buku besar lokal tak terubahkan (*immutable ledger*) berbasis konsensus **Proof-of-Work SHA-256 (kesulitan prefix `"00"`)**, enkripsi metadata terautentikasi **AES-256-GCM**, dan pasak tanda tangan **HMAC Chain-Tip Anchor** untuk mendeteksi manipulasi basis data secara instan (*Tamper Lab*).
@@ -108,7 +108,7 @@ Yogyakarta, 11 November 2026
     - 4.2.1 Pengujian Kriteria 1: Hardware Dongle Intercept & Anti-Cloning
     - 4.2.2 Pengujian Kriteria 2: Login Biometrik & Penolakan Wajah Penyusup
     - 4.2.3 Pengujian Kriteria 3: Super Enkripsi Teks Dua Tahap
-    - 4.2.4 Pengujian Kriteria 4: Enkripsi File ChaCha20 & Paket `.bagus.enc`
+    - 4.2.4 Pengujian Kriteria 4: Enkripsi File ChaCha20 & Paket `.krypt.enc`
     - 4.2.5 Pengujian Kriteria 5: Audit Forensik Basis Data At-Rest
     - 4.2.6 Pengujian Kriteria 6: Penyisipan & Ekstraksi Steganografi LSB
     - 4.2.7 Pengujian Kriteria 7: Penambangan PoW & Deteksi Manipulasi SQLite
@@ -279,7 +279,7 @@ flowchart TD
     
     subgraph G3_Subsystems ["Subsistem Operasi Forensik & Intelijen"]
         G3 --> S1["[01] Laporan Intelijen\nSuper Enkripsi: Vigenère + AES-256-CBC"]
-        G3 --> S2["[02] Berkas Barang Bukti\nChaCha20 Stream Cipher (.bagus.enc)"]
+        G3 --> S2["[02] Berkas Barang Bukti\nChaCha20 Stream Cipher (.krypt.enc)"]
         G3 --> S3["[03] Citra Forensik Steganografi\nLossless PNG LSB + Delimiter <<<END>>>"]
         G3 --> S4["[04] Inspeksi Basis Data At-Rest\nSide-by-Side Ciphertext vs Decrypted"]
         G3 --> S5["[05] Chain of Custody Ledger\nPoW Blockchain ('00') + AES-256-GCM"]
@@ -338,8 +338,8 @@ flowchart LR
 flowchart LR
     F_Bytes["Byte Stream File Dokumen (PDF, DOCX, dll)"] --> SHA_Pre["Hitung Checksum SHA-256 Plaintext"]
     F_Bytes --> Cha_Core["Enkripsi ChaCha20\n(256-bit Key, 12B Nonce, Salt 16B)"]
-    SHA_Pre & Cha_Core --> Pack["Bungkus Magic Header 'BAGUSENC1' + Metadata JSON + Ciphertext"]
-    Pack --> Env[".bagus.enc Standalone File"]
+    SHA_Pre & Cha_Core --> Pack["Bungkus Magic Header 'KRYPTENC1' + Metadata JSON + Ciphertext"]
+    Pack --> Env[".krypt.enc Standalone File"]
 ```
 
 #### 3.2.5 Flowchart Gate 03: Sub-sistem Steganografi LSB PNG
@@ -450,7 +450,7 @@ Pengembangan dan pengujian Krypt Vault dilakukan pada lingkungan komputasi denga
 | **1. Hardware Dongle** | `modules/dongle_guard.py` | `HMAC-SHA256` kanonikal, `psutil`, Win32 Volume Serial Binding | **100% Lolos (PASSED)** |
 | **2. Login Biometrik** | `modules/auth_biometric.py` | `PBKDF2-SHA256` (600k iterasi), `PIL 128x128 Grayscale`, `AES-128-EAX` | **100% Lolos (PASSED)** |
 | **3. Super Enkripsi Teks** | `modules/super_encryption.py` | `Extended Vigenère (modulo 256)` $\rightarrow$ `AES-256-CBC (PKCS#7)` | **100% Lolos (PASSED)** |
-| **4. Enkripsi File Biner** | `modules/file_crypto.py` | `ChaCha20 Stream Cipher` (256-bit key, 12B nonce), `.bagus.enc` | **100% Lolos (PASSED)** |
+| **4. Enkripsi File Biner** | `modules/file_crypto.py` | `ChaCha20 Stream Cipher` (256-bit key, 12B nonce), `.krypt.enc` | **100% Lolos (PASSED)** |
 | **5. Enkripsi Basis Data** | `database.py` | At-Rest Zero-Plaintext Persistence, Hex/BLOB, Side-by-Side Audit | **100% Lolos (PASSED)** |
 | **6. Steganografi Gambar** | `modules/steganography.py` | Spatial Domain `LSB` Lossless PNG, Delimiter `<<<END>>>`, ChaCha20 | **100% Lolos (PASSED)** |
 | **7. Blockchain Sederhana** | `modules/blockchain.py` | `Proof-of-Work SHA-256` (prefix `"00"`), `AES-256-GCM`, `HMAC Anchor` | **100% Lolos (PASSED)** |
@@ -471,7 +471,7 @@ Pengembangan dan pengujian Krypt Vault dilakukan pada lingkungan komputasi denga
 - **Tahap 2 (AES-256-CBC)**: Intermediate byte stream di-pad dengan PKCS#7 dan dienkripsi dengan AES-256 menggunakan salt 16 byte dan IV 16 byte acak CSPRNG.
 - **Pemulihan**: Token Base64 berhasil didekripsi kembali ke plaintext asli secara akurat tanpa kehilangan karakter. Kesalahan pada salah satu kunci (Vigenère atau AES) menghasilkan kegagalan otentikasi.
 
-#### 4.2.4 Pengujian Kriteria 4: Enkripsi File ChaCha20 & Paket `.bagus.enc`
+#### 4.2.4 Pengujian Kriteria 4: Enkripsi File ChaCha20 & Paket `.krypt.enc`
 - Berkas dokumen uji biner PDF dienkripsi menggunakan ChaCha20 Stream Cipher.
 - Berkas dibungkus dalam amplop mandiri biner:
   $$\text{Header (10B)} \parallel \text{MetaLength (4B)} \parallel \text{MetaJSON} \parallel \text{Ciphertext}$$
@@ -500,19 +500,19 @@ Pemeriksaan langsung pada basis data `storage/vault.db` membuktikan:
 Pengujian otomatis dijalankan secara mandiri pada suite `tests/test_crypto_modules.py`:
 
 ```text
-test_01_dongle_hmac_and_guard (__main__.TestBAGUSVaultCryptography)
+test_01_dongle_hmac_and_guard (__main__.TestKryptVaultCryptography)
 Uji validasi tanda tangan HMAC-SHA256 dan proteksi gatekeeper dongle. ... ok
-test_02_biometric_face_and_pbkdf2_login (__main__.TestBAGUSVaultCryptography)
+test_02_biometric_face_and_pbkdf2_login (__main__.TestKryptVaultCryptography)
 Uji pendaftaran & login: PBKDF2-SHA256 (600k iterasi) + PIL 128x128 + AES-128-EAX. ... ok
-test_03_super_encryption_cascade (__main__.TestBAGUSVaultCryptography)
+test_03_super_encryption_cascade (__main__.TestKryptVaultCryptography)
 Uji super enkripsi dua lapis: Extended Vigenère (klasik) + AES-256-CBC (modern). ... ok
-test_04_chacha20_file_encryption (__main__.TestBAGUSVaultCryptography)
-Uji enkripsi file dokumen biner menggunakan ChaCha20 Stream Cipher dan amplop .bagus.enc. ... ok
-test_05_database_at_rest_encryption (__main__.TestBAGUSVaultCryptography)
+test_04_chacha20_file_encryption (__main__.TestKryptVaultCryptography)
+Uji enkripsi file dokumen biner menggunakan ChaCha20 Stream Cipher dan amplop .krypt.enc. ... ok
+test_05_database_at_rest_encryption (__main__.TestKryptVaultCryptography)
 Audit basis data: Buktikan bahwa SQLite hanya menyimpan ciphertext/hash/BLOB saat at-rest. ... ok
-test_06_steganography_lsb (__main__.TestBAGUSVaultCryptography)
+test_06_steganography_lsb (__main__.TestKryptVaultCryptography)
 Uji penyisipan pesan ke dalam LSB channel RGB citra PNG lossless dengan pembatas <<<END>>>. ... ok
-test_07_blockchain_pow_and_integrity (__main__.TestBAGUSVaultCryptography)
+test_07_blockchain_pow_and_integrity (__main__.TestKryptVaultCryptography)
 Uji blockchain PoW SHA-256 ('00'), segel AES-256-GCM, auto-sync ledger.json, & tamper detection. ... ok
 
 ----------------------------------------------------------------------

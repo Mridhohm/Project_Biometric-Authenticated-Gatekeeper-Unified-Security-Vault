@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -9,9 +11,6 @@ namespace KryptVault
 {
     static class Program
     {
-        private const int Port = 8501;
-        private static readonly string AppUrl = "http://localhost:" + Port;
-
         [STAThread]
         static void Main(string[] args)
         {
@@ -52,13 +51,15 @@ namespace KryptVault
                     return;
                 }
 
+                int port = FindFreePort(8501);
+                string appUrl = "http://127.0.0.1:" + port;
                 string browserPath = FindBrowser();
 
                 ProcessStartInfo serverPsi = new ProcessStartInfo();
                 serverPsi.FileName = pythonPath;
                 serverPsi.Arguments = string.Format(
-                    "-m streamlit run app.py --server.port {0} --server.headless true --browser.serverAddress localhost --server.enableCORS false --server.enableXsrfProtection false",
-                    Port
+                    "-m streamlit run app.py --server.port {0} --server.address 127.0.0.1 --server.headless true --browser.serverAddress 127.0.0.1 --server.enableCORS false --server.enableXsrfProtection false",
+                    port
                 );
                 serverPsi.WorkingDirectory = appDir;
                 serverPsi.CreateNoWindow = true;
@@ -81,12 +82,12 @@ namespace KryptVault
                     return;
                 }
 
-                bool ready = WaitForServer(AppUrl, 25);
+                bool ready = WaitForServer(appUrl, 25);
                 if (!ready)
                 {
                     KillProcessTree(serverProcess);
                     MessageBox.Show(
-                        "Server internal tidak merespons dalam waktu yang ditentukan.\nPastikan port 8501 tidak terblokir oleh firewall lokal.",
+                        string.Format("Server internal tidak merespons pada port {0} dalam waktu yang ditentukan.", port),
                         "Krypt Vault - Waktu Habis",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error
@@ -106,14 +107,14 @@ namespace KryptVault
                     browserPsi.Arguments = string.Format(
                         "--user-data-dir=\"{0}\" --app={1} --window-size=1320,880 --class=KryptVault",
                         profileDir,
-                        AppUrl
+                        appUrl
                     );
                     browserPsi.UseShellExecute = false;
                     browserProcess = Process.Start(browserPsi);
                 }
                 else
                 {
-                    Process.Start(AppUrl);
+                    Process.Start(appUrl);
                 }
 
                 if (browserProcess != null)
@@ -232,6 +233,26 @@ namespace KryptVault
                 }
             }
             return false;
+        }
+
+        private static int FindFreePort(int startPort)
+        {
+            HashSet<int> activePorts = new HashSet<int>();
+            try
+            {
+                foreach (IPEndPoint ep in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners())
+                {
+                    activePorts.Add(ep.Port);
+                }
+            }
+            catch { }
+
+            for (int p = startPort; p < startPort + 100; p++)
+            {
+                if (!activePorts.Contains(p))
+                    return p;
+            }
+            return startPort;
         }
 
         private static void KillProcessTree(Process p)

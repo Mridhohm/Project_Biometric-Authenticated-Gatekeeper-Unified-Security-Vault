@@ -219,7 +219,7 @@ def build_academic_docx():
         "(2) Login Biometrik 2FA via PBKDF2-HMAC-SHA256 (600.000 iterasi) + normalisasi citra wajah optik 128x128 grayscale "
         "yang disegel menggunakan AES-128-EAX, "
         "(3) Super Enkripsi Teks melalui kaskade Extended Vigenère Cipher (modulo 256) dilanjutkan AES-256-CBC, "
-        "(4) Enkripsi File Biner lintas format dokumen menggunakan ChaCha20 Stream Cipher dalam amplop mandiri .bagus.enc "
+        "(4) Enkripsi File Biner lintas format dokumen menggunakan ChaCha20 Stream Cipher dalam amplop mandiri .krypt.enc "
         "ber-checksum SHA-256, "
         "(5) Enkripsi Basis Data At-Rest berprinsip Zero-Plaintext Persistence pada SQLite vault.db, "
         "(6) Steganografi Citra PNG Lossless LSB dengan pembatas terminal <<<END>>>, dan "
@@ -507,7 +507,7 @@ def build_academic_docx():
         ("1", "Hardware Dongle Gatekeeper", "Token .geovault_dongle + HMAC-SHA256 + Volume Serial Binding + Virtual Switch", "100% Lulus (OK)"),
         ("2", "Login Biometrik & Kriptografi", "PBKDF2-HMAC-SHA256 (600k iter) + PIL 128x128 Face + AES-128-EAX Sealing", "100% Lulus (OK)"),
         ("3", "Super Enkripsi Teks", "Extended Vigenère (modulo 256) -> AES-256-CBC (PKCS#7 & IV CSPRNG)", "100% Lulus (OK)"),
-        ("4", "Enkripsi File (Beda dari Teks)", "ChaCha20 Stream Cipher (256-bit, 12B nonce) + Amplop Mandiri .bagus.enc", "100% Lulus (OK)"),
+        ("4", "Enkripsi File (Beda dari Teks)", "ChaCha20 Stream Cipher (256-bit, 12B nonce) + Amplop Mandiri .krypt.enc", "100% Lulus (OK)"),
         ("5", "Enkripsi Basis Data (At-Rest)", "Zero-Plaintext SQLite vault.db + Side-by-Side Raw vs Decrypted Audit View", "100% Lulus (OK)"),
         ("6", "Steganografi Gambar", "Spatial LSB Kanal RGB Citra PNG Lossless + Delimiter <<<END>>> + ChaCha20", "100% Lulus (OK)"),
         ("7", "Blockchain Sederhana Aset", "PoW SHA-256 (prefix '00') + AES-256-GCM + HMAC Tip Anchor + Tamper Lab", "100% Lulus (OK)"),
@@ -531,7 +531,7 @@ def build_academic_docx():
         "Wajah simulasi penyusup menghasilkan skor 42.9% (< 70%), sistem menolak akses secara tepat.\n"
         "3. Kriteria 3 (Super Enkripsi): Plaintext berhasil melewati substitusi Vigenère byte-modulo 256 dan "
         "AES-256-CBC, disimpan dalam token Base64, dan dipulihkan kembali secara utuh.\n"
-        "4. Kriteria 4 (ChaCha20 File): Berkas PDF bukti forensik berhasil dienkripsi ke .bagus.enc dan didekripsi "
+        "4. Kriteria 4 (ChaCha20 File): Berkas PDF bukti forensik berhasil dienkripsi ke .krypt.enc dan didekripsi "
         "kembali dengan verifikasi kecocokan hash SHA-256 plaintext 100% identik.\n"
         "5. Kriteria 5 (Database At-Rest): Inspeksi langsung pada file SQLite membuktikan tidak ada password mentah "
         "maupun dokumen terbuka di disk lokal.\n"
@@ -546,13 +546,13 @@ def build_academic_docx():
 
     add_code_snippet(
         doc,
-        "test_01_dongle_hmac_and_guard (__main__.TestBAGUSVaultCryptography) ... ok\n"
-        "test_02_biometric_face_and_pbkdf2_login (__main__.TestBAGUSVaultCryptography) ... ok\n"
-        "test_03_super_encryption_cascade (__main__.TestBAGUSVaultCryptography) ... ok\n"
-        "test_04_chacha20_file_encryption (__main__.TestBAGUSVaultCryptography) ... ok\n"
-        "test_05_database_at_rest_encryption (__main__.TestBAGUSVaultCryptography) ... ok\n"
-        "test_06_steganography_lsb (__main__.TestBAGUSVaultCryptography) ... ok\n"
-        "test_07_blockchain_pow_and_integrity (__main__.TestBAGUSVaultCryptography) ... ok\n\n"
+        "test_01_dongle_hmac_and_guard (__main__.TestKryptVaultCryptography) ... ok\n"
+        "test_02_biometric_face_and_pbkdf2_login (__main__.TestKryptVaultCryptography) ... ok\n"
+        "test_03_super_encryption_cascade (__main__.TestKryptVaultCryptography) ... ok\n"
+        "test_04_chacha20_file_encryption (__main__.TestKryptVaultCryptography) ... ok\n"
+        "test_05_database_at_rest_encryption (__main__.TestKryptVaultCryptography) ... ok\n"
+        "test_06_steganography_lsb (__main__.TestKryptVaultCryptography) ... ok\n"
+        "test_07_blockchain_pow_and_integrity (__main__.TestKryptVaultCryptography) ... ok\n\n"
         "----------------------------------------------------------------------\n"
         "Ran 7 tests in 2.011s\n\n"
         "OK (100% PASSED)"

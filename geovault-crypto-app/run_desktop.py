@@ -8,18 +8,37 @@ from __future__ import annotations
 
 import os
 import shutil
+import socket
 import subprocess
 import sys
 import time
+import urllib.request
 import webbrowser
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
-PORT = 8501
-URL = f"http://localhost:{PORT}"
 
 
-def find_browser_app_cmd() -> list[str] | None:
+def _is_port_in_use(port: int) -> bool:
+    for family, host in ((socket.AF_INET, "127.0.0.1"), (socket.AF_INET6, "::1")):
+        try:
+            with socket.socket(family, socket.SOCK_STREAM) as sock:
+                sock.settimeout(0.2)
+                if sock.connect_ex((host, port)) == 0:
+                    return True
+        except OSError:
+            pass
+    return False
+
+
+def find_free_port(start_port: int = 8501) -> int:
+    for port in range(start_port, start_port + 100):
+        if not _is_port_in_use(port):
+            return port
+    return start_port
+
+
+def find_browser_app_cmd(url: str) -> list[str] | None:
     """Find Microsoft Edge or Google Chrome to launch in application window mode."""
     candidates = [
         os.path.expandvars(r"%ProgramFiles(x86)%\Microsoft\Edge\Application\msedge.exe"),
@@ -35,8 +54,19 @@ def find_browser_app_cmd() -> list[str] | None:
         pass
     for c in candidates:
         if os.path.isfile(c):
-            return [c, f"--user-data-dir={profile_dir}", f"--app={URL}", "--window-size=1320,880"]
+            return [c, f"--user-data-dir={profile_dir}", f"--app={url}", "--window-size=1320,880"]
     return None
+
+
+def wait_for_server(url: str, timeout: float = 20.0) -> None:
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        try:
+            with urllib.request.urlopen(url, timeout=1.0) as resp:
+                if resp.status == 200:
+                    return
+        except Exception:
+            time.sleep(0.3)
 
 
 def main():
@@ -47,6 +77,8 @@ def main():
     print("\n[+] Menginisialisasi Server Krypt Vault...")
 
     os.chdir(str(BASE_DIR))
+    port = find_free_port(8501)
+    url = f"http://127.0.0.1:{port}"
 
     # Start streamlit server in background
     cmd = [
@@ -56,11 +88,13 @@ def main():
         "run",
         "app.py",
         "--server.port",
-        str(PORT),
+        str(port),
+        "--server.address",
+        "127.0.0.1",
         "--server.headless",
         "true",
         "--browser.serverAddress",
-        "localhost",
+        "127.0.0.1",
         "--server.enableCORS",
         "false",
         "--server.enableXsrfProtection",
@@ -68,16 +102,16 @@ def main():
     ]
 
     server_proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    time.sleep(2.0)
+    wait_for_server(url)
 
-    print(f"[+] Server aktif di {URL}")
-    browser_cmd = find_browser_app_cmd()
+    print(f"[+] Server aktif di {url}")
+    browser_cmd = find_browser_app_cmd(url)
     if browser_cmd:
         print("[+] Membuka jendela Desktop App Mode (Frameless)...")
         subprocess.Popen(browser_cmd)
     else:
         print("[+] Membuka browser default...")
-        webbrowser.open(URL)
+        webbrowser.open(url)
 
     print("\n[OK] KRYPT VAULT BERHASIL DIJALANKAN!")
     print("[i] Tekan Ctrl+C pada jendela ini untuk mematikan server aplikasi.")

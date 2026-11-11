@@ -822,13 +822,13 @@ def main():
     add_p(doc, "Eksekusi suite pengujian unit otomatis pada tests/test_crypto_modules.py menghasilkan kelulusan 100%:", indent=False)
 
     add_code(doc,
-        "test_01_dongle_hmac_and_guard (__main__.TestBAGUSVaultCryptography) ... ok\n"
-        "test_02_biometric_face_and_pbkdf2_login (__main__.TestBAGUSVaultCryptography) ... ok\n"
-        "test_03_super_encryption_cascade (__main__.TestBAGUSVaultCryptography) ... ok\n"
-        "test_04_chacha20_file_encryption (__main__.TestBAGUSVaultCryptography) ... ok\n"
-        "test_05_database_at_rest_encryption (__main__.TestBAGUSVaultCryptography) ... ok\n"
-        "test_06_steganography_lsb (__main__.TestBAGUSVaultCryptography) ... ok\n"
-        "test_07_blockchain_pow_and_integrity (__main__.TestBAGUSVaultCryptography) ... ok\n\n"
+        "test_01_dongle_hmac_and_guard (__main__.TestKryptVaultCryptography) ... ok\n"
+        "test_02_biometric_face_and_pbkdf2_login (__main__.TestKryptVaultCryptography) ... ok\n"
+        "test_03_super_encryption_cascade (__main__.TestKryptVaultCryptography) ... ok\n"
+        "test_04_chacha20_file_encryption (__main__.TestKryptVaultCryptography) ... ok\n"
+        "test_05_database_at_rest_encryption (__main__.TestKryptVaultCryptography) ... ok\n"
+        "test_06_steganography_lsb (__main__.TestKryptVaultCryptography) ... ok\n"
+        "test_07_blockchain_pow_and_integrity (__main__.TestKryptVaultCryptography) ... ok\n\n"
         "Ran 7 tests in 1.543s -> OK (100% PASSED - 0 FAILURES)"
     )
 

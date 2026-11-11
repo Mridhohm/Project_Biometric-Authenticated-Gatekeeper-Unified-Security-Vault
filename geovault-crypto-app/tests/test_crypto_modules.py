@@ -1,14 +1,14 @@
 """
-B.A.G.U.S. Vault - Comprehensive Cryptographic Verification Test Suite
-=====================================================================
+Krypt Vault - Comprehensive Cryptographic Verification Test Suite
+=================================================================
 Mata Kuliah: Kriptografi (UPN "Veteran" Yogyakarta)
-Dosen Pengampu: Pak Bagus
+Dosen Pengampu: Bagus Mahardika, S.Kom., M.T.
 
 Pengujian Otomatis 7 Kriteria Tugas Akhir:
   1. [KRITERIA 1] Hardware Dongle Intercept & HMAC-SHA256 Signature
   2. [KRITERIA 2] Optical Facial Biometric (PIL 128x128) + PBKDF2-SHA256 & AES-128-EAX
   3. [KRITERIA 3] Super Enkripsi Teks (Extended Vigenere Modulo 256 + AES-256-CBC)
-  4. [KRITERIA 4] Enkripsi File Biner (ChaCha20 Stream Cipher & .bagus.enc Envelope)
+  4. [KRITERIA 4] Enkripsi File Biner (ChaCha20 Stream Cipher & .krypt.enc Envelope)
   5. [KRITERIA 5] Enkripsi Basis Data At-Rest (Zero-Plaintext SQLite Verification)
   6. [KRITERIA 6] Steganografi Citra PNG LSB (Least Significant Bit + <<<END>>>)
   7. [KRITERIA 7] Blockchain PoW SHA-256 ('00' Prefix) & AES-256-GCM Asset Custody
@@ -47,11 +47,11 @@ from modules import (
 from PIL import Image
 
 
-class TestBAGUSVaultCryptography(unittest.TestCase):
+class TestKryptVaultCryptography(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Create an isolated temporary test storage directory
-        cls.test_dir = tempfile.mkdtemp(prefix="bagus_vault_test_")
+        cls.test_dir = tempfile.mkdtemp(prefix="krypt_vault_test_")
         cls.orig_storage_dir = config.STORAGE_DIR
         cls.orig_db_path = config.DB_PATH
         cls.orig_ledger_json = config.LEDGER_JSON_PATH
@@ -202,7 +202,7 @@ class TestBAGUSVaultCryptography(unittest.TestCase):
     # 4. KRITERIA 4: Enkripsi File Biner (ChaCha20 Stream Cipher)
     # ----------------------------------------------------------------------- #
     def test_04_chacha20_file_encryption(self):
-        """Uji enkripsi file dokumen biner menggunakan ChaCha20 Stream Cipher dan amplop .bagus.enc."""
+        """Uji enkripsi file dokumen biner menggunakan ChaCha20 Stream Cipher dan amplop .krypt.enc."""
         file_content = b"%PDF-1.7 BUKTI FORENSIK DIGITAL CYBER-CRIME CORPO-LEAK DATASET 0xDEADBEEF"
         passphrase = "ChaCha20-HighSpeed-StreamKey!"
         orig_filename = "bukti_kasus_01.pdf"
@@ -213,19 +213,19 @@ class TestBAGUSVaultCryptography(unittest.TestCase):
         self.assertEqual(bundle.algorithm, "ChaCha20-Stream")
         self.assertNotEqual(bundle.ciphertext, file_content)
 
-        # Kemas dalam amplop mandiri .bagus.enc
-        package_bytes = file_crypto.pack_bagus_envelope(bundle, orig_filename, mime_type)
+        # Kemas dalam amplop mandiri .krypt.enc
+        package_bytes = file_crypto.pack_krypt_envelope(bundle, orig_filename, mime_type)
         self.assertTrue(package_bytes.startswith(file_crypto.MAGIC_HEADER))
 
-        # Dekripsi paket .bagus.enc mandiri
-        recovered_bytes, meta = file_crypto.unpack_bagus_envelope(package_bytes, passphrase)
+        # Dekripsi paket .krypt.enc mandiri
+        recovered_bytes, meta = file_crypto.unpack_krypt_envelope(package_bytes, passphrase)
         self.assertEqual(recovered_bytes, file_content)
         self.assertEqual(meta["original_name"], orig_filename)
         self.assertEqual(meta["sha256_plain"], bundle.sha256_plain)
 
         # Dekripsi dengan passphrase salah (harus gagal verifikasi integritas SHA-256)
         with self.assertRaises(Exception):
-            file_crypto.unpack_bagus_envelope(package_bytes, "WrongPassphrase123!")
+            file_crypto.unpack_krypt_envelope(package_bytes, "WrongPassphrase123!")
 
     # ----------------------------------------------------------------------- #
     # 5. KRITERIA 5: Enkripsi Basis Data At-Rest (Zero-Plaintext)

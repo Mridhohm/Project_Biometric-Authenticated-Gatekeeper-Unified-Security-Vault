@@ -1,15 +1,15 @@
 """
-B.A.G.U.S. Vault - Hardware / USB Dongle Guard
-==============================================
+Krypt Vault - Hardware / USB Dongle Guard
+=========================================
 
 The application stays locked until a *valid* dongle token is found on a
 mounted removable drive (or on a configured fallback path for testing).
 
-Dongle token format (``.geovault_dongle`` / ``.cyberdeck_dongle`` - UTF-8 JSON)
--------------------------------------------------------------------------------
+Dongle token format (``.krypt_dongle`` / ``.geovault_dongle`` - UTF-8 JSON)
+---------------------------------------------------------------------------
 {
   "version": 1,
-  "product": "B.A.G.U.S. Vault",
+  "product": "Krypt Vault",
   "dongle_id": "<uuid4 hex>",
   "label": "Operator Hardware Key",
   "issued_at": "2026-11-10T12:00:00+00:00",
@@ -43,7 +43,7 @@ import config
 
 DONGLE_VERSION = 1
 PRODUCT_NAME = "Krypt Vault"
-ACCEPTED_PRODUCTS = ("Krypt Vault", "B.A.G.U.S. Vault", "GeoVault", "BAGUS_OS")
+ACCEPTED_PRODUCTS = ("Krypt Vault", "GeoVault")
 SUPPORTED_FILENAMES = (config.DONGLE_FILENAME, ".krypt_dongle", ".geovault_dongle", ".cyberdeck_dongle")
 MAX_TOKEN_BYTES = 4096  # refuse to parse oversized files (DoS hardening)
 REQUIRED_FIELDS = ("version", "product", "dongle_id", "label", "issued_at",
@@ -275,7 +275,7 @@ def build_dongle_token(
         "version": DONGLE_VERSION,
         "product": PRODUCT_NAME,
         "dongle_id": uuid.uuid4().hex,
-        "label": (label or "B.A.G.U.S. Vault Dongle").strip()[:64],
+        "label": (label or "Krypt Vault Dongle").strip()[:64],
         "issued_at": issued.isoformat(),
         "expires_at": (issued + timedelta(days=valid_days)).isoformat() if valid_days else None,
         "volume_serial": volume_serial,
@@ -393,7 +393,7 @@ def scan_for_dongle(extra_paths: Optional[Iterable[str]] = None) -> DongleStatus
 
 def provision_dongle(
     target: str | os.PathLike,
-    label: str = "B.A.G.U.S. Vault Dongle",
+    label: str = "Krypt Vault Dongle",
     valid_days: Optional[int] = None,
     bind_to_volume: bool = True,
     overwrite: bool = False,

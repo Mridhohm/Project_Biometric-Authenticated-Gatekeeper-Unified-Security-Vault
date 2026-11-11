@@ -396,7 +396,7 @@ def page_files(user: str) -> None:
             else:
                 raw = up.getvalue()
                 bundle = file_crypto.encrypt_file_bytes(raw, pw)
-                pkg = file_crypto.pack_bagus_envelope(bundle, up.name, up.type)
+                pkg = file_crypto.pack_krypt_envelope(bundle, up.name, up.type)
                 stored = f"{secrets.token_hex(16)}.enc"
                 config.ensure_storage()
                 (config.FILES_DIR / stored).write_bytes(bundle.ciphertext)
@@ -425,7 +425,7 @@ def page_files(user: str) -> None:
         pw = st.text_input("Passphrase", type="password", key="fd_pw")
         if st.button("Dekripsi berkas", type="primary", disabled=enc is None):
             try:
-                plain, meta = file_crypto.unpack_bagus_envelope(enc.getvalue(), pw)
+                plain, meta = file_crypto.unpack_krypt_envelope(enc.getvalue(), pw)
                 st.session_state.file_dec = (plain, meta)
                 ui.log("FILE", f"Berkas '{meta['original_name']}' didekripsi, SHA-256 cocok", meta["sha256_plain"], "OK")
             except Exception as exc:

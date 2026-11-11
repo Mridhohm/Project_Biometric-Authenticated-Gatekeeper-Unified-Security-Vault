@@ -1,6 +1,6 @@
 """
-B.A.G.U.S. Vault - Optical Facial Biometric + Cryptographic Login
-=================================================================
+Krypt Vault - Optical Facial Biometric + Cryptographic Login
+============================================================
 
 Factor 1 - Knowledge (Passkey)
 ------------------------------

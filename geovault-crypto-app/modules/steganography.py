@@ -1,6 +1,6 @@
 """
-B.A.G.U.S. Vault - LSB PNG Image Steganography
-==============================================
+Krypt Vault - LSB PNG Image Steganography
+=========================================
 
 Spatial-domain Least Significant Bit (LSB) steganography on lossless PNG images (PIL):
   1. Each RGB pixel contributes 3 carrier bits (1 bit per R, G, B channel LSB):
@@ -29,7 +29,7 @@ SALT_LEN: int = 16
 NONCE_LEN: int = 12
 
 
-AUTH_TAG: bytes = b"BAGUS_STEGO_OK::"
+AUTH_TAG: bytes = b"KRYPT_STEGO_OK::"
 
 
 def _encrypt_payload(plaintext_bytes: bytes, passphrase: str) -> bytes:
@@ -167,7 +167,7 @@ def extract_message_lsb(
 
     if not found_delim:
         raise ValueError(
-            "No valid B.A.G.U.S. Vault steganographic payload detected (delimiter '<<<END>>>' not found)."
+            "No valid Krypt Vault steganographic payload detected (delimiter '<<<END>>>' not found)."
         )
 
     payload_body = bytes(extracted_bytes[:-delim_len])

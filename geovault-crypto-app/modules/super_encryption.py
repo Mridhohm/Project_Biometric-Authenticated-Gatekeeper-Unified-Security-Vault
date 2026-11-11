@@ -1,6 +1,6 @@
 """
-B.A.G.U.S. Vault - Text Super Encryption (Vigenere + AES-256-CBC)
-================================================================
+Krypt Vault - Text Super Encryption (Vigenere + AES-256-CBC)
+============================================================
 
 Two-layer cascade encryption pipeline for classified intelligence dispatches:
   1. Classical polyalphabetic substitution layer:

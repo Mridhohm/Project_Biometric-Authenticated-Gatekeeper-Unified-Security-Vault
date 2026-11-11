@@ -1,6 +1,6 @@
 """
-B.A.G.U.S. Vault - ChaCha20 File Byte-Stream Encryption
-=======================================================
+Krypt Vault - ChaCha20 File Byte-Stream Encryption
+==================================================
 
 High-speed symmetric stream encryption for forensic documents (PDF, DOCX, TXT, CSV,
 images, archives) using Daniel J. Bernstein's **ChaCha20** stream cipher:
@@ -8,7 +8,7 @@ images, archives) using Daniel J. Bernstein's **ChaCha20** stream cipher:
   2. Derive a 256-bit key from `passphrase` and `kdf_salt` via PBKDF2-HMAC-SHA256 (200,000 iterations).
   3. Compute the plaintext SHA-256 digest (`sha256_plain`) prior to encryption.
   4. Encrypt document bytes using `Crypto.Cipher.ChaCha20`.
-  5. Package into standalone `.bagus.enc` envelope containing embedded metadata for one-click restoration.
+  5. Package into standalone `.krypt.enc` envelope containing embedded metadata for one-click restoration.
 """
 
 from __future__ import annotations
@@ -29,7 +29,6 @@ KDF_ITERATIONS: int = 200_000
 SALT_BYTES: int = 16
 NONCE_BYTES: int = 12
 MAGIC_HEADER: bytes = b"KRYPTENC1\x00"
-LEGACY_MAGIC: bytes = b"BAGUSENC1\x00"
 
 
 @dataclass
@@ -130,15 +129,15 @@ def decrypt_file_bytes(
 
 
 # --------------------------------------------------------------------------- #
-# Standalone .bagus.enc Package Envelope Helpers
+# Standalone .krypt.enc Package Envelope Helpers
 # --------------------------------------------------------------------------- #
-def pack_bagus_envelope(
+def pack_krypt_envelope(
     bundle: EncryptedFileBundle,
     original_name: str,
     mime_type: Optional[str] = None,
 ) -> bytes:
     """
-    Package an encrypted bundle into a self-contained `.krypt.enc` / `.bagus.enc` binary file:
+    Package an encrypted bundle into a self-contained `.krypt.enc` binary file:
       [MAGIC_HEADER (10B)] [HEADER_LEN (4B uint32)] [JSON_HEADER] [CIPHERTEXT_BYTES]
     """
     meta = {
@@ -157,18 +156,15 @@ def pack_bagus_envelope(
     return MAGIC_HEADER + header_len + meta_json + bundle.ciphertext
 
 
-pack_krypt_envelope = pack_bagus_envelope
-
-
-def unpack_bagus_envelope(package_bytes: bytes, passphrase: str) -> tuple[bytes, dict]:
+def unpack_krypt_envelope(package_bytes: bytes, passphrase: str) -> tuple[bytes, dict]:
     """
-    Unpack and decrypt a standalone `.krypt.enc` / `.bagus.enc` binary file.
+    Unpack and decrypt a standalone `.krypt.enc` binary file.
     Returns ``(plain_bytes, metadata_dict)``.
     """
     magic_len = len(MAGIC_HEADER)
     if len(package_bytes) < magic_len + 4:
         raise ValueError("Invalid file format: file too small to be an encrypted package.")
-    if package_bytes[:magic_len] not in (MAGIC_HEADER, LEGACY_MAGIC):
+    if package_bytes[:magic_len] != MAGIC_HEADER:
         raise ValueError("Invalid file signature: missing Krypt Vault magic header.")
 
     header_len = struct.unpack(">I", package_bytes[magic_len:magic_len + 4])[0]
