@@ -1,0 +1,11 @@
+[
+  {
+    "index": 0,
+    "timestamp": "2026-11-11T01:18:44+00:00",
+    "asset_name": "GENESIS",
+    "encrypted_asset_metadata": "/YRaYb7qhB/w6k97XXdTYBF45MygiyBtjaPNTThRRs6mAhRrDIha4kjF0mpKjR2AT/2IqQdIHl/XYRQOrgQB5/COoPkZYMhSiMd78kqZ5DGfOmbZhjI3EZ1xJ6XeQFXtAChR6V0Euw==",
+    "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "nonce": 42,
+    "current_hash": "002b57a97f0dedb3b4922af6964f7c7fa63a3fceea792bb6b5c34525bfa45025"
+  }
+]

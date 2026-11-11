@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+geovault-crypto-app/storage/*.db
+geovault-crypto-app/storage/*.db-journal
+geovault-crypto-app/storage/.master_secret
+geovault-crypto-app/storage/files/*
+!geovault-crypto-app/storage/files/.gitkeep
+!geovault-crypto-app/storage/.gitkeep
+geovault-crypto-app/virtual_usb/
+.geovault_dongle
+.cyberdeck_dongle

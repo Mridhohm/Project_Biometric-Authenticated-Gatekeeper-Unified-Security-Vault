@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+storage/*.db
+storage/*.db-journal
+storage/.master_secret
+storage/files/*
+!storage/files/.gitkeep
+!storage/.gitkeep
+virtual_usb/
+.geovault_dongle
+.cyberdeck_dongle
