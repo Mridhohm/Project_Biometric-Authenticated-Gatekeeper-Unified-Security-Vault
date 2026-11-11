@@ -194,6 +194,8 @@ def screen_identity(status: dongle_guard.DongleStatus) -> None:
     tab_in, tab_up = st.tabs(["Masuk", "Daftarkan operator baru"])
 
     with tab_in:
+        if database.count_users() == 0:
+            st.info("Belum ada operator terdaftar. Buka tab 'Daftarkan operator baru' untuk mendaftarkan akun pertama.")
         c1, c2 = st.columns([1, 1.1], gap="large")
         with c1:
             with st.container(border=True):

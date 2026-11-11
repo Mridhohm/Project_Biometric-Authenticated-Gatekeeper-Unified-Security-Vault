@@ -64,7 +64,7 @@ def add_callout(doc: Document, text: str, title: str = "CATATAN ARSITEKTUR KRIPT
     p = cell.paragraphs[0]
     p.paragraph_format.space_before = Pt(2)
     p.paragraph_format.space_after = Pt(2)
-    run_t = p.add_run(f"🛡️ {title}\n")
+    run_t = p.add_run(f"[!] {title}\n")
     run_t.bold = True
     run_t.font.name = "Arial"
     run_t.font.size = Pt(10.5)
@@ -601,7 +601,7 @@ def build_academic_docx():
 
     # Save Document
     doc.save(str(OUTPUT_DOCX))
-    print(f"✅ Berhasil membuat dokumen Word: {OUTPUT_DOCX} ({os.path.getsize(OUTPUT_DOCX):,} bytes)")
+    print(f"[OK] Berhasil membuat dokumen Word: {OUTPUT_DOCX} ({os.path.getsize(OUTPUT_DOCX):,} bytes)")
 
 
 if __name__ == "__main__":

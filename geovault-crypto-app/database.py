@@ -192,6 +192,11 @@ def user_exists(username: str) -> bool:
     return _fetchone("SELECT 1 AS x FROM users WHERE username = ?", (username,)) is not None
 
 
+def count_users() -> int:
+    row = _fetchone("SELECT COUNT(*) AS c FROM users")
+    return int(row["c"]) if row else 0
+
+
 def record_login_failure(username: str, max_attempts: int, lockout_seconds: int) -> int:
     """Increment the failure counter; lock the account when the limit is hit. Returns the new count."""
     with transaction() as conn:

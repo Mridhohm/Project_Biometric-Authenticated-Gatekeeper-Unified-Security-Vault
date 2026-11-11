@@ -154,8 +154,8 @@ def run_cli(argv: Optional[list[str]] = None) -> int:
 def run_streamlit_ui() -> None:
     import streamlit as st
 
-    st.set_page_config(page_title="GeoVault Dongle Provisioner", page_icon="🔑", layout="centered")
-    st.title("🔑 GeoVault Dongle Provisioning Studio")
+    st.set_page_config(page_title="Krypt Vault Dongle Provisioner", layout="centered")
+    st.title("Krypt Vault Dongle Provisioning Studio")
     st.caption("Utility to sign & write a `.geovault_dongle` HMAC-SHA256 hardware token.")
 
     mounts = dongle_guard.list_removable_mountpoints()
@@ -190,7 +190,7 @@ def run_streamlit_ui() -> None:
 
     col_btn1, col_btn2 = st.columns(2)
     with col_btn1:
-        if st.button("✨ Provision `.geovault_dongle` Now", type="primary", use_container_width=True, disabled=not target_str):
+        if st.button("Provision Token Kunci Sekarang", type="primary", use_container_width=True, disabled=not target_str):
             try:
                 if mode.startswith("Local Virtual USB"):
                     Path(target_str).mkdir(parents=True, exist_ok=True)
@@ -216,7 +216,7 @@ def run_streamlit_ui() -> None:
                 st.error(str(exc))
 
     with col_btn2:
-        if st.button("🗑️ Revoke / Remove Dongle", use_container_width=True, disabled=not target_str):
+        if st.button("Hapus / Cabut Dongle", use_container_width=True, disabled=not target_str):
             token_path = Path(target_str) / config.DONGLE_FILENAME
             if token_path.exists():
                 token_path.unlink()

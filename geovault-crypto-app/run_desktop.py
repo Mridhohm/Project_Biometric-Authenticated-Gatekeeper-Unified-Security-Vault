@@ -37,7 +37,7 @@ def find_browser_app_cmd() -> list[str] | None:
 
 def main():
     print("=" * 65)
-    print("      ⚡ KRYPT VAULT : FORENSIC SECURITY EDITION")
+    print("      KRYPT VAULT : FORENSIC SECURITY EDITION")
     print("      Tugas Akhir Kriptografi — UPN \"Veteran\" Yogyakarta")
     print("=" * 65)
     print("\n[+] Menginisialisasi Server Krypt Vault...")
@@ -75,7 +75,7 @@ def main():
         print("[+] Membuka browser default...")
         webbrowser.open(URL)
 
-    print("\n[✓] KRYPT VAULT BERHASIL DIJALANKAN!")
+    print("\n[OK] KRYPT VAULT BERHASIL DIJALANKAN!")
     print("[i] Tekan Ctrl+C pada jendela ini untuk mematikan server aplikasi.")
 
     try:
