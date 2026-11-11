@@ -1,160 +1,239 @@
-# ⚡ Krypt Vault — Sistem Pengamanan Bukti Forensik Siber & Dokumen Intelijen Strategis
+# Krypt Vault — Biometric-Authenticated Gatekeeper & Unified Security Vault
+
+**Sistem Brankas Bukti Forensik Siber & Dokumen Intelijen Strategis**  
+**Tugas Akhir Mata Kuliah Kriptografi — Program Studi Informatika**  
+**Fakultas Teknik Industri, Universitas Pembangunan Nasional "Veteran" Yogyakarta**  
+**Dosen Pengampu: Bagus Mahardika, S.Kom., M.T.**
+
+---
+
+## 1. Ringkasan Eksekutif
+
+Krypt Vault adalah sistem keamanan brankas digital yang menerapkan arsitektur pertahanan tiga gerbang (*3-Gate Defense-in-Depth*) untuk mengamankan bukti forensik digital dan dokumen intelijen sensitif. Aplikasi ini menggabungkan autentikasi berbasis kepemilikan perangkat keras fisik (USB Hardware Dongle), autentikasi biometrik wajah optik dengan penyelarasan spasial multi-skala, kriptografi kunci simetris modern (AES-256-CBC, ChaCha20 Stream Cipher), super enkripsi kaskade (Extended Vigenere 256-byte modulo), steganografi spasial LSB, penyimpanan basis data SQLite *zero-plaintext at-rest*, serta rantai audit bukti forensik yang diikat dengan konsensus blockchain Proof-of-Work (PoW).
+
+Seluruh sistem dirancang menggunakan implementasi murni berbasis pustaka standar dan kriptografi baku tanpa ketergantungan pada layanan cloud pihak ketiga, sehingga dapat dijalankan secara mandiri, lokal, dan portabel.
+
+---
+
+## 2. Pemenuhan 7 Kriteria Kriptografi Tugas Akhir
+
+Sistem ini memenuhi 100% dari 7 kriteria tugas akhir yang disyaratkan:
+
+| No | Kriteria Tugas Akhir | Implementasi Teknis pada Krypt Vault | Status Uji |
+| :---: | :--- | :--- | :---: |
+| 1 | **Login Biometrik & Intersept Dongle USB** | Gerbang 1 (*Hardware Dongle Intercept*): Memvalidasi tanda tangan HMAC-SHA256 pada berkas `.krypt_dongle` yang diikat ke nomor seri volume fisik USB flashdisk. Sesi terkunci otomatis seketika saat USB dicabut (*live USB bus watcher*). Tersedia mode token virtual lokal untuk demonstrasi tanpa port USB. | LULUS (100%) |
+| 2 | **Login Algoritma Kriptografi (Hash / AES)** | Gerbang 2 (*Identity & Biometrics*): Kombinasi PBKDF2-HMAC-SHA256 (600.000 iterasi) untuk faktor pengetahuan, dan enkripsi template biometrik wajah $128 \times 128$ piksel menggunakan AES-128-EAX *authenticated encryption*. Kunci biometrik diturunkan secara dinamis via HKDF dan tidak pernah disimpan dalam basis data. | LULUS (100%) |
+| 3 | **Pesan Teks Menggunakan Super Enkripsi** | Super Enkripsi Kaskade Dua Lapis: Lapis pertama menggunakan Extended Vigenere Cipher klasik (substitusi byte-modulo 256 pada seluruh rentang biner ASCII), dilapisi enkripsi modern AES-256-CBC dengan Salt 16-byte, IV CSPRNG 16-byte, dan PKCS#7 padding. Dikemas dalam token Base64 mandiri. | LULUS (100%) |
+| 4 | **Pesan Berkas Menggunakan Algoritma Berbeda** | Enkripsi Berkas Biner Terpisah: Berkas biner (PDF, DOCX, ZIP, citra) diamankan menggunakan ChaCha20 Stream Cipher 256-bit (berbeda dari AES pada teks). Menggunakan kunci turunan PBKDF2 200.000 iterasi, nonce acak 12-byte, checksum verifikasi SHA-256, dan dikemas dalam wadah mandiri `.krypt.enc`. | LULUS (100%) |
+| 5 | **Pesan Penting Dienkripsi pada Basis Data** | Keamanan At-Rest Zero-Plaintext: Seluruh data sensitif pada SQLite (`storage/vault.db`) disimpan dalam bentuk ciphertext terenkripsi (AES-256-CBC, ChaCha20, AES-128-EAX) dan hash ber-salt. Pemeriksaan biner langsung pada berkas basis data membuktikan tidak ada satu pun teks terbuka yang bocor. | LULUS (100%) |
+| 6 | **Pesan Gambar Diamankan dengan Steganografi** | Steganografi Citra Spasial LSB: Pesan rahasia intelijen atau koordinat disisipkan ke dalam Least Significant Bit (LSB) kanal RGB pada citra berformat PNG lossless. Mendukung proteksi lapis ganda via passphrase dan penanda akhir muatan `<<<END>>>` untuk rekonstruksi presisi. | LULUS (100%) |
+| 7 | **Aset Penting Diamankan dengan Blockchain** | Ledger Rantai Bukti Forensik: Setiap registrasi barang bukti dicatat ke dalam blok blockchain yang diikat secara kriptografis menggunakan Proof-of-Work SHA-256 (kesulitan target hash diawali `00`). Dilengkapi laboratorium pengujian manipulasi (*Tamper Lab*) untuk membuktikan deteksi instan terhadap pemalsuan riwayat. | LULUS (100%) |
+
+---
+
+## 3. Struktur Direktori Proyek
 
 ```text
- ██████╗    █████╗   ██████╗  ██╗   ██╗ ███████╗    ██╗   ██╗  █████╗  ██╗   ██╗ ██╗  ████████╗
- ██╔══██╗  ██╔══██╗ ██╔════╝  ██║   ██║ ██╔════╝    ██║   ██║ ██╔══██╗ ██║   ██║ ██║  ╚══██╔══╝
- ██████╔╝  ███████║ ██║  ███╗ ██║   ██║ ███████╗    ██║   ██║ ███████║ ██║   ██║ ██║     ██║   
- ██╔══██╗  ██╔══██║ ██║   ██║ ██║   ██║ ╚════██║    ╚██╗ ██╔╝ ██╔══██║ ██║   ██║ ██║     ██║   
- ██████╔╝▄ ██║  ██║▄╚██████╔╝▄╚██████╔╝▄███████║▄    ╚████╔╝  ██║  ██║ ╚██████╔╝ ███████╗██║   
- ╚═════╝ ▀ ╚═╝  ╚═╝▀ ╚═════╝ ▀ ╚═════╝ ▀╚══════╝▀     ╚═══╝   ╚═╝  ╚═╝  ╚═════╝  ╚══════╝╚═╝   
-```
-
-**Krypt Vault (*Biometric-Authenticated Gatekeeper & Unified Security Vault*)** adalah sistem pengamanan data pertahanan berlapis (*defense-in-depth digital evidence vault*) berbasis Python dan Streamlit. Dirancang khusus untuk mengamankan bukti forensik digital, berkas perkara kejahatan siber, dan dokumen intelijen geospasial strategis melalui antarmuka Cyberdeck Command Line Interface (`[SYS@KRYPT-VAULT ~]#`) bertema Netrunner dengan telemetri eksekusi *real-time*.
-
----
-
-## 🏛️ Filosofi Arsitektur Keamanan
-
-Krypt Vault mengimplementasikan prinsip ketahanan kriptografi tingkat militer:
-
-1. **Zero-Plaintext Persistence (Enkripsi At-Rest)**: Tidak ada password mentah, vektor biometrik wajah, laporan teks, maupun dokumen yang tersimpan dalam format terbuka di database SQLite (`storage/geovault.db`) maupun sistem berkas lokal.
-2. **Hierarki Kunci Terpisah (HKDF-SHA256 Key Hierarchy)**: Master secret 256-bit CSPRNG mendistribusikan sub-kunci domain independen (`dongle/hmac-sha256`, `auth/password-pepper`, `ledger/aes-256-gcm`, `ledger/anchor-hmac`).
-3. **Sequential Security Gatekeeper**:
-   - **Gate 01**: Intersep Hardware Dongle USB (`HMAC-SHA256` token). Akses ke seluruh sistem terkunci mati jika dongle tidak terpasang.
-   - **Gate 02**: Pemindaian Wajah Otis Real-Time (*Realtime Auto-Scanning Optical Face Recognition*) menggunakan normalisasi matriks `128x128` Grayscale PIL, `SHA-256` pixel digest, dan enkripsi terautentikasi **AES-128-EAX** dipadukan dengan passkey **PBKDF2-HMAC-SHA256 (600.000 iterasi)**.
-   - **Gate 03**: Evidence Vault Core yang memuat 5 subsistem pengamanan dokumen intelijen dan bukti forensik.
-
----
-
-## 🔐 Diagram Alur Kriptografi
-
-```mermaid
-flowchart TD
-    A["Boot Sistem // Krypt Vault"] --> B{"Gate 01: Pindai Hardware USB\n(.geovault_dongle / .cyberdeck_dongle)"}
-    B -- "Tidak Terdeteksi / Token Palsu / Beda Volume" --> C["[CRITICAL_SECURITY_HALT]\nLockscreen Merah Crimson"]
-    B -- "HMAC-SHA256 Valid" --> D{"Gate 02: Realtime Optical Face Scan + Passkey"}
-    D -- "PBKDF2-SHA256 (600k iter) + PIL 128x128 Face / AES-128-EAX" --> E{"Kemiripan Wajah >= 80%?"}
-    E -- "Ditolak / Mismatch" --> F["Catat Percobaan Gagal\n& Kunci Akun Sementara"]
-    E -- "Diterima (Cleared)" --> G["Gate 03: Krypt Vault Core\n[SYS@KRYPT-VAULT ~]#"]
-    G --> H["[01] Laporan Intelijen\nSuper Enkripsi: Vigenère + AES-256-CBC"]
-    G --> I["[02] Berkas Barang Bukti\nChaCha20 Stream Cipher + Paket .bagus.enc"]
-    G --> J["[03] Citra Forensik Steganografi\nLossless PNG LSB + Delimiter <<<END>>>"]
-    G --> K["[04] Inspeksi Basis Data\nSide-by-Side Ciphertext At-Rest vs Decrypted"]
-    G --> L["[05] Chain of Custody Ledger\nSHA-256 PoW ('00') + AES-256-GCM + HMAC Anchor"]
+Project_Biometric-Authenticated-Gatekeeper-Unified-Security-Vault-main/
+|-- KryptVault.exe                   <- Aplikasi Desktop Native Windows (1-Klik)
+|-- KryptVault_Native.cs             <- Kode sumber kompilasi C# Win32 winexe
+|-- JALANKAN_KRYPT_VAULT.bat         <- Peluncur batch cerdas dengan auto-installer
+|-- RESET_DATA_FRESH.bat             <- Skrip pembersih basis data ke kondisi fresh pabrik
+|-- README.md                        <- Dokumentasi terpadu dan panduan pengujian
+|-- geovault-crypto-app/             <- Direktori utama aplikasi Krypt Vault
+    |-- app.py                       <- Antarmuka utama dan perutean 3-gerbang
+    |-- config.py                    <- Pengaturan jalur penyimpanan dan derivasi HKDF
+    |-- database.py                  <- Lapisan abstraksi basis data SQLite
+    |-- generate_dongle.py           <- Utilitas pembuatan dan inspeksi token USB
+    |-- reset_fresh.py               <- Utilitas pengembalian ke kondisi fresh
+    |-- run_desktop.py               <- Peluncur server dan browser app mode
+    |-- ui_theme.py                  <- Tema antarmuka executive document console
+    |-- requirements.txt             <- Daftar dependensi Python
+    |-- modules/                     <- Modul engine kriptografi mandiri
+    |   |-- auth_biometric.py        <- Biometrik wajah optik & PBKDF2 + AES-128-EAX
+    |   |-- blockchain.py            <- Ledger rantai bukti PoW SHA-256
+    |   |-- dongle_guard.py          <- Intersept hardware USB & verifikasi HMAC
+    |   |-- file_crypto.py           <- Enkripsi berkas biner ChaCha20
+    |   |-- steganography.py         <- Steganografi spasial LSB PNG lossless
+    |   |-- super_encryption.py      <- Super enkripsi Extended Vigenere + AES-256-CBC
+    |-- storage/                     <- Penyimpanan lokal at-rest terenkripsi
+    |   |-- vault.db                 <- Basis data SQLite zero-plaintext
+    |   |-- ledger.json              <- Ledger blockchain bukti forensik
+    |   |-- files/                   <- Berkas biner terenkripsi (.krypt.enc)
+    |-- tests/                       <- Suite pengujian unit otomatis
+    |   |-- test_crypto_modules.py   <- Uji kebenaran matematis 7 kriteria kriptografi
+    |-- docs/                        <- Dokumen laporan akademik
+        |-- LAPORAN_AKHIR_KRIPTOGRAFI.docx <- Laporan akhir Word standar akademik UPN
+        |-- LAPORAN_AKHIR_KRIPTOGRAFI.md   <- Naskah laporan format Markdown
+        |-- build_merged_report.py         <- Generator laporan Word otomatis
+        |-- generate_report_docx.py        <- Modul penyusun layout laporan akademik
 ```
 
 ---
 
-## 🛡️ Spesifikasi 7 Modul Kriptografi
+## 4. Persyaratan Sistem
 
-### 1. Hardware Dongle Authentication (`HMAC-SHA256` USB Token)
-- Menginspeksi partisi penyimpanan fisik melalui `psutil` untuk menemukan token otorisasi `.geovault_dongle` atau `.cyberdeck_dongle`.
-- Memvalidasi tanda tangan kriptografis kanonikal **HMAC-SHA256** dalam waktu konstan (*constant-time verification*).
-- Mengikat token dengan nomor seri volume drive Windows (`GetVolumeInformationW`) untuk menangkal penggandaan bit (*anti-cloning protection*).
-- Menyediakan Lockscreen Crimson Red beranimasi hazard pulsing dengan tabel diagnostik USB bus serta saklar demo *Mount / Unmount Virtual Dongle*.
-
-### 2. Realtime Optical Facial Recognition + Salted `SHA-256` & `AES-128-EAX` Login
-- **Faktor Pengetahuan (Passkey)**: Passphrase digarami salt 16-byte CSPRNG dan diregangkan dengan **PBKDF2-HMAC-SHA256** (600.000 iterasi) + server pepper melalui **HKDF-SHA256** menghasilkan `auth/verifier` (32B) dan `auth/biometric-key` (16B).
-- **Faktor Melekat (Pemindai Wajah Otomatis Real-Time)**: Pemindaian sensor optik wajah secara otomatis selama 2 detik dengan HUD reticle Cyberpunk tanpa memerlukan tombol manual *Take Photo*.
-- **Normalisasi PIL**: Diproses murni via Pillow (`PIL`) tanpa dependensi OpenCV cascade loader: konversi ke Grayscale 8-bit (`.convert("L")`), normalisasi matriks `128x128` piksel, komputasi `SHA-256` byte digest, serta ekstraksi deskriptor struktural `phash` dan `dhash`.
-- **Enkripsi Template**: Vektor biometrik wajah disegel dalam SQLite menggunakan **AES-128-EAX** dengan Associated Authenticated Data (AAD) yang terikat pada username operator.
-
-### 3. Laporan Intelijen (Super Enkripsi: `Vigenère Cipher` + `AES-256-CBC`)
-- **Tahap 1 (Substitusi Polialfabetik Klasik)**: Transformasi Extended Vigenère terhadap byte stream UTF-8 modulo 256:
-  $$C_i = (P_i + K_{i \bmod |K|}) \bmod 256$$
-- **Tahap 2 (Block Cipher Modern)**: Padding PKCS#7 dan enkripsi **AES-256-CBC** dengan IV acak 16-byte CSPRNG serta kunci 256-bit turunan PBKDF2-HMAC-SHA256.
-- Dilengkapi antarmuka dua arah: Enkripsi dengan pratinjau live telemetry tiap tahap, dan Dekripsi untuk memulihkan plaintext asli dari token Base64 database.
-
-### 4. Berkas Barang Bukti (`ChaCha20` Stream Cipher)
-- Mengenkripsi berkas biner barang bukti dokumen (PDF, DOCX, TXT, CSV, JPG, PNG, ZIP, KML) menggunakan cipher aliran simetris **ChaCha20** dengan kunci 256-bit (PBKDF2 200.000 iterasi) dan nonce acak 12-byte.
-- Membungkus ciphertext ke dalam amplop mandiri `.bagus.enc` ber-magic header yang memuat checksum integritas `SHA-256`.
-- Antarmuka dekripsi mampu memulihkan nama dan ekstensi asli berkas serta memvalidasi kesesuaian SHA-256.
-
-### 5. Citra Forensik Steganografi (Lossless PNG `LSB` + Delimiter `<<<END>>>`)
-- Menyisipkan pesan rahasia intelijen ke dalam Least Significant Bit komponen warna RGB citra PNG lossless secara kasat mata:
-  $$C'_{c} = (C_{c} \mathbin{\&} \text{0xFE}) \mathbin{|} b_k, \quad c \in \{R, G, B\}$$
-- Menggunakan pembatas terminal `<<<END>>>` sehingga ekstraksi berhenti tepat di akhir payload tanpa noise carrier.
-- Mendukung proteksi passphrase tambahan sebelum penyisipan bit.
-
-### 6. Inspeksi Basis Data (Encrypted SQLite At-Rest vs Decrypted View)
-- Audit forensik independen side-by-side: Menampilkan data mentah ciphertext SQLite yang tersimpan di disk `storage/vault.db` (hash PBKDF2, BLOB template wajah AES-128-EAX, token super-enkripsi Base64, dan metadata ChaCha20) dibandingkan dengan tampilan data terdekripsi terautentikasi.
-
-### 7. Chain of Custody Ledger (Proof-of-Work Blockchain & Integritas Aset)
-- Mencatat riwayat rantai bukti digital ke dalam buku besar tak terubahkan (*immutable ledger*) dan sinkronisasi otomatis ke `storage/ledger.json`.
-- Setiap blok bukti disegel dengan enkripsi terautentikasi **AES-256-GCM** dan ditambang menggunakan algoritma konsensus **Proof-of-Work SHA-256** dengan tingkat kesulitan prefix `"00"`.
-- Dilindungi tanda tangan **HMAC Chain-Tip Anchor** pada `app_meta` yang mendeteksi segala bentuk manipulasi SQLite langsung (*Tamper Lab*).
+- **Sistem Operasi**: Windows 10 atau Windows 11 (64-bit disarankan).
+- **Python**: Versi 3.10 atau yang lebih baru.
+  - Unduh resmi: `https://www.python.org/downloads/`
+  - *Penting*: Saat instalasi, pastikan mencentang kotak **"Add Python to PATH"**.
+- **Kamera**: Webcam bawaan laptop / USB eksternal (tersedia opsi alternatif unggah foto bila perangkat tidak memiliki webcam).
+- **Media Penyimpanan Tambahan**: Flashdisk USB tipe apa pun (tersedia mode token virtual lokal jika tidak membawa USB saat presentasi).
 
 ---
 
-## 🧪 Pengujian Otomatis (Automated Unit Test Suite)
+## 5. Cara Menjalankan Aplikasi
 
-Sistem dilengkapi suite pengujian otomatis mandiri yang menguji dan membuktikan kehandalan seluruh 7 modul kriptografi:
-```bash
-python tests/test_crypto_modules.py
-```
-Hasil uji: **7 tests run, 100% OK (Passed)**.
+Tersedia tiga cara untuk menjalankan aplikasi sesuai kenyamanan Anda:
 
----
-
-## 📂 Struktur Repositori Proyek
-
+### Cara 1: Aplikasi Desktop Native Windows (Paling Praktis)
+Cukup klik ganda (*double-click*) berkas:
 ```text
-geovault-crypto-app/
-├── app.py                      # Main Cyberpunk HUD UI Router & Gatekeeper
-├── config.py                   # Hierarki Kunci & Konfigurasi Path vault.db
-├── database.py                 # SQLite At-Rest Persistence Layer (vault.db)
-├── generate_dongle.py          # Script Provisioning USB Token & CLI
-├── ui_cyberpunk.py             # Cyberpunk Theme, HUD CSS & Telemetry Logs
-├── modules/
-│   ├── __init__.py             # Inisialisasi Paket Modul Kriptografi
-│   ├── dongle_guard.py         # [Kriteria 1] Hardware USB Dongle & HMAC
-│   ├── auth_biometric.py       # [Kriteria 2] Face Scanner PIL & AES-128-EAX
-│   ├── super_encryption.py     # [Kriteria 3] Super Enkripsi Vigenère + AES-256
-│   ├── file_crypto.py          # [Kriteria 4] ChaCha20 File Stream Cipher
-│   ├── steganography.py        # [Kriteria 6] LSB PNG Image Steganography
-│   └── blockchain.py           # [Kriteria 7] PoW SHA-256 Blockchain Ledger
-├── storage/
-│   ├── vault.db                # [Kriteria 5] Encrypted SQLite Database
-│   ├── ledger.json             # Cadangan State Blockchain JSON
-│   └── files/                  # BLOB Berkas Biner Terenkripsi
-├── tests/
-│   └── test_crypto_modules.py  # Unit Test Suite Otomatis 7 Kriteria
-├── docs/
-│   ├── LAPORAN_AKHIR_KRIPTOGRAFI.md   # Naskah Laporan Akademik Lengkap
-│   ├── LAPORAN_AKHIR_KRIPTOGRAFI.docx # Dokumen Word Laporan Akhir Siap Cetak
-│   ├── PANDUAN_DEMO_PENGUJIAN.md      # Panduan Ujian & Demonstrasi Dosen (Pak Bagus)
-│   └── generate_report_docx.py        # Script Generator Berkas Word DOCX
-├── requirements.txt            # Dependensi Python
-└── README.md                   # Dokumentasi Utama Proyek
+KryptVault.exe
 ```
+- Berkas eksekutabel ini langsung membuka jendela aplikasi desktop tanpa memunculkan jendela konsol hitam (*command prompt*).
+- Menutup jendela aplikasi via tombol [X] akan otomatis menghentikan server latar belakang secara bersih.
 
----
+### Cara 2: Batch Launcher Cerdas (1-Klik via Windows Explorer)
+Klik ganda berkas:
+```text
+JALANKAN_KRYPT_VAULT.bat
+```
+Peluncur ini secara otomatis akan:
+1. Memeriksa ketersediaan Python pada sistem.
+2. Memeriksa paket dependensi (`streamlit`, `pycryptodome`, `pillow`, `psutil`). Jika ada paket yang belum terpasang, sistem langsung mengunduhnya secara otomatis via `pip`.
+3. Mengaktifkan server lokal dan membuka jendela antarmuka mandiri.
 
-## 🚀 Panduan Menjalankan Aplikasi
-
-### 1. Prasyarat & Instalasi
-Pastikan Python 3.10+ telah terpasang. Jalankan instalasi dependensi:
+### Cara 3: Eksekusi Manual melalui Terminal
+Buka PowerShell atau Command Prompt pada folder proyek:
 ```bash
+cd geovault-crypto-app
 pip install -r requirements.txt
+python run_desktop.py
 ```
 
-### 2. Menjalankan Aplikasi
-Buka terminal dan jalankan:
+---
+
+## 6. Panduan Pengujian Pertama Kali (Fresh State)
+
+Saat pertama kali dibuka, aplikasi berada dalam kondisi pabrik (*fresh state*):
+
+### Langkah 1: Membuka Gerbang 1 (Hardware Dongle)
+1. Tancapkan flashdisk USB ke komputer.
+2. Pada layar aplikasi, pilih huruf drive flashdisk Anda (misal: `E:\`), lalu klik tombol **"Inisialisasi sebagai kunci"**.
+3. Sistem akan membuat token rahasia `.krypt_dongle` bertanda tangan HMAC-SHA256 tanpa mengubah data lain di flashdisk Anda.
+4. *Opsi Tanpa Flashdisk*: Pada panel kanan di bawah "Mode presentasi tanpa flashdisk", klik tombol **"Aktifkan token virtual"**. Layar akan langsung terbuka ke Gerbang 2.
+
+### Langkah 2: Registrasi dan Login Operator (Gerbang 2)
+1. Karena belum ada akun terdaftar, buka tab **"Daftarkan operator baru"**.
+2. Masukkan nama pengguna (contoh: `analyst_01`), kata sandi (minimal 8 karakter huruf dan angka), dan posisikan wajah menghadap webcam lalu ambil foto (atau unggah berkas foto wajah).
+3. Klik tombol **"Daftarkan operator"**. Kunci PBKDF2 diturunkan dan template wajah $128 \times 128$ disegel dengan AES-128-EAX.
+4. Pindah ke tab **"Masuk"**, masukkan kredensial yang baru didaftarkan, ambil foto wajah verifikasi, lalu klik **"Verifikasi dan masuk"**.
+5. Algoritma penyelarasan spasial multi-skala akan mencocokkan wajah (ambang batas kelulusan $\ge 70\%$). Jika valid, ruang kerja brankas utama langsung terbuka.
+
+### Langkah 3: Menjalankan Fitur Ruang Kerja (Gerbang 3)
+Gunakan bilah menu di sebelah kiri untuk mengakses 8 modul kerja:
+- **Ringkasan (Overview)**: Status sistem dan rangkuman kriptografi.
+- **Super Enkripsi Teks**: Enkripsi kaskade Vigenere + AES-256-CBC.
+- **Enkripsi Berkas**: Enkripsi biner dokumen ChaCha20 (.krypt.enc).
+- **Steganografi Citra**: Penyisipan teks rahasia ke kanal LSB PNG.
+- **Inspeksi Basis Data**: Audit at-rest zero-plaintext pada SQLite.
+- **Blockchain Ledger**: Pencatatan bukti PoW & simulasi tamper lab.
+- **Pengaturan Kunci USB**: Manajemen dan status drive hardware key.
+- **Keluar**: Mengunci sesi kembali ke Gerbang 1.
+
+---
+
+## 7. Skenario Demonstrasi & Presentasi 5 Menit di Hadapan Dosen
+
+Gunakan skenario berikut saat melakukan pengujian dan demonstrasi agar seluruh 7 kriteria terbukti secara runtut dan meyakinkan:
+
+```text
+[00:00 - 00:45] Gerbang 1: Hardware Dongle Intercept & Deteksi Cabut USB
+[00:45 - 01:45] Gerbang 2: Autentikasi PBKDF2 & Biometrik Wajah Multi-Skala
+[01:45 - 02:30] Gerbang 3: Super Enkripsi Teks Kaskade (Vigenere + AES-256)
+[02:30 - 03:15] Gerbang 3: Enkripsi Berkas Biner ChaCha20 (.krypt.enc)
+[03:15 - 03:45] Gerbang 3: Steganografi Spasial LSB Citra PNG Lossless
+[03:45 - 04:15] Gerbang 3: Audit Basis Data SQLite At-Rest Zero-Plaintext
+[04:15 - 05:00] Gerbang 3: Ledger Bukti Blockchain PoW & Tamper Lab Attack
+```
+
+### Prosedur Demonstrasi Tiap Kriteria:
+1. **Pengujian Kriteria 1 (Dongle Guard)**:
+   - Tunjukkan layar tertahan di Gerbang 1 saat flashdisk belum terpasang.
+   - Tancapkan flashdisk atau aktifkan token virtual; sistem seketika membuka Gerbang 2.
+   - *Uji Proteksi Cabut USB*: Saat berada di dalam ruang kerja, cabut flashdisk USB; dalam hitungan 4 detik background watcher akan langsung mengunci paksa sesi kembali ke Gerbang 1.
+2. **Pengujian Kriteria 2 (Biometrik Wajah & Toleransi Gerak)**:
+   - Lakukan login dengan wajah terdaftar; skor kecocokan mencapai 85%–100% dan sesi terbuka.
+   - Coba gunakan foto orang lain atau simulasikan wajah berbeda; sistem menolak akses karena skor kemiripan berada di bawah 60% ($< 70\%$).
+3. **Pengujian Kriteria 3 (Super Enkripsi Teks)**:
+   - Buka menu Super Enkripsi Teks, masukkan teks rahasia, kunci Vigenere, dan passphrase AES.
+   - Tunjukkan hasil dua lapis: transformasi Vigenere byte-modulo 256 dilanjutkan enkripsi AES-256-CBC hingga menghasilkan token Base64.
+   - Lakukan dekripsi pada tab dekripsi untuk membuktikan plaintext pulih 100% identik.
+4. **Pengujian Kriteria 4 (Enkripsi Berkas Dokumen ChaCha20)**:
+   - Jelaskan bahwa enkripsi berkas sengaja menggunakan cipher biner yang berbeda dari teks, yaitu ChaCha20 Stream Cipher 256-bit.
+   - Unggah berkas dokumen (PDF atau DOCX), masukkan passphrase, unduh berkas terenkripsi `.krypt.enc`.
+   - Lakukan dekripsi berkas tersebut; sistem memvalidasi checksum SHA-256 asli dan berkas dokumen pulih sempurna.
+5. **Pengujian Kriteria 5 (Audit Basis Data At-Rest Zero-Plaintext)**:
+   - Buka modul Inspeksi Basis Data.
+   - Tunjukkan tampilan ciphertext langsung dari berkas fisik `storage/vault.db`: kata sandi hanya berupa intisari hash ber-salt, template biometrik berupa BLOB acak AES-128-EAX, dan seluruh pesan intelijen tersimpan dalam bentuk terenkripsi.
+6. **Pengujian Kriteria 6 (Steganografi Citra PNG LSB)**:
+   - Buka modul Steganografi Citra, unggah berkas cover PNG, masukkan pesan rahasia dan passphrase.
+   - Unduh citra stego yang dihasilkan (secara visual tampak identik dengan aslinya).
+   - Ekstrak pesan dari citra stego untuk membuktikan pesan terbaca tepat hingga delimiter `<<<END>>>`.
+7. **Pengujian Kriteria 7 (Blockchain Proof-of-Work & Tamper Lab)**:
+   - Buka modul Blockchain Ledger, tunjukkan rantai blok yang tertaut dengan hash SHA-256 berawalan `00`.
+   - Tambahkan blok barang bukti baru; sistem akan menambang nonce PoW secara real-time.
+   - Buka tab "Uji Integritas & Tamper Lab", simulasikan manipulasi isi blok lama; sistem langsung mendeteksi patahnya rantai (*CHAIN_TAMPERED*) dan menandai blok yang korup secara visual.
+
+---
+
+## 8. Cara Mengembalikan Data ke Kondisi Fresh Pabrik
+
+Jika Anda atau penguji telah selesai melakukan demonstrasi dan ingin mengosongkan kembali seluruh akun, riwayat laporan, dan berkas ke kondisi awal:
+Cukup klik ganda:
+```text
+RESET_DATA_FRESH.bat
+```
+Tekan tombol `Y` saat diminta konfirmasi. Skrip akan:
+- Mengosongkan tabel pengguna dan menghapus template biometrik lama.
+- Mengosongkan riwayat berkas terenkripsi dan laporan rahasia.
+- Menyetel ulang rantai blockchain kembali ke Blok Genesis #0.
+- Membersihkan token virtual, sehingga siap dipakai kembali untuk pengujian baru.
+
+---
+
+## 9. Suite Pengujian Otomatis (Unit Testing)
+
+Krypt Vault dilengkapi suite pengujian otomatis komprehensif yang menguji kebenaran matematis seluruh mekanisme kriptografi secara independen dari antarmuka:
+
+Jalankan perintah berikut pada terminal:
 ```bash
-streamlit run app.py
+cd geovault-crypto-app
+python -m unittest tests/test_crypto_modules.py
 ```
 
-### 3. Panduan Demonstrasi Pengujian (Demo Mode)
-1. **Menguji Status Kunci Dongle (Locked State)**:
-   - Saat aplikasi pertama kali dibuka tanpa USB dongle, layar otomatis beralih ke **Crimson Red Lockscreen** (`// CRITICAL_SECURITY_HALT`).
-   - Buka panel ekspander `[ DEV_DEMO: MOUNT / UNMOUNT VIRTUAL DONGLE ]`.
-   - Klik `[ MOUNT_VIRTUAL_DONGLE ]` untuk mensimulasikan pemasangan flashdisk otorisasi secara instan.
-2. **Menguji Pemindaian Wajah Real-Time**:
-   - Daftarkan akun baru di tab `[02] ENROLL_NEW_IDENTITY`. Masukkan operator handle dan passkey, lalu klik `[ ⚡ INITIALIZE_REALTIME_OPTICAL_SCAN ]`.
-   - Masuk di tab `[01] AUTHENTICATE_OPERATOR`. Centang opsi `[ Simulasikan Wajah Tidak Cocok / Penyusup ]` untuk mendemonstrasikan penolakan biometrik secara langsung di depan penguji.
-3. **Menguji Enkripsi & Dekripsi**:
-   - Uji Super Enkripsi pada menu `[01] LAPORAN INTELIJEN` dan pulihkan kembali teks aslinya di tab Dekripsi.
-   - Uji Enkripsi Berkas Dokumen pada menu `[02] BERKAS BARANG BUKTI`, unduh berkas `.bagus.enc`, dan dekripsi kembali untuk mendapatkan berkas asli.
-   - Uji Penyisipan & Ekstraksi Steganografi pada menu `[03] CITRA FORENSIK STEGANOGRAFI`.
-   - Tunjukkan bukti enkripsi at-rest pada menu `[04] INSPEKSI BASIS DATA`.
-   - Tambang blok bukti dan simulasikan serangan manipulasi basis data pada menu `[05] CHAIN OF CUSTODY LEDGER`.
+### Hasil Pengujian:
+```text
+Ran 7 tests in 1.917s
+
+OK
+```
+- `test_01_dongle_hmac_and_guard`: Validasi HMAC-SHA256, deteksi pemalsuan token, dan penguncian sesi unmount.
+- `test_02_biometric_face_and_pbkdf2_login`: Verifikasi PBKDF2 600k iterasi, segel AES-128-EAX, toleransi gerak wajar kepala 10px, dan penolakan penyusup.
+- `test_03_super_encryption_cascade`: Kebenaran kaskade Extended Vigenere byte-modulo 256 + AES-256-CBC.
+- `test_04_chacha20_file_encryption`: Enkripsi berkas ChaCha20, validasi wadah `.krypt.enc`, dan verifikasi checksum SHA-256.
+- `test_05_at_rest_zero_plaintext_sqlite`: Audit kebocoran plaintext pada berkas fisik basis data `vault.db`.
+- `test_06_lsb_steganography_png`: Penyisipan bit LSB, proteksi passphrase, dan pembacaan delimiter `<<<END>>>`.
+- `test_07_blockchain_pow_integrity_and_tamper`: Penambangan PoW target `00`, verifikasi tautan hash, dan deteksi pemalsuan riwayat.
+
+---
+
+## 10. Dokumen Laporan Akhir (Deliverables)
+
+Laporan akhir resmi telah disusun secara lengkap sesuai format akademik UPN "Veteran" Yogyakarta dengan ketentuan tipografi hitam standar, spasi 1.5, penjorokan paragraf 1 cm, dan daftar isi otomatis berpenuntun titik:
+- **Dokumen Word (.docx)**:
+  - [`Laporan_Tugas_Akhir_Kriptografi_Krypt_Vault.docx`](../Laporan_Tugas_Akhir_Kriptografi_Krypt_Vault.docx)
+  - Salinan arsip: [`geovault-crypto-app/docs/LAPORAN_AKHIR_KRIPTOGRAFI.docx`](./geovault-crypto-app/docs/LAPORAN_AKHIR_KRIPTOGRAFI.docx)
+- **Dokumen Markdown (.md)**:
+  - [`geovault-crypto-app/docs/LAPORAN_AKHIR_KRIPTOGRAFI.md`](./geovault-crypto-app/docs/LAPORAN_AKHIR_KRIPTOGRAFI.md)
