@@ -1,11 +1,11 @@
 [
   {
     "index": 0,
-    "timestamp": "2026-11-11T11:51:50+00:00",
+    "timestamp": "2026-11-11T12:28:49+00:00",
     "asset_name": "GENESIS",
-    "encrypted_asset_metadata": "gb1lcKIJWYd5VKQdYTsBWpckud1QKYmFSYvYmAg7qURTXDG2QA+hz6DsbKUF8Rw6GUWH0ilg4uw+5VaYogMYeNfZezVG2+ZlSL8PrnMw7rXozjYe7vBj5PKsO0j3ZrcN5cnQOtyLiA==",
+    "encrypted_asset_metadata": "y/9HSEoHQ4/w1OvL9u9Xz8ZyZGNkDdxs3kslHDnLkIcH9W1r/vgA3iglXyffNUENi5PTnjkvfziu9mpPkKePn97FLfePjzTl3twvVj6AwLAQ5Sev6Se0YjkmR/rEbh04TAv+SWKQLg==",
     "previous_hash": "0000000000000000000000000000000000000000000000000000000000000000",
-    "nonce": 337,
-    "current_hash": "00fb1aa8d16c172e6fd26a74ff55a8b94d22556e79dcbe32fe7aae1a49cdf7a0"
+    "nonce": 646,
+    "current_hash": "00613fb024671d489fbb6ddff6e42553802689d32296fbb8892043e2b86f71b3"
   }
 ]

@@ -48,7 +48,6 @@ for _k, _v in {
     "page": "Ringkasan",
     "dongle_sig": None,
     "pnp_usb_serial": None,
-    "kv_theme": "dark",
     "last_auth_sim": None,
     "last_usb_snapshot": None,
 }.items():
@@ -77,6 +76,10 @@ def _short(path: Optional[str], n: int = 42) -> str:
     if not path:
         return "-"
     return path if len(path) <= n else "..." + path[-(n - 3):]
+
+
+def _navigate(target_page: str) -> None:
+    st.session_state.page = target_page
 
 
 def _format_bytes(num: int) -> str:
@@ -130,43 +133,28 @@ def _active_dongle_status() -> dongle_guard.DongleStatus:
 
 
 def _render_topbar(status: dongle_guard.DongleStatus, show_brand: bool = True) -> None:
-    """Persistent application bar with hardware status badge, log popover, and theme toggle."""
-    theme_mode = ui.get_theme()
-    next_label = "Mode Terang" if theme_mode == "dark" else "Mode Gelap"
+    """Persistent application bar: brand or breadcrumb, hardware key status, and the activity log."""
     logs_count = len(st.session_state.get("kv_logs", []))
 
-    c_left, c_stat, c_log, c_theme = st.columns([2.1, 1.8, 0.75, 0.85], vertical_alignment="center")
+    c_left, c_stat, c_log = st.columns([2, 2.2, 0.9], vertical_alignment="center")
     with c_left:
         if show_brand:
             ui.brand()
         else:
-            st.markdown(
-                ui.chip(f"Halaman: {st.session_state.page}", "info", icon_name="shield"),
-                unsafe_allow_html=True,
-            )
+            ui.crumb("Vault", st.session_state.page)
     with c_stat:
         if status.valid:
-            st.markdown(
-                ui.chip(f"Dongle Aktif: {status.label or 'USB'}", "ok", dot=True),
-                unsafe_allow_html=True,
-            )
+            ui.status("Kunci aktif", "ok", status.label or "USB")
         else:
-            st.markdown(
-                ui.chip("Gate 01 Terkunci: Menunggu USB", "warn", dot=True),
-                unsafe_allow_html=True,
-            )
+            ui.status("Menunggu kunci USB", "warn")
     with c_log:
         with st.popover(f"Log ({logs_count})", use_container_width=True):
-            st.markdown("**Telemetri Aktivitas Terbaru**")
+            st.markdown("**Telemetri aktivitas terbaru**")
             ui.render_log(limit=25)
             if st.button("Bersihkan log", key="top_clear_logs", use_container_width=True):
                 st.session_state.kv_logs = []
                 ui.log("SYSTEM", "Riwayat log sesi dibersihkan", level="INFO")
                 st.rerun()
-    with c_theme:
-        if st.button(next_label, key="top_theme_toggle", use_container_width=True):
-            ui.toggle_theme()
-            st.rerun()
 
 
 @st.fragment(run_every=4)
@@ -494,19 +482,22 @@ def page_overview(user: str, status: dongle_guard.DongleStatus) -> None:
     st.markdown("### Akses Cepat Modul")
     qa_cols = st.columns(4)
     quick_items = [
-        ("Enkripsi Teks", "Super Enkripsi", "Extended Vigenere + AES-256-CBC untuk catatan rahasia."),
-        ("Enkripsi Berkas", "Stream ChaCha20", "Segel berkas biner ke amplop mandiri .krypt.enc."),
-        ("Steganografi", "Sisip Citra PNG", "Sembunyikan teks rahasia ke bit LSB kanal RGB."),
-        ("Ledger Aset", "Blockchain PoW", "Catat aset kritis dengan AES-GCM & hash berantai."),
+        ("Enkripsi Teks", "Super enkripsi", "text", "Extended Vigenere + AES-256-CBC untuk catatan rahasia."),
+        ("Enkripsi Berkas", "Stream ChaCha20", "file", "Segel berkas biner ke amplop mandiri .krypt.enc."),
+        ("Steganografi", "Sisip citra PNG", "image", "Sembunyikan teks rahasia ke bit LSB kanal RGB."),
+        ("Ledger Aset", "Blockchain PoW", "blocks", "Catat aset kritis dengan AES-GCM dan hash berantai."),
     ]
-    for col, (target_page, heading, desc) in zip(qa_cols, quick_items):
+    for col, (target_page, heading, ic, desc) in zip(qa_cols, quick_items):
         with col:
             with st.container(border=True):
-                st.markdown(f"**{heading}**")
-                st.caption(desc)
-                if st.button("Buka modul", key=f"qa_{target_page}", use_container_width=True):
-                    st.session_state.page = target_page
-                    st.rerun()
+                ui.module_head(ic, heading, desc)
+                st.button(
+                    "Buka modul",
+                    key=f"qa_{target_page}",
+                    on_click=_navigate,
+                    args=(target_page,),
+                    use_container_width=True,
+                )
 
     st.write("")
     c1, c2 = st.columns([1.6, 1], gap="large")
@@ -1103,18 +1094,16 @@ def main() -> None:
     user = st.session_state.user
     _dongle_watch(status.dongle_id)
 
+    if st.session_state.get("page") not in PAGES:
+        st.session_state.page = "Ringkasan"
+
     with st.sidebar:
         ui.brand()
         st.write("")
-        page = st.radio("Navigasi", PAGES, index=PAGES.index(st.session_state.page), label_visibility="collapsed")
-        st.session_state.page = page
+        page = st.radio("Navigasi", PAGES, key="page", label_visibility="collapsed")
         st.divider()
-        sim_txt = f" | Wajah {st.session_state.similarity:.0%}" if st.session_state.similarity is not None else ""
-        st.markdown(
-            ui.chip(f"{user}{sim_txt}", "info", icon_name="user")
-            + ui.chip(status.label or "USB Aktif", "ok", dot=True),
-            unsafe_allow_html=True,
-        )
+        sim_txt = f"Kecocokan wajah {st.session_state.similarity:.0%}" if st.session_state.similarity is not None else ""
+        ui.operator(user, sim_txt)
         st.write("")
         if st.button("Kunci & Keluar", use_container_width=True, key="sb_logout"):
             ui.log("AUTH", f"Operator '{user}' mengunci sesi", level="INFO")
