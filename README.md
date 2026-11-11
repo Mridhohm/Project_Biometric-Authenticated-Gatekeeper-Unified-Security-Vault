@@ -11,7 +11,8 @@ Seluruh kode sumber aplikasi, dokumentasi laporan akhir, dan suite pengujian oto
 
 ## Panduan Eksekusi 1-Klik
 Cukup jalankan berkas peluncur:
-- **Windows Launcher**: `JALANKAN_KRYPT_VAULT.bat`
+- **Aplikasi Desktop Native Windows**: `KryptVault.exe` (klik ganda langsung membuka jendela aplikasi tanpa jendela terminal)
+- **Windows Batch Launcher**: `JALANKAN_KRYPT_VAULT.bat`
 - **Reset Pabrik (Fresh)**: `RESET_DATA_FRESH.bat`
 
 Atau melalui terminal:

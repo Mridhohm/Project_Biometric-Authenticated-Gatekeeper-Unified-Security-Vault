@@ -15,9 +15,15 @@ Aplikasi ini dapat dibagikan dan dijalankan secara mandiri pada komputer mana pu
 - Perangkat Keras: Kamera webcam laptop/PC (opsional, tersedia opsi unggah foto jika tidak ada webcam)
 
 --------------------------------------------------------------------------------
-2. CARA MENJALANKAN APLIKASI (1-KLIK)
+2. CARA MENJALANKAN APLIKASI (NATIVE 1-KLIK)
 --------------------------------------------------------------------------------
-Cukup klik ganda (double-click) berkas:
+Cukup klik ganda (double-click) aplikasi:
+   >>> KryptVault.exe <<<
+
+Aplikasi desktop native Krypt Vault akan langsung terbuka dalam jendela mandiri
+(frameless app window tanpa command prompt dan tanpa tab peramban).
+
+Alternatif (via terminal script):
    >>> JALANKAN_KRYPT_VAULT.bat <<<
 
 Skrip peluncur ini akan otomatis:
