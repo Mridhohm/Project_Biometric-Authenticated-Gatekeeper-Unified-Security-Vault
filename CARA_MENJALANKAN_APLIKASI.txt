@@ -1,0 +1,69 @@
+================================================================================
+                    PANDUAN MENJALANKAN KRYPT VAULT SECARA LOKAL
+                 Tugas Akhir Kriptografi - UPN "Veteran" Yogyakarta
+================================================================================
+
+Aplikasi ini dapat dibagikan dan dijalankan secara mandiri pada komputer mana pun.
+
+--------------------------------------------------------------------------------
+1. PERSYARATAN SISTEM
+--------------------------------------------------------------------------------
+- Sistem Operasi : Windows 10 atau Windows 11
+- Python         : Versi 3.10 atau yang lebih baru
+  * Jika belum terpasang, unduh di: https://www.python.org/downloads/
+  * PENTING: Saat instalasi Python, centang kotak "Add Python to PATH".
+- Perangkat Keras: Kamera webcam laptop/PC (opsional, tersedia opsi unggah foto jika tidak ada webcam)
+
+--------------------------------------------------------------------------------
+2. CARA MENJALANKAN APLIKASI (1-KLIK)
+--------------------------------------------------------------------------------
+Cukup klik ganda (double-click) berkas:
+   >>> JALANKAN_KRYPT_VAULT.bat <<<
+
+Skrip peluncur ini akan otomatis:
+1. Memeriksa ketersediaan Python.
+2. Memeriksa paket dependensi (Streamlit, PyCryptodome, Pillow, Psutil).
+   Jika belum terpasang di komputer Anda, sistem akan otomatis mengunduhnya via pip.
+3. Menjalankan server dan membuka jendela aplikasi Krypt Vault secara otomatis.
+
+--------------------------------------------------------------------------------
+3. ALUR PENGUJIAN PERTAMA KALI (KONDISI FRESH)
+--------------------------------------------------------------------------------
+Saat aplikasi pertama kali dibuka:
+
+LANGKAH 1 - GERBANG DONGLE (GATE 01):
+- Jika Anda memiliki flashdisk USB, tancapkan ke laptop, pilih drive USB pada layar,
+  lalu klik "Inisialisasi sebagai kunci".
+- JIKA TIDAK ADA FLASHDISK: Lihat panel kanan di bawah "Mode presentasi tanpa flashdisk",
+  cukup klik tombol "Aktifkan token virtual".
+
+LANGKAH 2 - REGISTRASI & LOGIN OPERATOR (GATE 02):
+- Karena aplikasi dalam kondisi fresh (belum ada akun), klik tab:
+  "Daftarkan operator baru"
+- Masukkan Nama Pengguna, Kata Sandi, dan ambil foto wajah via kamera webcam Anda
+  (atau unggah foto wajah). Lalu klik "Daftarkan operator".
+- Setelah berhasil, pindah ke tab "Masuk", masukkan nama pengguna dan kata sandi Anda,
+  ambil foto verifikasi wajah, lalu klik "Verifikasi dan masuk".
+
+LANGKAH 3 - RUANG KERJA VAULT (GATE 03):
+- Anda telah berhasil masuk ke dalam brankas. Gunakan bilah menu di sebelah kiri
+  untuk mencoba seluruh 7 fitur kriptografi:
+  * Enkripsi Teks (Extended Vigenere + AES-256-CBC)
+  * Enkripsi Berkas (ChaCha20 Stream Cipher)
+  * Steganografi Citra (LSB pada kanal RGB citra PNG)
+  * Basis Data SQLite (Audit persistensi at-rest & pencarian biner langsung)
+  * Ledger Aset Blockchain (Proof-of-Work SHA-256 awalan '00' & Tamper Lab)
+
+--------------------------------------------------------------------------------
+4. CARA ME-RESET DATA KE KONDISI FRESH PABRIK KAPAN SAJA
+--------------------------------------------------------------------------------
+Jika Anda atau teman Anda sudah selesai mencoba dan ingin mengosongkan kembali
+semua akun, riwayat pesan, dan berkas ke kondisi awal pabrik:
+Cukup klik ganda:
+   >>> RESET_DATA_FRESH.bat <<<
+
+Pilih "Y" saat diminta konfirmasi, dan sistem akan langsung bersih kembali 100%.
+
+================================================================================
+Krypt Vault - Forensic Evidence & Strategic Intelligence Security Suite
+================================================================================
