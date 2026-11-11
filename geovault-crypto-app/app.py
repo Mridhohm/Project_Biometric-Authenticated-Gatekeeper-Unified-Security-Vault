@@ -65,70 +65,69 @@ if "last_logged_dongle_state" not in st.session_state:
 # Top HUD Navigation & Gatekeeper Badges
 # --------------------------------------------------------------------------- #
 def render_hud_topbar(current_step: int, dongle_mounted: bool = True) -> None:
-    dongle_color = "#00FF66" if dongle_mounted else "#FF003C"
-    dongle_label = "● DONGLE_MOUNTED" if dongle_mounted else "● DONGLE_UNMOUNTED"
-    dongle_glow = "rgba(0, 255, 102, 0.35)" if dongle_mounted else "rgba(255, 0, 60, 0.35)"
+    dongle_color = "#10B981" if dongle_mounted else "#EF4444"
+    dongle_bg = "rgba(16, 185, 129, 0.12)" if dongle_mounted else "rgba(239, 68, 68, 0.12)"
+    dongle_label = "● HARDWARE KEY: TERHUBUNG" if dongle_mounted else "● HARDWARE KEY: TERPUTUS"
 
     st.markdown(
         f"""
         <div style="
-            background: linear-gradient(135deg, #0d0f17 0%, #131826 55%, #060609 100%);
-            border: 1px solid rgba(0, 240, 255, 0.45);
-            border-left: 4px solid #FCEE0A;
-            padding: 16px 22px;
-            margin-bottom: 14px;
-            clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
-            box-shadow: 0 0 22px rgba(0, 240, 255, 0.14), inset 0 0 18px rgba(0, 240, 255, 0.05);
+            background: linear-gradient(135deg, #0F172A 0%, #111827 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 18px 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
         ">
             <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                    <span style="font-size: 1.5rem; font-weight: 800; color: #F8FAFC; letter-spacing: -0.02em;">
+                        ⚡ KRYPT VAULT
+                    </span>
+                    <span style="
+                        background: rgba(14, 165, 233, 0.15);
+                        color: #38BDF8;
+                        border: 1px solid rgba(14, 165, 233, 0.3);
+                        padding: 2px 10px;
+                        border-radius: 9999px;
+                        font-size: 0.72rem;
+                        font-weight: 700;
+                        letter-spacing: 0.05em;
+                    ">ENTERPRISE FORENSIC EDITION</span>
+                </div>
                 <div style="
-                    color: #FCEE0A;
-                    font-size: clamp(1.2rem, 2.2vw, 1.65rem);
-                    font-weight: 700;
-                    letter-spacing: 0.08em;
-                    line-height: 1.2;
-                    text-shadow: 0 0 14px rgba(252, 238, 10, 0.6), 0 0 4px rgba(252, 238, 10, 0.35);
-                    margin-bottom: 4px;
-                ">// KRYPT VAULT [v2.6_FORENSIC_EDITION]</div>
-                <div style="
-                    color: #00F0FF;
-                    font-size: clamp(0.72rem, 1.1vw, 0.85rem);
-                    letter-spacing: 0.12em;
-                    text-transform: uppercase;
-                    opacity: 0.92;
-                ">SISTEM PENGAMANAN BUKTI FORENSIK SIBER &amp; DOKUMEN INTELIJEN STRATEGIS</div>
+                    color: #94A3B8;
+                    font-size: 0.82rem;
+                    font-weight: 500;
+                ">Sistem Pengamanan Bukti Forensik Siber &amp; Dokumen Intelijen Strategis</div>
             </div>
             <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
                 <span style="
-                    background: rgba(6, 6, 9, 0.9);
+                    background: {dongle_bg};
                     color: {dongle_color};
                     border: 1px solid {dongle_color};
-                    padding: 6px 13px;
+                    padding: 6px 14px;
+                    border-radius: 9999px;
                     font-size: 0.78rem;
                     font-weight: 700;
-                    letter-spacing: 0.08em;
+                    letter-spacing: 0.04em;
                     white-space: nowrap;
-                    box-shadow: 0 0 10px {dongle_glow};
-                    text-shadow: 0 0 8px {dongle_glow};
-                    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
                 ">{dongle_label}</span>
                 <span style="
-                    background: rgba(6, 6, 9, 0.9);
-                    color: #00F0FF;
-                    border: 1px solid rgba(0, 240, 255, 0.65);
-                    padding: 6px 13px;
+                    background: rgba(14, 165, 233, 0.1);
+                    color: #38BDF8;
+                    border: 1px solid rgba(14, 165, 233, 0.25);
+                    padding: 6px 14px;
+                    border-radius: 9999px;
                     font-size: 0.78rem;
-                    font-weight: 700;
-                    letter-spacing: 0.08em;
+                    font-weight: 600;
                     white-space: nowrap;
-                    box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
-                    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-                ">CIPHER: AES-256 / CHACHA20 / SHA-256</span>
+                ">CIPHER: AES-256 / CHACHA20 / SHA-256 / LSB</span>
             </div>
         </div>
         """,
@@ -136,26 +135,42 @@ def render_hud_topbar(current_step: int, dongle_mounted: bool = True) -> None:
     )
 
     steps = [
-        (1, "GATE_01 // HARDWARE_DONGLE_HMAC"),
-        (2, "GATE_02 // OPTICAL_FACE_AES128"),
-        (3, "GATE_03 // EVIDENCE_VAULT_CORE"),
+        (1, "GATE 01", "HARDWARE DONGLE USB", "HMAC-SHA256 Token"),
+        (2, "GATE 02", "BIOMETRIK & KREDENSIAL", "PBKDF2 + AES-128-EAX"),
+        (3, "GATE 03", "BRANKAS BUKTI FORENSIK", "Super Enc & Ledger Core"),
     ]
     cols = st.columns(3)
-    for col, (num, title) in zip(cols, steps):
+    for col, (num, tag, title, desc) in zip(cols, steps):
         if num < current_step:
-            border, fg, status_txt = "#00FF66", "#00FF66", "ONLINE // CLEARED"
+            border = "rgba(16, 185, 129, 0.5)"
+            bg = "linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, #111827 100%)"
+            badge = "<span style='color:#10B981; font-weight:700;'>● ONLINE / CLEARED</span>"
         elif num == current_step:
-            border, fg, status_txt = "#FCEE0A", "#FCEE0A", "ACTIVE // ENGAGED"
+            border = "rgba(14, 165, 233, 0.8)"
+            bg = "linear-gradient(135deg, rgba(14, 165, 233, 0.12) 0%, #111827 100%)"
+            badge = "<span style='color:#38BDF8; font-weight:700;'>⚡ AKTIF / VERIFIKASI</span>"
         else:
-            border, fg, status_txt = "#FF003C", "#7C8DA6", "LOCKED // STANDBY"
+            border = "rgba(255, 255, 255, 0.06)"
+            bg = "#0B0F19"
+            badge = "<span style='color:#64748B; font-weight:600;'>🔒 TERKUNCI / STANDBY</span>"
+
         with col:
             st.markdown(
                 f"""
-                <div style="background:#0d0f17;border:1px solid {border};border-left:4px solid {border};
-                            padding:8px 12px;margin-bottom:8px;
-                            clip-path:polygon(0 0,95% 0,100% 25%,100% 100%,5% 100%,0 75%);">
-                    <div style="font-size:11px;color:#7C8DA6;">{status_txt}</div>
-                    <div style="font-size:13px;color:{fg};font-weight:bold;">{title}</div>
+                <div style="
+                    background: {bg};
+                    border: 1px solid {border};
+                    border-radius: 10px;
+                    padding: 12px 16px;
+                    margin-bottom: 14px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                ">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; font-size:11px;">
+                        <span style="color:#94A3B8; font-weight:700;">{tag}</span>
+                        {badge}
+                    </div>
+                    <div style="font-size:13px; color:#F8FAFC; font-weight:700; margin-bottom:2px;">{title}</div>
+                    <div style="font-size:11px; color:#64748B;">{desc}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -172,65 +187,118 @@ def render_dongle_lock_screen(status: dongle_guard.DongleStatus) -> None:
         has_tamper_failure=bool(status.failures),
     )
 
-    col_rescan, col_demo = st.columns([1, 1])
-    with col_rescan:
-        if st.button("⚡ RE-SCAN_USB_PORTS // VERIFIKASI HMAC-SHA256 DONGLE", type="primary", use_container_width=True):
-            ui_cyberpunk.log_cli(
-                "DONGLE_GUARD",
-                "Re-scanning system USB bus & probing removable mounts for hardware dongle token",
-                digest=ui_cyberpunk.sha256_hex(str(status.scanned_locations)),
-                level="WARN",
+    # 1. Real Physical USB Detection & Provisioning
+    st.markdown("### 🔌 PENDETEKSI & INISIALISASI HARDWARE KEY USB FISIK")
+    st.caption(
+        "Krypt Vault memerlukan flashdisk fisik sebagai kunci otorisasi. "
+        "Sistem membaca Volume Serial partisi fisik Windows dan menyematkan token `.krypt_dongle` ber-tanda tangan HMAC-SHA256."
+    )
+
+    all_drives = dongle_guard.list_all_drives_for_provisioning()
+    usb_drives = [d for d in all_drives if d.get("is_usb")]
+
+    card_col1, card_col2 = st.columns([1.2, 1])
+
+    with card_col1:
+        st.markdown("#### 💾 Status Flashdisk Port USB")
+        if usb_drives:
+            st.success(f"🟢 **Terdeteksi {len(usb_drives)} Flashdisk USB di Komputer:**")
+            for u in usb_drives:
+                st.markdown(
+                    f"- **Drive `{u['drive']}`** ({u['type_name']}) — Serial: `{u['volume_serial']}`"
+                )
+
+            target_usb = st.selectbox(
+                "Pilih Flashdisk Untuk Diinisialisasi Sebagai Kunci Hardware",
+                [u["drive"] for u in usb_drives],
+                key="target_usb_select",
             )
+            key_label = st.text_input(
+                "Label Kunci Hardware",
+                value="Analis Forensik Hardware Key",
+                key="usb_key_label_input",
+            )
+
+            if st.button("🔑 INISIALISASI FLASHDISK INI SEBAGAI HARDWARE KEY", type="primary", use_container_width=True):
+                ok, msg = dongle_guard.provision_drive(target_usb, label=key_label)
+                if ok:
+                    ui_cyberpunk.log_cli("DONGLE_GUARD", f"Physical USB provisioned at {target_usb}", level="OK")
+                    st.success(msg)
+                    st.rerun()
+                else:
+                    ui_cyberpunk.log_cli("DONGLE_GUARD", f"Provisioning failed: {msg}", level="CRIT")
+                    st.error(msg)
+        else:
+            st.warning("⚠️ **Tidak ada Flashdisk Removable USB yang terdeteksi.**")
+            st.markdown(
+                """
+                1. Tancapkan **Flashdisk USB fisik** apa saja ke port USB komputer Anda.
+                2. Tunggu beberapa detik hingga Windows mengenali drive flashdisk Anda.
+                3. Klik tombol **Pindai Ulang Port USB** di sebelah kanan.
+                """
+            )
+
+            # Allow provisioning any drive if user has an external drive or wants manual selection
+            with st.expander("🔍 Inisialisasi Drive Lain (Harddisk Eksternal / Partisi Khusus)"):
+                other_drives = [d["drive"] for d in all_drives]
+                if other_drives:
+                    manual_drive = st.selectbox("Pilih Drive", other_drives, key="manual_drive_select")
+                    if st.button(f"🔑 Buat Kunci di Drive {manual_drive}", key="btn_manual_prov"):
+                        ok, msg = dongle_guard.provision_drive(manual_drive, label="Custom Drive Key")
+                        if ok:
+                            ui_cyberpunk.log_cli("DONGLE_GUARD", f"Hardware key written to {manual_drive}", level="OK")
+                            st.success(msg)
+                            st.rerun()
+                        else:
+                            st.error(msg)
+
+    with card_col2:
+        st.markdown("#### ⚡ Aksi Kontrol & Pindai")
+        if st.button("🔄 PINDAI ULANG PORT USB (RE-SCAN)", type="primary", use_container_width=True):
+            ui_cyberpunk.log_cli("DONGLE_GUARD", "Manual USB bus re-scan requested by operator", level="INFO")
             st.session_state.last_logged_dongle_state = None
             st.rerun()
 
-    with col_demo:
-        with st.expander("🛠️ DEV_DEMO: MOUNT / UNMOUNT VIRTUAL DONGLE", expanded=True):
+        st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+        with st.expander("🛠️ Mode Cadangan / Virtual Dongle (Pengujian Tanpa Flashdisk)"):
             st.caption(
-                "Gunakan saklar ini untuk mendemonstrasikan status **Terkunci (Locked)** dan "
-                "**Terbuka (Unlocked)** secara langsung di depan penguji tanpa harus mencabut flashdisk fisik."
+                "Gunakan opsi ini jika Anda sedang tidak membawa flashdisk fisik saat presentasi/pengujian. "
+                "Fitur ini membuat folder token virtual lokal untuk mensimulasikan flashdisk."
             )
             v_mounted = dongle_guard.is_virtual_dongle_mounted()
             if v_mounted:
                 st.success("🟢 VIRTUAL DONGLE: **TERPASANG (MOUNTED)**")
-                if st.button("🔴 UNMOUNT_VIRTUAL_DONGLE (SIMULASIKAN USB DICABUT)", use_container_width=True):
+                if st.button("🔴 CABUT VIRTUAL DONGLE (KUNCI SISTEM)", use_container_width=True):
                     dongle_guard.unmount_virtual_dongle()
-                    ui_cyberpunk.log_cli("DONGLE_GUARD", "Virtual dongle hot-unplugged by operator demo", level="CRIT")
+                    ui_cyberpunk.log_cli("DONGLE_GUARD", "Virtual dongle unmounted", level="WARN")
                     st.session_state.last_logged_dongle_state = None
                     st.rerun()
             else:
-                st.error("🔴 VIRTUAL DONGLE: **TIDAK TERPASANG (UNMOUNTED)**")
-                if st.button("🟢 MOUNT_VIRTUAL_DONGLE (AKTIFKAN TOKEN FORENSIK)", type="primary", use_container_width=True):
-                    res = dongle_guard.mount_virtual_dongle(label="Operator Forensic Hardware Key")
-                    ui_cyberpunk.log_cli(
-                        "DONGLE_GUARD",
-                        f"Virtual dongle provisioned & mounted: {res.path}",
-                        digest=res.dongle_id,
-                        level="OK",
-                    )
+                st.info("🔴 VIRTUAL DONGLE: **TIDAK AKTIF**")
+                if st.button("🟢 PASANG VIRTUAL DONGLE (BUKA SISTEM)", use_container_width=True):
+                    res = dongle_guard.mount_virtual_dongle(label="Virtual Forensic Hardware Key")
+                    ui_cyberpunk.log_cli("DONGLE_GUARD", f"Virtual dongle mounted: {res.path}", level="OK")
                     st.session_state.last_logged_dongle_state = None
                     st.rerun()
 
-    # Live Diagnostic Box showing scanned USB drive letters/mounts
-    st.markdown("#### 📡 LIVE USB DIAGNOSTIC & MOUNT TELEMETRY")
+    # Telemetry Table
+    st.markdown("#### 📡 Telemetri Port Penyimpanan Sistem")
     diagnostics = dongle_guard.get_usb_diagnostics()
     if diagnostics:
-        cols_hdr = st.columns([1.5, 1.2, 1.2, 2.0, 3.0])
-        cols_hdr[0].markdown("**MOUNT / DRIVE**")
-        cols_hdr[1].markdown("**DEVICE TYPE**")
+        cols_hdr = st.columns([1.2, 1.8, 1.2, 1.8, 2.5])
+        cols_hdr[0].markdown("**DRIVE**")
+        cols_hdr[1].markdown("**TIPE PERANGKAT**")
         cols_hdr[2].markdown("**VOL SERIAL**")
-        cols_hdr[3].markdown("**TOKEN FILE**")
-        cols_hdr[4].markdown("**HMAC-SHA256 CHALLENGE STATE**")
+        cols_hdr[3].markdown("**FILE TOKEN**")
+        cols_hdr[4].markdown("**STATUS HMAC-SHA256**")
 
         for d in diagnostics:
-            c1, c2, c3, c4, c5 = st.columns([1.5, 1.2, 1.2, 2.0, 3.0])
+            c1, c2, c3, c4, c5 = st.columns([1.2, 1.8, 1.2, 1.8, 2.5])
             c1.code(d["mount"])
             c2.write(f"`{d['type']}`")
             c3.write(f"`{d['volume_serial']}`")
             c4.write(f"`{d['token_file']}`")
-            c5.markdown(f"<span style='color:{d['status_color']};font-weight:bold;'>{d['hmac_challenge']}</span>", unsafe_allow_html=True)
-    else:
-        st.write("NO_STORAGE_PARTITIONS_DETECTED")
+            c5.markdown(f"<span style='color:{d['status_color']};font-weight:600;'>{d['hmac_challenge']}</span>", unsafe_allow_html=True)
 
     ui_cyberpunk.render_cli_console("GATE_01 // HARDWARE DONGLE INTERCEPT TELEMETRY")
 
@@ -242,32 +310,32 @@ def _capture_optical_face_auto(username: str, simulate_mismatch: bool = False) -
     """
     Realtime automatic optical face frame capture:
     Attempts direct camera grab; smoothly falls back to deterministic optical frame.
-    Runs a 2-second Cyberpunk scanning sequence without requiring manual 'Take Photo'.
+    Runs a sleek modern scanning sequence.
     """
     status_box = st.empty()
     progress_bar = st.progress(0)
 
     stages = [
-        (0.15, "INITIALIZING OPTICAL SENSOR // LOCKING APERTURE..."),
-        (0.35, "LOCATING CENTROID // PROJECTING 128x128 RETICLE..."),
-        (0.60, "EXTRACTING FACIAL GRADIENTS & PHASH/DHASH DESCRIPTORS..."),
-        (0.85, "COMPUTING SHA-256 DIGEST OVER NORMALIZED PIXEL BYTES..."),
-        (1.00, "SEALING FACIAL TEMPLATE VECTOR WITH AES-128-EAX..."),
+        (0.20, "Inisialisasi Sensor Optik // Mengunci Apertur..."),
+        (0.40, "Memetakan Centroid // Memproyeksikan Retikel 128x128..."),
+        (0.65, "Mengekstraksi Gradien Wajah & Deskriptor pHash/dHash..."),
+        (0.85, "Menghitung SHA-256 Digest Matriks Piksel Grayscale..."),
+        (1.00, "Menyegel Vektor Biometrik dengan AES-128-EAX..."),
     ]
 
     for p, txt in stages:
         progress_bar.progress(int(p * 100))
         status_box.markdown(
-            f"<div style='color:#00F0FF;font-size:13px;padding:6px;border-left:3px solid #00F0FF;background:#0d0f17;margin:6px 0;'>"
-            f"⚡ [OPTICAL_SCANNER] {txt} ({int(p*100)}%)</div>",
+            f"<div style='color:#38BDF8; font-size:13px; padding:8px 14px; border-left:3px solid #0EA5E9; background:#111827; border-radius:6px; margin:6px 0;'>"
+            f"⚡ [SENSOR OPTIK] {txt} ({int(p*100)}%)</div>",
             unsafe_allow_html=True,
         )
-        time.sleep(0.35)
+        time.sleep(0.3)
 
     progress_bar.empty()
     status_box.empty()
 
-    # Attempt hardware capture via OpenCV if camera 0 is ready
+    # Attempt hardware capture via OpenCV if camera is ready
     captured_bytes: Optional[bytes] = None
     try:
         import cv2
@@ -277,7 +345,6 @@ def _capture_optical_face_auto(username: str, simulate_mismatch: bool = False) -
                 ret, frame = cap.read()
             cap.release()
             if ret and frame is not None:
-                # Convert BGR OpenCV frame to RGB PIL Image
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 pil_img = Image.fromarray(rgb_frame)
                 buf = io.BytesIO()
@@ -295,38 +362,69 @@ def _capture_optical_face_auto(username: str, simulate_mismatch: bool = False) -
 
 def render_auth_screen(dongle: dongle_guard.DongleStatus) -> None:
     render_hud_topbar(current_step=2, dongle_mounted=True)
+
+    mount_display = dongle.path or "Removable USB"
+    if len(mount_display) > 40:
+        mount_display = "..." + mount_display[-35:]
+
     st.markdown(
-        f"### 🧬 GATE_02 // OPTICAL FACIAL RECOGNITION & CRYPTOGRAPHIC HANDSHAKE\n" f"`DONGLE_ID: {dongle.dongle_id}` · `MOUNT: {dongle.path}` · "
-        f"`PIPELINE: PIL-128x128-GRAYSCALE + SHA-256 + AES-128-EAX`"
+        f"""
+        <div style="
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 10px 18px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+            font-size: 0.85rem;
+        ">
+            <div>🔑 <strong>Kunci Hardware:</strong> <span style="color:#10B981; font-weight:600;">{dongle.label or 'Valid Hardware Key'}</span></div>
+            <div>📍 <strong>Mount:</strong> <code style="color:#38BDF8;">{mount_display}</code></div>
+            <div>🧬 <strong>Pipeline:</strong> <span style="color:#94A3B8;">PBKDF2 (600k iter) + PIL 128x128 + AES-128-EAX</span></div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
     tab_login, tab_register = st.tabs([
-        "🔑 [01] AUTHENTICATE_OPERATOR (LOGIN)",
-        "📝 [02] ENROLL_NEW_IDENTITY (REGISTRASI)",
+        "🔑 [01] OTORISASI OPERATOR (LOGIN)",
+        "📝 [02] REGISTRASI OPERATOR BARU",
     ])
 
     with tab_login:
+        st.info("💡 **Akun Default Pengujian**: Username: `analyst_01` | Passkey: `KryptVault2026!` (atau daftarkan akun baru pada tab [02] Registrasi)")
         c1, c2 = st.columns([1, 1])
         with c1:
-            st.subheader("FACTOR_01 // KREDENSIAL PBKDF2-SHA256")
-            login_user = st.text_input("Operator Identifier (Username)", key="login_username", placeholder="analyst_01")
-            login_pw = st.text_input("Passkey Otorisasi", type="password", key="login_password")
+            st.markdown("#### FAKTOR 01 // KREDENSIAL PBKDF2-SHA256")
+            login_user = st.text_input("Operator Identifier (Username)", key="login_username", value="analyst_01")
+            login_pw = st.text_input("Passkey Otorisasi", type="password", key="login_password", value="KryptVault2026!")
             st.caption(
                 "Kunci diturunkan melalui **PBKDF2-HMAC-SHA256 (600.000 iterasi)** + 16-byte random salt + "
                 "**HKDF-SHA256** domain separation (`auth/verifier` & `auth/biometric-key`)."
             )
-            sim_mismatch = st.checkbox("🧪 DEV_DEMO: Simulasikan Wajah Tidak Cocok / Penyusup", key="sim_mismatch_login")
-        with c2:
-            st.subheader("FACTOR_02 // REALTIME OPTICAL SCANNER")
-            ui_cyberpunk.render_optical_scanner_hud("login_cam_hud", height=290)
+            sim_mismatch = st.checkbox("🧪 DEV_DEMO: Simulasikan Wajah Tidak Cocok / Penyusup (Demo Dosen)", key="sim_mismatch_login")
 
-        if st.button("⚡ INITIALIZE_REALTIME_OPTICAL_SCAN // VERIFY OPERATOR", type="primary", use_container_width=True):
+        with c2:
+            st.markdown("#### FAKTOR 02 // REALTIME OPTICAL SCANNER")
+            ui_cyberpunk.render_optical_scanner_hud("login_cam_hud", height=240)
+            scan_mode = st.radio("Metode Akuisisi Wajah", ["Pindai Sensor Optik / Kamera", "Unggah Citra Wajah (.PNG / .JPG)"], horizontal=True, key="login_face_mode")
+            uploaded_face = None
+            if scan_mode == "Unggah Citra Wajah (.PNG / .JPG)":
+                uploaded_face = st.file_uploader("Pilih Berkas Foto Wajah", type=["png", "jpg", "jpeg"], key="face_upload_login")
+
+        if st.button("⚡ OTORISASI AKSES OPERATOR (VERIFIKASI 2FA)", type="primary", use_container_width=True):
             if not login_user or not login_pw:
-                st.warning("Supply Operator Identifier dan Passkey sebelum inisialisasi pemindaian wajah.")
+                st.warning("Masukkan Operator Identifier dan Passkey sebelum inisialisasi.")
             else:
                 user_norm = login_user.strip().lower()
-                with st.spinner("RUNNING REALTIME OPTICAL FACE SCANNER..."):
-                    face_bytes = _capture_optical_face_auto(user_norm, simulate_mismatch=sim_mismatch)
+                with st.spinner("MEMVERIFIKASI KREDENSIAL PBKDF2 & DEKRIPSI VEKTOR BIOMETRIK AES-128-EAX..."):
+                    if uploaded_face is not None:
+                        face_bytes = uploaded_face.getvalue()
+                    else:
+                        face_bytes = _capture_optical_face_auto(user_norm, simulate_mismatch=sim_mismatch)
                     img_digest = ui_cyberpunk.sha256_hex(face_bytes)
 
                     ui_cyberpunk.log_cli(
@@ -355,32 +453,39 @@ def render_auth_screen(dongle: dongle_guard.DongleStatus) -> None:
                         digest=img_digest,
                         level="CRIT",
                     )
-                    st.error(f"{res.message}{sim_txt}")
+                    st.error(f"❌ {res.message}{sim_txt}")
 
     with tab_register:
         c1, c2 = st.columns([1, 1])
         with c1:
-            st.subheader("STEP_A // PEMBUATAN IDENTITAS OPERATOR")
-            reg_user = st.text_input("New Operator Handle (3-32 chars, a-z0-9_.-)", key="reg_username", placeholder="analyst_01")
+            st.markdown("#### LANGKAH 1 // PEMBUATAN IDENTITAS OPERATOR")
+            reg_user = st.text_input("Username Baru (3-32 karakter, a-z0-9_.-)", key="reg_username", placeholder="analyst_02")
             reg_pw = st.text_input("Passkey Otorisasi (min. 8 karakter, huruf & angka)", type="password", key="reg_pw")
             reg_pw2 = st.text_input("Konfirmasi Passkey", type="password", key="reg_pw2")
         with c2:
-            st.subheader("STEP_B // OPTICAL ENROLLMENT SCANNER")
-            ui_cyberpunk.render_optical_scanner_hud("reg_cam_hud", height=290)
+            st.markdown("#### LANGKAH 2 // PENDAFTARAN BIOMETRIK WAJAH")
+            ui_cyberpunk.render_optical_scanner_hud("reg_cam_hud", height=240)
+            reg_scan_mode = st.radio("Metode Akuisisi", ["Pindai Sensor Optik / Kamera", "Unggah Citra Wajah"], horizontal=True, key="reg_face_mode")
+            reg_face_upload = None
+            if reg_scan_mode == "Unggah Citra Wajah":
+                reg_face_upload = st.file_uploader("Unggah Foto Wajah", type=["png", "jpg", "jpeg"], key="reg_face_up")
             st.caption(
                 "Citra dinormalisasi ke matriks grayscale `128x128` via `PIL`, dihitung SHA-256 pixel digest, "
                 "dan disegel dalam database dengan enkripsi terautentikasi **AES-128-EAX**."
             )
 
-        if st.button("⚡ INITIALIZE_REALTIME_OPTICAL_SCAN // ENROLL OPERATOR", type="primary", use_container_width=True):
+        if st.button("📝 DAFTARKAN IDENTITAS BARU (ENROLL BIOMETRIC)", type="primary", use_container_width=True):
             if reg_pw != reg_pw2:
                 st.error("Konfirmasi passkey tidak cocok.")
             elif not reg_user or not reg_pw:
-                st.warning("Lengkapi Operator Handle dan Passkey.")
+                st.warning("Lengkapi Username dan Passkey.")
             else:
                 user_norm = reg_user.strip().lower()
-                with st.spinner("ACQUIRING OPTICAL BIOMETRIC MATRIX & SEALING AES-128-EAX TEMPLATE..."):
-                    face_bytes = _capture_optical_face_auto(user_norm, simulate_mismatch=False)
+                with st.spinner("MENYIMPAN KREDENSIAL PBKDF2 & MENYEGEL BIOMETRIK DENGAN AES-128-EAX..."):
+                    if reg_face_upload is not None:
+                        face_bytes = reg_face_upload.getvalue()
+                    else:
+                        face_bytes = _capture_optical_face_auto(user_norm, simulate_mismatch=False)
                     img_digest = ui_cyberpunk.sha256_hex(face_bytes)
                     res = auth_biometric.register_user(user_norm, reg_pw, face_bytes)
 
@@ -391,10 +496,10 @@ def render_auth_screen(dongle: dongle_guard.DongleStatus) -> None:
                         digest=img_digest,
                         level="OK",
                     )
-                    st.success(res.message)
+                    st.success(f"✅ {res.message}")
                 else:
                     ui_cyberpunk.log_cli("FACE_AUTH", f"Enrollment error: {res.message}", digest=img_digest, level="WARN")
-                    st.error(res.message)
+                    st.error(f"❌ {res.message}")
 
     ui_cyberpunk.render_cli_console("GATE_02 // OPTICAL BIOMETRIC & PBKDF2-SHA256 TELEMETRY STREAM")
 
@@ -568,12 +673,12 @@ def render_file_crypto_tab(username: str) -> None:
     st.subheader("📁 [02] BERKAS BARANG BUKTI // ENKRIPSI DOKUMEN FORENSIK (CHACHA20)")
     st.caption(
         "Enkripsi stream cipher kecepatan tinggi ChaCha20 untuk barang bukti dokumen (PDF, DOCX, TXT, CSV, JPG, ZIP). "
-        "Menghasilkan berkas terenkripsi mandiri berformat `.bagus.enc` yang memuat verifikasi integritas SHA-256."
+        "Menghasilkan berkas terenkripsi mandiri berformat `.krypt.enc` yang memuat verifikasi integritas SHA-256."
     )
 
     tab_enc, tab_dec = st.tabs([
         "🔐 [01] ENKRIPSI BERKAS BARANG BUKTI",
-        "🔓 [02] DEKRIPSI BERKAS (.BAGUS.ENC / ARSIP VAULT)",
+        "🔓 [02] DEKRIPSI BERKAS (.KRYPT.ENC / ARSIP VAULT)",
     ])
 
     with tab_enc:
@@ -588,9 +693,9 @@ def render_file_crypto_tab(username: str) -> None:
                 st.warning("Masukkan passphrase enkripsi.")
             else:
                 raw_bytes = uploaded.getvalue()
-                with st.spinner("MENGEKSEKUSI STREAM CIPHER CHACHA20 & MEMBUNGKUS .BAGUS.ENC..."):
+                with st.spinner("MENGEKSEKUSI STREAM CIPHER CHACHA20 & MEMBUNGKUS .KRYPT.ENC..."):
                     bundle = file_crypto.encrypt_file_bytes(raw_bytes, passphrase)
-                    package_bytes = file_crypto.pack_bagus_envelope(bundle, uploaded.name, uploaded.type)
+                    package_bytes = file_crypto.pack_krypt_envelope(bundle, uploaded.name, uploaded.type)
 
                     # Persist ciphertext blob & metadata
                     stored_name = f"{secrets.token_hex(16)}.enc"
@@ -632,7 +737,7 @@ def render_file_crypto_tab(username: str) -> None:
                             "kdf_iterations": 200_000,
                         })
 
-                    enc_filename = f"{uploaded.name}.bagus.enc"
+                    enc_filename = f"{uploaded.name}.krypt.enc"
                     st.download_button(
                         f"⬇️ UNDUH BERKAS TERENKRIPSI ({enc_filename})",
                         data=package_bytes,
@@ -643,12 +748,12 @@ def render_file_crypto_tab(username: str) -> None:
 
     with tab_dec:
         st.markdown("#### 🔓 DEKRIPSI DAN PEMULIHAN BERKAS BUKTI FORENSIK")
-        dec_mode = st.radio("Metode Masukan Berkas", ["Unggah Berkas .bagus.enc Mandiri", "Pilih Dari Arsip Database SQLite"], horizontal=True)
+        dec_mode = st.radio("Metode Masukan Berkas", ["Unggah Berkas .krypt.enc Mandiri", "Pilih Dari Arsip Database SQLite"], horizontal=True)
 
-        if dec_mode == "Unggah Berkas .bagus.enc Mandiri":
-            enc_file_in = st.file_uploader("Unggah Berkas .bagus.enc", type=["enc"], key="standalone_enc_in")
+        if dec_mode.startswith("Unggah"):
+            enc_file_in = st.file_uploader("Unggah Berkas Terenkripsi (.krypt.enc / .bagus.enc)", type=["enc"], key="standalone_enc_in")
             dec_pw = st.text_input("Passphrase Dekripsi ChaCha20", type="password", key="dec_pw_standalone")
-            if st.button("🔓 DEKRIPSI PAKET .BAGUS.ENC", type="primary", disabled=enc_file_in is None):
+            if st.button("🔓 DEKRIPSI PAKET MANDIRI", type="primary", disabled=enc_file_in is None):
                 if not dec_pw:
                     st.warning("Masukkan passphrase dekripsi.")
                 else:
@@ -761,9 +866,9 @@ def render_steganography_tab() -> None:
                         st.image(out_png, use_container_width=True)
 
                     st.download_button(
-                        "⬇️ UNDUH CITRA STEGANOGRAFI (bagus_forensic_stego.png)",
+                        "⬇️ UNDUH CITRA STEGANOGRAFI (krypt_forensic_stego.png)",
                         data=out_png,
-                        file_name="bagus_forensic_stego.png",
+                        file_name="krypt_forensic_stego.png",
                         mime="image/png",
                         use_container_width=True,
                     )
@@ -918,7 +1023,7 @@ def render_blockchain_tab(username: str) -> None:
         st.download_button(
             "⬇️ EKSPOR LEDGER KE JSON",
             data=blockchain.export_chain_json(),
-            file_name="bagus_vault_chain_of_custody.json",
+            file_name="krypt_vault_chain_of_custody.json",
             mime="application/json",
             use_container_width=True,
         )

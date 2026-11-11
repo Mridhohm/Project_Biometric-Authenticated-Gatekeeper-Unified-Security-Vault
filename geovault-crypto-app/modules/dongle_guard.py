@@ -44,7 +44,7 @@ import config
 DONGLE_VERSION = 1
 PRODUCT_NAME = "Krypt Vault"
 ACCEPTED_PRODUCTS = ("Krypt Vault", "B.A.G.U.S. Vault", "GeoVault", "BAGUS_OS")
-SUPPORTED_FILENAMES = (config.DONGLE_FILENAME, ".krypt_dongle", ".cyberdeck_dongle")
+SUPPORTED_FILENAMES = (config.DONGLE_FILENAME, ".krypt_dongle", ".geovault_dongle", ".cyberdeck_dongle")
 MAX_TOKEN_BYTES = 4096  # refuse to parse oversized files (DoS hardening)
 REQUIRED_FIELDS = ("version", "product", "dongle_id", "label", "issued_at",
                    "expires_at", "volume_serial", "nonce", "signature")
@@ -136,6 +136,23 @@ def _is_linux_removable(device: str) -> bool:
 def list_removable_mountpoints() -> list[str]:
     """Enumerate mount points of removable drives (USB flash disks, SD cards...)."""
     mounts: list[str] = []
+    if sys.platform.startswith("win"):
+        import string
+        try:
+            bitmask = ctypes.windll.kernel32.GetLogicalDrives()
+            for letter in string.ascii_uppercase:
+                if bitmask & 1:
+                    drive_path = f"{letter}:\\"
+                    # 2 == DRIVE_REMOVABLE (USB flash drive, thumb drive)
+                    dtype = ctypes.windll.kernel32.GetDriveTypeW(drive_path)
+                    if dtype == 2:
+                        mounts.append(drive_path)
+                bitmask >>= 1
+        except Exception:
+            pass
+        if mounts:
+            return sorted(set(mounts))
+
     try:
         partitions = psutil.disk_partitions(all=False)
     except Exception:
@@ -145,7 +162,7 @@ def list_removable_mountpoints() -> list[str]:
         opts = (part.opts or "").lower()
         mount = part.mountpoint
         if sys.platform.startswith("win"):
-            if "removable" in opts:
+            if "removable" in opts or getattr(part, "fstype", "").lower() in ("fat32", "exfat"):
                 mounts.append(mount)
         elif sys.platform == "darwin":
             if mount.startswith("/Volumes/"):
@@ -157,20 +174,90 @@ def list_removable_mountpoints() -> list[str]:
     return sorted(set(mounts))
 
 
+def list_all_drives_for_provisioning() -> list[dict]:
+    """Enumerate all logical drives with details for hardware dongle provisioning."""
+    drives = []
+    if sys.platform.startswith("win"):
+        import string
+        drive_types = {
+            2: "Removable USB Flash Drive",
+            3: "Fixed Local Disk",
+            4: "Network Drive",
+            5: "CD/DVD ROM",
+        }
+        try:
+            bitmask = ctypes.windll.kernel32.GetLogicalDrives()
+            for letter in string.ascii_uppercase:
+                if bitmask & 1:
+                    drive_path = f"{letter}:\\"
+                    dtype = ctypes.windll.kernel32.GetDriveTypeW(drive_path)
+                    drives.append({
+                        "drive": drive_path,
+                        "letter": letter,
+                        "type_code": dtype,
+                        "type_name": drive_types.get(dtype, "Drive"),
+                        "is_usb": dtype == 2,
+                        "volume_serial": get_volume_serial(drive_path) or "N/A",
+                    })
+                bitmask >>= 1
+        except Exception:
+            pass
+    return drives
+
+
+def provision_drive(drive_path: str, label: str = "Krypt Vault Hardware Key") -> tuple[bool, str]:
+    """Write signed .krypt_dongle to target USB drive with HMAC-SHA256 signature and Volume Serial."""
+    try:
+        target = Path(drive_path)
+        if not target.exists():
+            return False, f"Drive '{drive_path}' tidak ditemukan."
+        serial = get_volume_serial(str(target))
+        token = build_dongle_token(label=label, volume_serial=serial)
+        for fname in (".krypt_dongle", config.DONGLE_FILENAME):
+            out_file = target / fname
+            if out_file.exists():
+                try:
+                    if os.name == "nt":
+                        ctypes.windll.kernel32.SetFileAttributesW(str(out_file), 0x80)
+                    out_file.unlink()
+                except Exception:
+                    pass
+            out_file.write_text(json.dumps(token, indent=2), encoding="utf-8")
+            _hide_file(out_file)
+        return True, f"Hardware Key berhasil dibuat di {drive_path} (Serial: {serial or 'Unbound'})."
+    except Exception as exc:
+        return False, f"Gagal menulis Hardware Key ke {drive_path}: {exc}"
+
+
 def _env_fallback_paths() -> list[str]:
     raw = os.environ.get(config.DONGLE_PATH_ENV, "")
     paths = [p.strip() for p in raw.split(os.pathsep) if p.strip()]
-    if config.DEFAULT_FALLBACK_DONGLE_DIR.is_dir():
+    # Only fall back to local virtual_usb if DEV_MODE is active or explicitly set
+    if config.DEV_MODE and config.DEFAULT_FALLBACK_DONGLE_DIR.is_dir():
         paths.append(str(config.DEFAULT_FALLBACK_DONGLE_DIR))
     return paths
 
 
 def candidate_locations(extra_paths: Optional[Iterable[str]] = None) -> list[str]:
-    """Removable drives + env fallback paths + caller-supplied paths (deduplicated, ordered)."""
+    """Removable drives + active virtual mount + env fallback paths + caller-supplied paths."""
     ordered: list[str] = []
-    for loc in [*list_removable_mountpoints(), *_env_fallback_paths(), *(extra_paths or [])]:
+
+    # 1. Removable physical USB drives
+    for loc in list_removable_mountpoints():
         if loc and loc not in ordered:
             ordered.append(loc)
+
+    # 2. Active Virtual Dongle mount (if operator explicitly mounted it)
+    if is_virtual_dongle_mounted():
+        vdir = str(config.DEFAULT_FALLBACK_DONGLE_DIR)
+        if vdir not in ordered:
+            ordered.append(vdir)
+
+    # 3. Env fallback paths or caller extra paths
+    for loc in [*_env_fallback_paths(), *(extra_paths or [])]:
+        if loc and loc not in ordered:
+            ordered.append(loc)
+
     return ordered
 
 
