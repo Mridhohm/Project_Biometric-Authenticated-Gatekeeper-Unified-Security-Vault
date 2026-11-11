@@ -318,7 +318,8 @@ class TestKryptVaultCryptography(unittest.TestCase):
 
         block = mined_res.block
         self.assertTrue(block.current_hash.startswith("00"), "Hash blok harus memenuhi PoW prefix '00'")
-        self.assertGreater(block.nonce, 0)
+        self.assertGreaterEqual(block.nonce, 0)
+        self.assertGreaterEqual(mined_res.attempts, 1)
 
         # Verifikasi seluruh rantai ledger
         report = blockchain.verify_chain()

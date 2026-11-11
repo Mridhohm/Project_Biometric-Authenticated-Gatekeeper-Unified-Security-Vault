@@ -91,6 +91,14 @@ def compute_signature(token: dict) -> str:
     return mac.hexdigest()
 
 
+def compute_physical_usb_token(drive_letter: str, volume_serial: str) -> str:
+    """Derive a runtime HMAC-SHA256 authorization token from physical USB drive metadata."""
+    payload = f"KRYPT_VAULT_PHYSICAL_USB|{drive_letter}|{volume_serial}".encode("utf-8")
+    mac = HMAC.new(_hmac_key(), digestmod=SHA256)
+    mac.update(payload)
+    return mac.hexdigest()
+
+
 # --------------------------------------------------------------------------- #
 # Platform helpers
 # --------------------------------------------------------------------------- #
@@ -223,7 +231,7 @@ def provision_drive(drive_path: str, label: str = "Krypt Vault Hardware Key") ->
                 except Exception:
                     pass
             out_file.write_text(json.dumps(token, indent=2), encoding="utf-8")
-            _hide_file(out_file)
+            _set_hidden(out_file)
         return True, f"Hardware Key berhasil dibuat di {drive_path} (Serial: {serial or 'Unbound'})."
     except Exception as exc:
         return False, f"Gagal menulis Hardware Key ke {drive_path}: {exc}"
@@ -368,8 +376,38 @@ def check_dongle_at(location: Optional[str]) -> DongleStatus:
     )
 
 
-def scan_for_dongle(extra_paths: Optional[Iterable[str]] = None) -> DongleStatus:
-    """Scan candidate locations and return the first valid dongle."""
+def authorize_physical_usb(drive_path: Optional[str] = None) -> DongleStatus:
+    """Authorize a currently mounted removable USB flash drive via runtime serial HMAC-SHA256."""
+    usb_drives = [d for d in list_all_drives_for_provisioning() if d.get("is_usb")]
+    if drive_path:
+        norm_target = drive_path.rstrip("\\").upper()
+        usb_drives = [d for d in usb_drives if d["drive"].rstrip("\\").upper() == norm_target]
+
+    if not usb_drives:
+        return DongleStatus(False, "Tidak ada USB flash drive removable yang terpasang pada sistem.")
+
+    active = usb_drives[0]
+    serial = active.get("volume_serial") or "GENERIC_USB"
+    letter = active.get("letter") or active["drive"].rstrip(":\\")
+    runtime_hmac = compute_physical_usb_token(f"{letter}:", serial)
+    return DongleStatus(
+        valid=True,
+        message=f"USB Fisik Plug-and-Play terautentikasi di {active['drive']} (Serial: {serial}).",
+        path=active["drive"],
+        dongle_id=f"PNP-{serial}-{runtime_hmac[:8].upper()}",
+        label=f"USB Fisik Plug-and-Play ({letter}:)",
+        issued_at=datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        expires_at=None,
+        volume_serial=serial,
+        scanned_locations=[active["drive"]],
+    )
+
+
+def scan_for_dongle(
+    extra_paths: Optional[Iterable[str]] = None,
+    pnp_volume_serial: Optional[str] = None,
+) -> DongleStatus:
+    """Scan candidate locations for signed dongle tokens, or verify an authorized Plug-and-Play USB."""
     locations = candidate_locations(extra_paths)
     failures: dict[str, str] = {}
     for loc in locations:
@@ -379,6 +417,14 @@ def scan_for_dongle(extra_paths: Optional[Iterable[str]] = None) -> DongleStatus
             return status
         if _find_token_file(loc) is not None:
             failures[loc] = status.message
+
+    if not failures and pnp_volume_serial:
+        usb_drives = [
+            d for d in list_all_drives_for_provisioning()
+            if d.get("is_usb") and (d.get("volume_serial") or "GENERIC_USB") == pnp_volume_serial
+        ]
+        if usb_drives:
+            return authorize_physical_usb(usb_drives[0]["drive"])
 
     if failures:
         message = "Dongle token found but validation FAILED: " + "; ".join(
@@ -421,8 +467,8 @@ def provision_dongle(
 # --------------------------------------------------------------------------- #
 # Lockscreen Telemetry & Dev Demo Virtual Mount
 # --------------------------------------------------------------------------- #
-def get_usb_diagnostics() -> list[dict]:
-    """Inspect all system disk partitions and report live dongle/HMAC status for the Lockscreen."""
+def get_usb_diagnostics(pnp_volume_serial: Optional[str] = None) -> list[dict]:
+    """Inspect all system disk partitions and report live dongle/HMAC status."""
     diagnostics: list[dict] = []
     try:
         partitions = psutil.disk_partitions(all=False)
@@ -436,33 +482,51 @@ def get_usb_diagnostics() -> list[dict]:
         token_path = _find_token_file(mount)
         token_name = token_path.name if token_path else "NOT_FOUND"
 
+        is_win_usb = os.name == "nt" and ctypes.windll.kernel32.GetDriveTypeW(ctypes.c_wchar_p(mount)) == 2
+        is_usb_drive = ("removable" in opts.lower() or is_win_usb) and not mount.upper().startswith("C:")
         status = check_dongle_at(mount) if token_path else None
-        if status and status.valid:
-            challenge_str = "AUTHENTICATED // HMAC-SHA256 VERIFIED"
-            state_color = "#00FF66"
+        is_pnp_active = bool(is_usb_drive and pnp_volume_serial and vol_serial == pnp_volume_serial)
+
+        if (status and status.valid) or is_pnp_active:
+            challenge_str = (
+                "AUTHENTICATED // PLUG-AND-PLAY SERIAL HMAC"
+                if is_pnp_active and not (status and status.valid)
+                else "AUTHENTICATED // HMAC-SHA256 VERIFIED"
+            )
+            state_color = "#34D399"
+            state_kind = "ok"
         elif token_path:
             challenge_str = f"TAMPER_DETECTED // {status.message if status else 'INVALID'}"
-            state_color = "#FF003C"
+            state_color = "#F87171"
+            state_kind = "bad"
+        elif is_usb_drive:
+            challenge_str = "USB TERDETEKSI // SIAP OTORISASI"
+            state_color = "#FBBF24"
+            state_kind = "warn"
         else:
-            challenge_str = "AWAITING_DEVICE // NO_KEY_TOKEN"
-            state_color = "#7C8DA6"
+            challenge_str = "STANDBY // PARTISI LOKAL"
+            state_color = "#94A3B8"
+            state_kind = "standby"
 
         diagnostics.append({
             "mount": mount,
             "device": part.device,
             "fstype": part.fstype or "RAW",
-            "type": "REMOVABLE_USB" if "removable" in opts.lower() else "FIXED_DRIVE",
+            "type": "REMOVABLE_USB" if is_usb_drive else "FIXED_DRIVE",
             "volume_serial": vol_serial,
             "token_file": token_name,
             "hmac_challenge": challenge_str,
             "status_color": state_color,
-            "is_valid": bool(status and status.valid),
+            "state_kind": state_kind,
+            "is_usb": is_usb_drive,
+            "is_valid": bool((status and status.valid) or is_pnp_active),
         })
 
     # Always report virtual fallback path state
     v_dir = config.DEFAULT_FALLBACK_DONGLE_DIR
     v_token = _find_token_file(v_dir) if v_dir.is_dir() else None
     v_status = check_dongle_at(str(v_dir)) if v_token else None
+    v_ok = bool(v_status and v_status.valid)
     diagnostics.append({
         "mount": str(v_dir),
         "device": "[VIRTUAL_LOOPBACK]",
@@ -470,13 +534,11 @@ def get_usb_diagnostics() -> list[dict]:
         "type": "VIRTUAL_DONGLE",
         "volume_serial": "VIRTUAL_KEY",
         "token_file": v_token.name if v_token else "NOT_MOUNTED",
-        "hmac_challenge": (
-            "AUTHENTICATED // HMAC-SHA256 VERIFIED"
-            if (v_status and v_status.valid)
-            else "VIRTUAL_TOKEN_DISCONNECTED"
-        ),
-        "status_color": "#00FF66" if (v_status and v_status.valid) else "#FF003C",
-        "is_valid": bool(v_status and v_status.valid),
+        "hmac_challenge": "AUTHENTICATED // TOKEN VIRTUAL" if v_ok else "NONAKTIF // TOKEN VIRTUAL",
+        "status_color": "#34D399" if v_ok else "#94A3B8",
+        "state_kind": "ok" if v_ok else "standby",
+        "is_usb": False,
+        "is_valid": v_ok,
     })
 
     return diagnostics

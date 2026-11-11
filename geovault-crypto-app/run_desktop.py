@@ -105,6 +105,34 @@ def main():
     wait_for_server(url)
 
     print(f"[+] Server aktif di {url}")
+    opened_webview = False
+    try:
+        import webview
+
+        print("[+] Membuka jendela Desktop Native (PyWebView 1340x860)...")
+        webview.create_window(
+            title="Krypt Vault // Forensic Security Suite",
+            url=url,
+            width=1340,
+            height=860,
+            min_size=(1024, 680),
+            resizable=True,
+            background_color="#090D16",
+        )
+        webview.start()
+        opened_webview = True
+    except Exception as exc:
+        print(f"[i] PyWebView tidak tersedia ({exc}); beralih ke mode App Browser...")
+
+    if opened_webview:
+        print("\n[*] Jendela ditutup. Mematikan server Krypt Vault...")
+        server_proc.terminate()
+        try:
+            server_proc.wait(timeout=4.0)
+        except Exception:
+            server_proc.kill()
+        return
+
     browser_cmd = find_browser_app_cmd(url)
     if browser_cmd:
         print("[+] Membuka jendela Desktop App Mode (Frameless)...")
