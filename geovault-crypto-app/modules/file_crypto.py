@@ -28,7 +28,8 @@ ALGORITHM_ID: str = "ChaCha20-Stream"
 KDF_ITERATIONS: int = 200_000
 SALT_BYTES: int = 16
 NONCE_BYTES: int = 12
-MAGIC_HEADER: bytes = b"BAGUSENC1\x00"
+MAGIC_HEADER: bytes = b"KRYPTENC1\x00"
+LEGACY_MAGIC: bytes = b"BAGUSENC1\x00"
 
 
 @dataclass
@@ -137,11 +138,11 @@ def pack_bagus_envelope(
     mime_type: Optional[str] = None,
 ) -> bytes:
     """
-    Package an encrypted bundle into a self-contained `.bagus.enc` binary file:
+    Package an encrypted bundle into a self-contained `.krypt.enc` / `.bagus.enc` binary file:
       [MAGIC_HEADER (10B)] [HEADER_LEN (4B uint32)] [JSON_HEADER] [CIPHERTEXT_BYTES]
     """
     meta = {
-        "format": "B.A.G.U.S._EVIDENCE_ENVELOPE",
+        "format": "KRYPT_VAULT_EVIDENCE_ENVELOPE",
         "version": 1,
         "algorithm": bundle.algorithm,
         "original_name": original_name,
@@ -156,16 +157,19 @@ def pack_bagus_envelope(
     return MAGIC_HEADER + header_len + meta_json + bundle.ciphertext
 
 
+pack_krypt_envelope = pack_bagus_envelope
+
+
 def unpack_bagus_envelope(package_bytes: bytes, passphrase: str) -> tuple[bytes, dict]:
     """
-    Unpack and decrypt a standalone `.bagus.enc` binary file.
+    Unpack and decrypt a standalone `.krypt.enc` / `.bagus.enc` binary file.
     Returns ``(plain_bytes, metadata_dict)``.
     """
     magic_len = len(MAGIC_HEADER)
     if len(package_bytes) < magic_len + 4:
-        raise ValueError("Invalid file format: file too small to be a .bagus.enc package.")
-    if package_bytes[:magic_len] != MAGIC_HEADER:
-        raise ValueError("Invalid file signature: missing B.A.G.U.S. Vault magic header.")
+        raise ValueError("Invalid file format: file too small to be an encrypted package.")
+    if package_bytes[:magic_len] not in (MAGIC_HEADER, LEGACY_MAGIC):
+        raise ValueError("Invalid file signature: missing Krypt Vault magic header.")
 
     header_len = struct.unpack(">I", package_bytes[magic_len:magic_len + 4])[0]
     header_end = magic_len + 4 + header_len

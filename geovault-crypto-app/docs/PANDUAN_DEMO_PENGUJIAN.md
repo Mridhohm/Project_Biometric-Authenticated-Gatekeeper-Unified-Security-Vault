@@ -1,5 +1,5 @@
 # 🎯 PANDUAN DEMONSTRASI & PENGUJIAN TUGAS AKHIR KRIPTOGRAFI
-## B.A.G.U.S. Vault (*Biometric-Authenticated Gatekeeper & Unified Security Vault*)
+## Krypt Vault (*Biometric-Authenticated Gatekeeper & Unified Security Vault*)
 **Dosen Pengampu: Pak Bagus | UPN "Veteran" Yogyakarta**
 
 ---

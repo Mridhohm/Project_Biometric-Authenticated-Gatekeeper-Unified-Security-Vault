@@ -1,6 +1,6 @@
 """
-B.A.G.U.S. Vault - Professional Academic Report Generator (DOCX)
-===============================================================
+Krypt Vault - Professional Academic Report Generator (DOCX)
+===========================================================
 Generates docs/LAPORAN_AKHIR_KRIPTOGRAFI.docx following formal
 academic formatting standards for UPN "Veteran" Yogyakarta.
 """
@@ -122,7 +122,7 @@ def build_academic_docx():
 
     p_cov_title = doc.add_paragraph()
     p_cov_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    r_title = p_cov_title.add_run("B.A.G.U.S. VAULT\n")
+    r_title = p_cov_title.add_run("KRYPT VAULT\n")
     r_title.font.name = "Arial"
     r_title.font.size = Pt(22)
     r_title.bold = True
@@ -212,7 +212,7 @@ def build_academic_docx():
     p_abs1.paragraph_format.line_spacing = 1.15
 
     p_abs2 = doc.add_paragraph(
-        "Laporan Tugas Akhir ini menyajikan rancang bangun dan implementasi B.A.G.U.S. Vault (Biometric-Authenticated "
+        "Laporan Tugas Akhir ini menyajikan rancang bangun dan implementasi Krypt Vault (Biometric-Authenticated "
         "Gatekeeper & Unified Security Vault), sebuah sistem brankas digital berlapis (defense-in-depth security vault) "
         "berbasis Python dan Streamlit yang memenuhi 100% dari 7 kriteria kriptografi yang diamanahkan: "
         "(1) Hardware Dongle Intercept via HMAC-SHA256 kanonikal dan Windows Volume Serial Binding, "
@@ -257,7 +257,7 @@ def build_academic_docx():
         "rahasia dapat diakses dengan mudah."
     )
     doc.add_paragraph(
-        "Untuk mengatasi spektrum ancaman tersebut, B.A.G.U.S. Vault dirancang dengan mengadopsi prinsip "
+        "Untuk mengatasi spektrum ancaman tersebut, Krypt Vault dirancang dengan mengadopsi prinsip "
         "Defense-in-Depth, menggabungkan otentikasi fisik USB Dongle, biometrik wajah optik yang disegel secara "
         "kriptografis, super enkripsi dokumen, steganografi citra, dan pencatatan rantai bukti berbasis blockchain."
     )
@@ -330,7 +330,7 @@ def build_academic_docx():
     doc.add_heading("2.1 Konsep Pertahanan Berlapis (Defense-in-Depth)", level=2)
     doc.add_paragraph(
         "Defense-in-Depth adalah strategi arsitektur keamanan informasi di mana berbagai kontrol keamanan "
-        "ditempatkan secara bertingkat di seluruh siklus hidup data. Dalam B.A.G.U.S. Vault, akses mensyaratkan "
+        "ditempatkan secara bertingkat di seluruh siklus hidup data. Dalam Krypt Vault, akses mensyaratkan "
         "kombinasi tiga faktor: kepemilikan fisik (USB Dongle), faktor inheren (Wajah Optik), dan faktor pengetahuan (Passkey)."
     )
 
@@ -404,7 +404,7 @@ def build_academic_docx():
 
     doc.add_heading("3.1 Arsitektur Pertahanan 3-Gate Security", level=2)
     doc.add_paragraph(
-        "Sistem B.A.G.U.S. Vault mengimplementasikan arsitektur keamanan gerbang bertingkat berurutan:\n"
+        "Sistem Krypt Vault mengimplementasikan arsitektur keamanan gerbang bertingkat berurutan:\n"
         "• Gate 01 (Hardware Intercept): Memverifikasi keberadaan dan keaslian token USB .geovault_dongle / .cyberdeck_dongle.\n"
         "• Gate 02 (Biometric & Credential): Memvalidasi passkey PBKDF2 (600k iterasi) dan pemindaian wajah optik 128x128.\n"
         "• Gate 03 (Vault Core Operations): Memuat 5 subsistem pengamanan dokumen intelijen dan forensik."
@@ -435,7 +435,7 @@ def build_academic_docx():
 
     add_code_snippet(
         doc,
-        "-- Skema Inti Basis Data B.A.G.U.S. Vault\n"
+        "-- Skema Inti Basis Data Krypt Vault\n"
         "CREATE TABLE users (\n"
         "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n"
         "    username TEXT NOT NULL UNIQUE,\n"
@@ -468,7 +468,7 @@ def build_academic_docx():
 
     doc.add_heading("3.4 Perancangan Antarmuka Cyberpunk HUD", level=2)
     doc.add_paragraph(
-        "Antarmuka grafis dirancang dengan nuansa Cyberdeck Terminal Command Line [SYS@BAGUS-VAULT ~]#. "
+        "Antarmuka grafis dirancang dengan nuansa Cyberdeck Terminal Command Line [SYS@KRYPT-VAULT ~]#. "
         "Dilengkapi indikator status neon, bilah navigasi topbar 3-Gate dinamis, modal pemindai optik dengan HUD reticle, "
         "serta konsol log TTY real-time yang menampilkan rekaman intisari SHA-256 setiap operasi kriptografi."
     )
@@ -495,7 +495,7 @@ def build_academic_docx():
     k_hdr = tbl_kriteria.rows[0].cells
     k_hdr[0].text = "No"
     k_hdr[1].text = "Kriteria Tugas Akhir"
-    k_hdr[2].text = "Implementasi pada B.A.G.U.S. Vault"
+    k_hdr[2].text = "Implementasi pada Krypt Vault"
     k_hdr[3].text = "Status Pengujian"
     for c in k_hdr:
         set_cell_background(c, "102C57")
@@ -570,7 +570,7 @@ def build_academic_docx():
 
     doc.add_heading("5.1 Kesimpulan", level=2)
     doc.add_paragraph(
-        "1. Sistem B.A.G.U.S. Vault telah berhasil dirancang dan diimplementasikan dengan memenuhi 100% dari "
+        "1. Sistem Krypt Vault telah berhasil dirancang dan diimplementasikan dengan memenuhi 100% dari "
         "7 kriteria tugas akhir mata kuliah Kriptografi UPN 'Veteran' Yogyakarta di bawah bimbingan Pak Bagus.\n"
         "2. Arsitektur pertahanan berlapis (3-Gate Security) terbukti efektif dalam memproteksi bukti forensik digital "
         "dan dokumen intelijen dari ancaman akses ilegal, kloning perangkat, dan manipulasi basis data.\n"

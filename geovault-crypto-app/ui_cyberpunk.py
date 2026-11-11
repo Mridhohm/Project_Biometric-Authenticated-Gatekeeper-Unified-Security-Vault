@@ -1,6 +1,6 @@
 """
-B.A.G.U.S. Vault — Cyberpunk / Netrunner Command Line Interface Layer
-=====================================================================
+Krypt Vault — Cyberpunk / Netrunner Command Line Interface Layer
+=================================================================
 
 Biometric-Authenticated Gatekeeper & Unified Security Vault UI subsystem:
   1. Global Cyberpunk CSS injection (`#060609` void background, `#0d0f17` panels,
@@ -321,10 +321,10 @@ def init_cli_logs() -> None:
     """Ensure `st.session_state.cli_logs` exists and is seeded with boot telemetry."""
     if "cli_logs" not in st.session_state:
         st.session_state.cli_logs = []
-        boot_digest = SHA256.new(b"B.A.G.U.S._VAULT//SECURITY_CORE_INIT").hexdigest()[:24]
+        boot_digest = SHA256.new(b"KRYPT_VAULT//SECURITY_CORE_INIT").hexdigest()[:24]
         log_cli(
             "KERNEL",
-            "B.A.G.U.S. Vault // Security Core Initialized — HKDF-SHA256 key hierarchy mounted",
+            "Krypt Vault // Security Core Initialized — HKDF-SHA256 key hierarchy mounted",
             digest=boot_digest,
             level="OK",
         )
@@ -366,7 +366,7 @@ def log_cli(
         st.session_state.cli_logs = st.session_state.cli_logs[-MAX_CLI_LOGS:]
 
 
-def render_cli_console(position_label: str = "B.A.G.U.S. VAULT // LIVE TELEMETRY STREAM") -> None:
+def render_cli_console(position_label: str = "KRYPT VAULT // LIVE TELEMETRY STREAM") -> None:
     """Render the `[SYS@BAGUS-VAULT ~]#` black-and-green terminal console."""
     init_cli_logs()
     level_colors = {
@@ -404,8 +404,8 @@ def render_cli_console(position_label: str = "B.A.G.U.S. VAULT // LIVE TELEMETRY
         f"""
         <div class="cp-cli-window">
             <div class="cp-cli-bar">
-                <span>⚡ [SYS@BAGUS-VAULT ~]# // {html.escape(position_label)}</span>
-                <span style="color:#00FF66;">B.A.G.U.S. VAULT :: AES/CHACHA20/SHA256 ENGINE ACTIVE ({len(st.session_state.cli_logs)} EVENTS)</span>
+                <span>⚡ [SYS@KRYPT-VAULT ~]# // {html.escape(position_label)}</span>
+                <span style="color:#00FF66;">KRYPT VAULT :: AES/CHACHA20/SHA256 ENGINE ACTIVE ({len(st.session_state.cli_logs)} EVENTS)</span>
             </div>
             <div class="cp-cli-body">
                 {lines_joined}
@@ -434,7 +434,7 @@ def render_ascii_hud(
         f"""
         <div class="cp-hud-topbar">
             <div>
-                <div class="cp-hud-title">// B.A.G.U.S. VAULT [v2.6_STABLE]</div>
+                <div class="cp-hud-title">// KRYPT VAULT [v2.6_STABLE]</div>
                 <div class="cp-hud-subtitle">BIOMETRIC-AUTHENTICATED GATEKEEPER &amp; UNIFIED SECURITY SYSTEM</div>
             </div>
             <div class="cp-hud-badges">
@@ -449,7 +449,7 @@ def render_ascii_hud(
     steps = [
         (1, "GATE_01 // DONGLE_HMAC_CHECK"),
         (2, "GATE_02 // OPTICAL_FACE_AES128"),
-        (3, "GATE_03 // B.A.G.U.S._VAULT_CORE"),
+        (3, "GATE_03 // KRYPT_VAULT_CORE"),
     ]
     cols = st.columns(3)
     for col, (num, title) in zip(cols, steps):
@@ -490,7 +490,7 @@ def render_dongle_breach_banner(reason: str, has_tamper_failure: bool = False) -
             </div>
             <div style="color:#E2F1FF;font-size:14px;border-top:1px dashed rgba(255,0,60,0.5);padding-top:10px;line-height:1.5;">
                 <div style="color:#FCEE0A;font-weight:bold;margin-bottom:6px;">
-                    ⚠️ SISTEM TERKUNCI. HUBUNGKAN USB HARDWARE DONGLE OTORISASI UNTUK MENGAKTIFKAN B.A.G.U.S. VAULT.
+                    ⚠️ SISTEM TERKUNCI. HUBUNGKAN USB HARDWARE DONGLE OTORISASI UNTUK MENGAKTIFKAN KRYPT VAULT.
                 </div>
                 <div style="color:#7C8DA6;font-size:13px;margin-bottom:8px;">
                     Akses ke sistem diblokir total. Hubungkan USB Flash Drive yang memuat token otorisasi

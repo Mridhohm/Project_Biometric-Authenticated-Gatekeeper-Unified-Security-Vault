@@ -1,5 +1,5 @@
 # LAPORAN TUGAS AKHIR KRIPTOGRAFI
-# B.A.G.U.S. VAULT
+# KRYPT VAULT
 ### *Biometric-Authenticated Gatekeeper & Unified Security Vault*
 ### Sistem Brankas Bukti Forensik Siber & Dokumen Intelijen Strategis
 
@@ -26,7 +26,7 @@ Pak Bagus, S.Kom., M.Cs.
 
 Integritas dan kerahasiaan bukti forensik digital serta dokumen intelijen strategis merupakan fondasi krusial dalam rantai pembuktian hukum (*chain of custody*) dan keamanan nasional. Kelemahan pada sistem penyimpanan konvensional yang menyimpan data dalam format terbuka (*plaintext*), otentikasi faktor tunggal berbasis kata sandi statis, dan absennya verifikasi keberadaan perangkat fisik pengawas (*hardware gatekeeper*) menciptakan kerentanan fatal terhadap ancaman eskalasi hak akses (*privilege escalation*), kebocoran data (*data exfiltration*), dan manipulasi bukti (*evidence tampering*).
 
-Laporan Tugas Akhir ini menyajikan rancang bangun dan implementasi **B.A.G.U.S. Vault (*Biometric-Authenticated Gatekeeper & Unified Security Vault*)**, sebuah sistem brankas digital berlapis (*defense-in-depth security vault*) berbasis Python dan Streamlit. Sistem ini dirancang untuk memenuhi secara paripurna 7 kriteria kriptografi yang diamanahkan dalam silabus perkuliahan:
+Laporan Tugas Akhir ini menyajikan rancang bangun dan implementasi **Krypt Vault (*Biometric-Authenticated Gatekeeper & Unified Security Vault*)**, sebuah sistem brankas digital berlapis (*defense-in-depth security vault*) berbasis Python dan Streamlit. Sistem ini dirancang untuk memenuhi secara paripurna 7 kriteria kriptografi yang diamanahkan dalam silabus perkuliahan:
 1. **Hardware Dongle Intercept**: Mekanisme gerbang fisik terluar (*Gate 01*) yang mengunci total akses aplikasi jika USB token bertanda tangan kriptografis kanonikal **HMAC-SHA256** dan terikat pada nomor seri volume Windows (*anti-cloning protection*) tidak terpasang.
 2. **Login Biometrik & Kriptografi**: Otentikasi dua faktor (*Gate 02*) yang memadukan peregangan kata sandi **PBKDF2-HMAC-SHA256 (600.000 iterasi)** dengan pemindaian optik wajah otomatis real-time beresolusi $128 \times 128$ grayscale yang vektor fiturnya disegel menggunakan algoritma **AES-128-EAX**.
 3. **Super Enkripsi Teks**: Perlindungan laporan intelijen menggunakan kaskade dua lapis: cipher substitusi polialfabetik klasik **Extended Vigenère Cipher (modulo 256)** dilanjutkan cipher blok simetris modern **AES-256-CBC** dengan vektor inisialisasi acak CSPRNG dan padding PKCS#7.
@@ -45,7 +45,7 @@ Pengujian fungsional dan verifikasi otomatis melalui *unit test suite* membuktik
 
 Puji syukur kami panjatkan ke hadirat Tuhan Yang Maha Esa atas rahmat, petunjuk, dan karunia-Nya sehingga kami dapat menyelesaikan perancangan, implementasi perangkat lunak, dan penyusunan Laporan Tugas Akhir Mata Kuliah Kriptografi dengan judul:
 
-**"B.A.G.U.S. Vault: Biometric-Authenticated Gatekeeper & Unified Security Vault — Sistem Brankas Bukti Forensik Siber & Dokumen Intelijen Strategis"**
+**"Krypt Vault: Biometric-Authenticated Gatekeeper & Unified Security Vault — Sistem Brankas Bukti Forensik Siber & Dokumen Intelijen Strategis"**
 
 Laporan dan aplikasi ini disusun untuk memenuhi salah satu syarat kelulusan akademis mata kuliah Kriptografi pada Program Studi Informatika, Fakultas Teknik Industri, Universitas Pembangunan Nasional "Veteran" Yogyakarta.
 
@@ -57,7 +57,7 @@ Kami menyampaikan apresiasi dan ucapan terima kasih yang sebesar-besarnya kepada
 Kami menyadari bahwa laporan ini masih memiliki ruang untuk penyempurnaan. Oleh karena itu, kritik dan saran yang konstruktif sangat kami harapkan guna pengembangan sistem keamanan informasi yang lebih handal di masa mendatang.
 
 Yogyakarta, 11 November 2026  
-**Tim Pengembang B.A.G.U.S. Vault**
+**Tim Pengembang Krypt Vault**
 
 ---
 
@@ -134,7 +134,7 @@ Kerentanan fundamental pada sistem brankas digital konvensional berakar pada tig
 3. **Penyimpanan Terbuka At-Rest**: Banyak basis data menyimpan data rahasia dalam bentuk teks mentah (*plaintext*) di disk lokal. Sekali sistem operasi terkompromi atau file basis data disalin, seluruh kerahasiaan data langsung runtuh seketika.
 4. **Manipulasi Catatan Bukti (*Tampering*)**: Log akses dan riwayat rantai bukti (*chain of custody*) pada basis data relasional standar dapat diedit atau dihapus secara sepihak oleh aktor yang memiliki hak akses administrator basis data tanpa meninggalkan jejak kriptografis yang terdeteksi.
 
-Untuk mengatasi spektrum ancaman tersebut, diperlukan pendekatan keamanan pertahanan berlapis (*defense-in-depth*) yang memadukan kriptografi klasik, kriptografi kunci simetris modern tingkat lanjut, biometrik optik, steganografi citra digital, dan buku besar terdistribusi berbasis blockchain. Melalui mata kuliah Kriptografi di bawah bimbingan Dosen Pengampu Pak Bagus, proyek **B.A.G.U.S. Vault (*Biometric-Authenticated Gatekeeper & Unified Security Vault*)** dikembangkan sebagai solusi holistik untuk mengamankan data intelijen dan barang bukti siber secara paripurna.
+Untuk mengatasi spektrum ancaman tersebut, diperlukan pendekatan keamanan pertahanan berlapis (*defense-in-depth*) yang memadukan kriptografi klasik, kriptografi kunci simetris modern tingkat lanjut, biometrik optik, steganografi citra digital, dan buku besar terdistribusi berbasis blockchain. Melalui mata kuliah Kriptografi di bawah bimbingan Dosen Pengampu Pak Bagus, proyek **Krypt Vault (*Biometric-Authenticated Gatekeeper & Unified Security Vault*)** dikembangkan sebagai solusi holistik untuk mengamankan data intelijen dan barang bukti siber secara paripurna.
 
 ### 1.2 Rumusan Masalah
 Berdasarkan latar belakang di atas dan 7 kriteria tugas akhir yang telah ditetapkan, rumusan masalah dalam proyek ini adalah:
@@ -147,7 +147,7 @@ Berdasarkan latar belakang di atas dan 7 kriteria tugas akhir yang telah ditetap
 7. Bagaimana mengamankan pencatatan riwayat rantai bukti menggunakan teknologi blockchain sederhana dengan konsensus Proof-of-Work SHA-256, enkripsi metadata AES-256-GCM, dan deteksi manipulasi instan?
 
 ### 1.3 Batasan Masalah
-Batasan masalah dalam perancangan B.A.G.U.S. Vault adalah sebagai berikut:
+Batasan masalah dalam perancangan Krypt Vault adalah sebagai berikut:
 1. Aplikasi dikembangkan menggunakan bahasa pemrograman Python 3.10+ dengan antarmuka grafis berbasis Streamlit bertema Cyberpunk HUD Terminal.
 2. Pemrosesan citra wajah biometrik optik dilakukan secara murni menggunakan pustaka Pillow (PIL) dengan normalisasi matriks $128 \times 128$ piksel grayscale tanpa ketergantungan pada pustaka *deep learning* eksternal yang berat.
 3. Media penyimpanan basis data lokal menggunakan SQLite3 (`storage/vault.db`) yang diinspeksi secara langsung.
@@ -155,7 +155,7 @@ Batasan masalah dalam perancangan B.A.G.U.S. Vault adalah sebagai berikut:
 5. Tingkat kesulitan konsensus Proof-of-Work (PoW) blockchain ditetapkan pada prefix heksadesimal `"00"` guna memastikan proses penambangan responsif untuk demonstrasi interaktif.
 
 ### 1.4 Tujuan Tugas Akhir
-Tujuan dari perancangan dan implementasi B.A.G.U.S. Vault adalah:
+Tujuan dari perancangan dan implementasi Krypt Vault adalah:
 1. Memenuhi 100% dari 7 kriteria tugas akhir mata kuliah Kriptografi UPN "Veteran" Yogyakarta secara tuntas dan terdokumentasi.
 2. Membuktikan secara empiris keunggulan pendekatan pertahanan berlapis (*defense-in-depth*) dalam mengamankan dokumen forensik siber dan intelijen.
 3. Menyediakan perangkat lunak fungsional yang dilengkapi rangkaian pengujian unit otomatis (*unit test suite*) dan panduan demonstrasi yang siap dipresentasikan di hadapan dosen penguji.
@@ -180,7 +180,7 @@ Untuk memastikan kontribusi yang seimbang dan adil, pembagian peran teknis dan p
 ### 2.1 Konsep Keamanan Informasi & Pertahanan Berlapis (*Defense-in-Depth*)
 Prinsip dasar keamanan informasi bertumpu pada triad CIA: *Confidentiality* (Kerahasiaan), *Integrity* (Integritas), dan *Availability* (Ketersediaan), yang diperluas dengan *Authentication* (Keaslian Identitas) dan *Non-Repudiation* (Anti-Penyangkalan). Pendekatan *Defense-in-Depth* menyatakan bahwa keamanan tidak boleh bergantung pada satu mekanisme pengaman tunggal. Apabila satu lapisan pengaman ditembus, lapisan pengaman berikutnya harus mampu menahan intrusi lawan.
 
-B.A.G.U.S. Vault mengimplementasikan rantai pertahanan 3 gerbang berurutan:
+Krypt Vault mengimplementasikan rantai pertahanan 3 gerbang berurutan:
 $$\text{Akses} = \text{Gate 01 (Fisik / Dongle)} \land \text{Gate 02 (Biometrik + Kredensial)} \land \text{Gate 03 (Kriptografi Dokumen)}$$
 
 ### 2.2 Kriptografi Kunci Simetris Modern
@@ -188,7 +188,7 @@ $$\text{Akses} = \text{Gate 01 (Fisik / Dongle)} \land \text{Gate 02 (Biometrik 
 #### 2.2.1 Advanced Encryption Standard (AES)
 AES (FIPS PUB 197) adalah cipher blok simetris yang beroperasi pada ukuran blok tetap sebesar 128 bit (16 byte) dengan panjang kunci 128, 192, atau 256 bit. Struktur AES terdiri atas transformasi berulang (*rounds*): *SubBytes*, *ShiftRows*, *MixColumns*, dan *AddRoundKey*.
 
-Dalam B.A.G.U.S. Vault, AES diimplementasikan dalam tiga mode operasi khusus:
+Dalam Krypt Vault, AES diimplementasikan dalam tiga mode operasi khusus:
 1. **Cipher Block Chaining (AES-256-CBC)**: Digunakan pada lapis kedua Super Enkripsi Teks. Setiap blok plaintext di-XOR dengan blok ciphertext sebelumnya sebelum dienkripsi:
    $$C_0 = E_K(P_0 \oplus IV), \quad C_i = E_K(P_i \oplus C_{i-1})$$
    Padding PKCS#7 diterapkan untuk memastikan ukuran data kelipatan 16 byte.
@@ -206,7 +206,7 @@ Keunggulan ChaCha20 dibandingkan AES untuk enkripsi berkas dokumen:
 ### 2.3 Kriptografi Klasik: Extended Vigenère Cipher (Modulo 256)
 Vigenère Cipher klasik adalah algoritma substitusi polialfabetik yang diperkenalkan oleh Blaise de Vigenère pada abad ke-16. Pada varian standar alfabet Inggris, enkripsi beroperasi pada 26 karakter huruf kapital modulo 26.
 
-Dalam B.A.G.U.S. Vault, algoritma ini diperluas menjadi **Extended Vigenère Cipher** yang beroperasi langsung pada aliran byte biner UTF-8 modulo 256:
+Dalam Krypt Vault, algoritma ini diperluas menjadi **Extended Vigenère Cipher** yang beroperasi langsung pada aliran byte biner UTF-8 modulo 256:
 - **Enkripsi**:
   $$C_i = (P_i + K_{i \bmod |K|}) \bmod 256$$
 - **Dekripsi**:
@@ -219,7 +219,7 @@ di mana $P_i$ adalah nilai byte plaintext pada indeks $i$, $K$ adalah larik byte
 SHA-256 (FIPS PUB 180-4) menghasilkan intisari pesan (*digest*) tetap sepanjang 256 bit (32 byte) dari masukan data dengan panjang sembarang. Sifat kriptografis fundamental yang dimanfaatkan meliputi *pre-image resistance*, *second pre-image resistance*, dan efek longsoran (*avalanche effect*). Digunakan untuk checksum integritas file biner, hash blok blockchain, dan fingerprint matriks citra wajah.
 
 #### 2.4.2 Key Derivation Functions (KDF)
-Kata sandi manusia umumnya memiliki entropi yang rendah sehingga tidak aman jika digunakan langsung sebagai kunci enkripsi. B.A.G.U.S. Vault menggunakan dua standar KDF:
+Kata sandi manusia umumnya memiliki entropi yang rendah sehingga tidak aman jika digunakan langsung sebagai kunci enkripsi. Krypt Vault menggunakan dua standar KDF:
 1. **PBKDF2-HMAC-SHA256 (NIST SP 800-132)**: Menerapkan fungsi pseudorandom berulang dengan penambahan *salt* acak 16 byte CSPRNG sebanyak 600.000 iterasi untuk kata sandi login dan 200.000 iterasi untuk berkas ChaCha20, sehingga kebal terhadap serangan GPU/ASIC *rainbow table*.
 2. **HKDF-SHA256 (RFC 5869)**: Fungsi derivasi kunci berbasis HMAC dengan paradigma *Extract-and-Expand*. Digunakan untuk mendistribusikan sub-kunci domain independen dari satu *Master Secret* 256-bit CSPRNG:
    - `dongle/hmac-sha256` untuk token USB.
@@ -267,7 +267,7 @@ Prinsip *Zero-Plaintext Persistence* mewajibkan bahwa tidak ada satu pun informa
 *(Bagian ini disusun dan dipertanggungjawabkan oleh Developer 1: MaddaQiya)*
 
 ### 3.1 Arsitektur Sistem 3-Gate Security
-B.A.G.U.S. Vault menerapkan struktur keamanan gerbang bertingkat (*sequential security gatekeeper*). Setiap gerbang harus berhasil dilalui sebelum sistem memuat modul gerbang berikutnya.
+Krypt Vault menerapkan struktur keamanan gerbang bertingkat (*sequential security gatekeeper*). Setiap gerbang harus berhasil dilalui sebelum sistem memuat modul gerbang berikutnya.
 
 ```mermaid
 flowchart TD
@@ -275,7 +275,7 @@ flowchart TD
     G1 -- "Dongle Absen / Token Palsu" --> L1["[HALT] Crimson Red Lockscreen\nAplikasi Terkunci Total"]
     G1 -- "HMAC-SHA256 Valid" --> G2{"GATE 02\nOtentikasi Biometrik & Kredensial"}
     G2 -- "Passkey Salah / Wajah < 80%" --> L2["[REJECT] Catat Percobaan Gagal\nKunci Akun Sementara"]
-    G2 -- "Wajah Cocok >= 80% & PBKDF2 Valid" --> G3["GATE 03 // B.A.G.U.S. VAULT CORE\n[SYS@BAGUS-VAULT ~]#"]
+    G2 -- "Wajah Cocok >= 80% & PBKDF2 Valid" --> G3["GATE 03 // KRYPT VAULT CORE\n[SYS@KRYPT-VAULT ~]#"]
     
     subgraph G3_Subsystems ["Subsistem Operasi Forensik & Intelijen"]
         G3 --> S1["[01] Laporan Intelijen\nSuper Enkripsi: Vigenère + AES-256-CBC"]
@@ -426,7 +426,7 @@ CREATE TABLE app_meta (
 
 ### 3.4 Perancangan Antarmuka Pengguna (Cyberpunk HUD Streamlit)
 Antarmuka pengguna dikembangkan dengan tema estetika militer/cyberpunk (*Cyberdeck Netrunner*) menggunakan injeksi CSS kustom pada Streamlit:
-- **Top HUD Bar**: Menampilkan identitas sistem `[// B.A.G.U.S. VAULT [v2.6_FORENSIC_EDITION]]`, indikator status hardware dongle berkode warna neon, dan breadcrumb 3-Gate.
+- **Top HUD Bar**: Menampilkan identitas sistem `[// KRYPT VAULT [v2.6_FORENSIC_EDITION]]`, indikator status hardware dongle berkode warna neon, dan breadcrumb 3-Gate.
 - **Crimson Red Lockscreen**: Layar bahaya merah menyala yang langsung aktif saat dongle tidak terpasang.
 - **Optical Scanner HUD**: Komponen visual WebRTC/reticle pemindai wajah optik Cyberpunk interaktif.
 - **TTY Terminal Log Stream**: Konsol telemetri live di bagian bawah layar yang mencatat setiap peristiwa kriptografis, hash intisari SHA-256, dan level log secara real-time.
@@ -437,7 +437,7 @@ Antarmuka pengguna dikembangkan dengan tema estetika militer/cyberpunk (*Cyberde
 *(Bagian ini disusun dan dipertanggungjawabkan oleh Developer 2: Partner)*
 
 ### 4.1 Lingkungan Pengembangan & Spesifikasi Sistem
-Pengembangan dan pengujian B.A.G.U.S. Vault dilakukan pada lingkungan komputasi dengan spesifikasi:
+Pengembangan dan pengujian Krypt Vault dilakukan pada lingkungan komputasi dengan spesifikasi:
 - **Sistem Operasi**: Microsoft Windows 11 Enterprise x64
 - **Bahasa Pemrograman**: Python 3.10+ / 3.14.0
 - **Pustaka Utama**: `streamlit (>=1.38.0)`, `pycryptodome (>=3.20.0)`, `pillow (>=10.0.0)`, `psutil (>=5.9.0)`
@@ -533,7 +533,7 @@ Seluruh 7 unit test berhasil dieksekusi dengan hasil **OK (100% lulus)** tanpa k
 
 ### 5.1 Kesimpulan
 Berdasarkan perancangan, implementasi, dan serangkaian pengujian komprehensif yang telah dilakukan, dapat disimpulkan bahwa:
-1. Sistem **B.A.G.U.S. Vault (*Biometric-Authenticated Gatekeeper & Unified Security Vault*)** telah berhasil dikembangkan dan memenuhi **100% dari 7 kriteria tugas akhir mata kuliah Kriptografi** UPN "Veteran" Yogyakarta di bawah bimbingan Pak Bagus.
+1. Sistem **Krypt Vault (*Biometric-Authenticated Gatekeeper & Unified Security Vault*)** telah berhasil dikembangkan dan memenuhi **100% dari 7 kriteria tugas akhir mata kuliah Kriptografi** UPN "Veteran" Yogyakarta di bawah bimbingan Pak Bagus.
 2. Integrasi mekanisme pertahanan berlapis (*Defense-in-Depth*) melalui 3-Gate Security memberikan tingkat perlindungan maksimal terhadap berkas forensik siber dan dokumen intelijen.
 3. Penerapan prinsip *Zero-Plaintext Persistence* menjamin bahwa integritas dan kerahasiaan data tetap terjaga utuh meskipun perangkat penyimpanan fisik dicuri atau diinspeksi dalam keadaan *at-rest*.
 4. Pembagian kerja kelompok dengan bobot seimbang 50:50 antara Developer 1 (Infrastruktur Keamanan & Kontrol) dan Developer 2 (Mesin Kriptografi Dokumen & Penyimpanan) terbukti efektif dalam merealisasikan proyek berskala produksi yang memenuhi standar akademis dan industri.
@@ -573,7 +573,7 @@ Untuk pengembangan sistem lebih lanjut di masa depan, disarankan beberapa pening
    ```bash
    python tests/test_crypto_modules.py
    ```
-3. Jalankan aplikasi B.A.G.U.S. Vault:
+3. Jalankan aplikasi Krypt Vault:
    ```bash
    streamlit run app.py
    ```

@@ -1,4 +1,4 @@
-# ⚡ B.A.G.U.S. Vault — Sistem Pengamanan Bukti Forensik Siber & Dokumen Intelijen Strategis
+# ⚡ Krypt Vault — Sistem Pengamanan Bukti Forensik Siber & Dokumen Intelijen Strategis
 
 ```text
  ██████╗    █████╗   ██████╗  ██╗   ██╗ ███████╗    ██╗   ██╗  █████╗  ██╗   ██╗ ██╗  ████████╗
@@ -9,13 +9,13 @@
  ╚═════╝ ▀ ╚═╝  ╚═╝▀ ╚═════╝ ▀ ╚═════╝ ▀╚══════╝▀     ╚═══╝   ╚═╝  ╚═╝  ╚═════╝  ╚══════╝╚═╝   
 ```
 
-**B.A.G.U.S. Vault (*Biometric-Authenticated Gatekeeper & Unified Security Vault*)** adalah sistem pengamanan data pertahanan berlapis (*defense-in-depth digital evidence vault*) berbasis Python dan Streamlit. Dirancang khusus untuk mengamankan bukti forensik digital, berkas perkara kejahatan siber, dan dokumen intelijen geospasial strategis melalui antarmuka Cyberdeck Command Line Interface (`[SYS@BAGUS-VAULT ~]#`) bertema Netrunner dengan telemetri eksekusi *real-time*.
+**Krypt Vault (*Biometric-Authenticated Gatekeeper & Unified Security Vault*)** adalah sistem pengamanan data pertahanan berlapis (*defense-in-depth digital evidence vault*) berbasis Python dan Streamlit. Dirancang khusus untuk mengamankan bukti forensik digital, berkas perkara kejahatan siber, dan dokumen intelijen geospasial strategis melalui antarmuka Cyberdeck Command Line Interface (`[SYS@KRYPT-VAULT ~]#`) bertema Netrunner dengan telemetri eksekusi *real-time*.
 
 ---
 
 ## 🏛️ Filosofi Arsitektur Keamanan
 
-B.A.G.U.S. Vault mengimplementasikan prinsip ketahanan kriptografi tingkat militer:
+Krypt Vault mengimplementasikan prinsip ketahanan kriptografi tingkat militer:
 
 1. **Zero-Plaintext Persistence (Enkripsi At-Rest)**: Tidak ada password mentah, vektor biometrik wajah, laporan teks, maupun dokumen yang tersimpan dalam format terbuka di database SQLite (`storage/geovault.db`) maupun sistem berkas lokal.
 2. **Hierarki Kunci Terpisah (HKDF-SHA256 Key Hierarchy)**: Master secret 256-bit CSPRNG mendistribusikan sub-kunci domain independen (`dongle/hmac-sha256`, `auth/password-pepper`, `ledger/aes-256-gcm`, `ledger/anchor-hmac`).
@@ -30,12 +30,12 @@ B.A.G.U.S. Vault mengimplementasikan prinsip ketahanan kriptografi tingkat milit
 
 ```mermaid
 flowchart TD
-    A["Boot Sistem // B.A.G.U.S. Vault"] --> B{"Gate 01: Pindai Hardware USB\n(.geovault_dongle / .cyberdeck_dongle)"}
+    A["Boot Sistem // Krypt Vault"] --> B{"Gate 01: Pindai Hardware USB\n(.geovault_dongle / .cyberdeck_dongle)"}
     B -- "Tidak Terdeteksi / Token Palsu / Beda Volume" --> C["[CRITICAL_SECURITY_HALT]\nLockscreen Merah Crimson"]
     B -- "HMAC-SHA256 Valid" --> D{"Gate 02: Realtime Optical Face Scan + Passkey"}
     D -- "PBKDF2-SHA256 (600k iter) + PIL 128x128 Face / AES-128-EAX" --> E{"Kemiripan Wajah >= 80%?"}
     E -- "Ditolak / Mismatch" --> F["Catat Percobaan Gagal\n& Kunci Akun Sementara"]
-    E -- "Diterima (Cleared)" --> G["Gate 03: B.A.G.U.S. Vault Core\n[SYS@BAGUS-VAULT ~]#"]
+    E -- "Diterima (Cleared)" --> G["Gate 03: Krypt Vault Core\n[SYS@KRYPT-VAULT ~]#"]
     G --> H["[01] Laporan Intelijen\nSuper Enkripsi: Vigenère + AES-256-CBC"]
     G --> I["[02] Berkas Barang Bukti\nChaCha20 Stream Cipher + Paket .bagus.enc"]
     G --> J["[03] Citra Forensik Steganografi\nLossless PNG LSB + Delimiter <<<END>>>"]

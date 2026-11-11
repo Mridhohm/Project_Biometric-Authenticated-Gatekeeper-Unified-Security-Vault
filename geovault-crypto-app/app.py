@@ -1,6 +1,6 @@
 """
-B.A.G.U.S. Vault: Sistem Pengamanan Bukti Forensik Siber & Dokumen Intelijen Strategis
-====================================================================================
+Krypt Vault: Sistem Pengamanan Bukti Forensik Siber & Dokumen Intelijen Strategis
+================================================================================
 
 Biometric-Authenticated Gatekeeper & Unified Security Vault
 Forensic & Intelligence Evidence Security Architecture:
@@ -41,7 +41,7 @@ from modules import (
 # Bootstrap & Page Setup
 # --------------------------------------------------------------------------- #
 st.set_page_config(
-    page_title="B.A.G.U.S. Vault | Forensic & Intelligence Evidence Security",
+    page_title="Krypt Vault | Forensic & Intelligence Evidence Security",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -94,7 +94,7 @@ def render_hud_topbar(current_step: int, dongle_mounted: bool = True) -> None:
                     line-height: 1.2;
                     text-shadow: 0 0 14px rgba(252, 238, 10, 0.6), 0 0 4px rgba(252, 238, 10, 0.35);
                     margin-bottom: 4px;
-                ">// B.A.G.U.S. VAULT [v2.6_FORENSIC_EDITION]</div>
+                ">// KRYPT VAULT [v2.6_FORENSIC_EDITION]</div>
                 <div style="
                     color: #00F0FF;
                     font-size: clamp(0.72rem, 1.1vw, 0.85rem);
@@ -407,7 +407,7 @@ def render_overview_tab(username: str, dongle: dongle_guard.DongleStatus) -> Non
     stats = database.get_user_stats(username)
     report = blockchain.verify_chain()
 
-    st.subheader("📡 B.A.G.U.S. VAULT // ARSITEKTUR KEAMANAN & TELEMETRI KRIPTOGRAFIS")
+    st.subheader("📡 KRYPT VAULT // ARSITEKTUR KEAMANAN & TELEMETRI KRIPTOGRAFIS")
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("CHAIN_OF_CUSTODY_BLOCKS", stats["ledger_blocks"])
     m2.metric("LEDGER_INTEGRITY", "VALID_OK" if report.valid else "TAMPER_DETECTED!")
@@ -424,7 +424,7 @@ def render_overview_tab(username: str, dongle: dongle_guard.DongleStatus) -> Non
     with c1:
         st.markdown("#### 🔑 HARDWARE_DONGLE // HMAC-SHA256 TOKEN SPECIFICATION")
         st.json({
-            "product": "B.A.G.U.S. Vault Forensic Edition",
+            "product": "Krypt Vault Forensic Edition",
             "dongle_label": dongle.label,
             "dongle_id": dongle.dongle_id,
             "mount_path": dongle.path,
@@ -433,7 +433,7 @@ def render_overview_tab(username: str, dongle: dongle_guard.DongleStatus) -> Non
             "anti_cloning_protection": "Volume Serial Binding Active",
         })
     with c2:
-        st.markdown("#### 🛡️ SPESIFIKASI 7 MODUL KRIPTOGRAFI B.A.G.U.S. VAULT")
+        st.markdown("#### 🛡️ SPESIFIKASI 7 MODUL KRIPTOGRAFI KRYPT VAULT")
         st.markdown(
             "- **[01] Hardware Dongle**: Token `.geovault_dongle` / `.cyberdeck_dongle` + `HMAC-SHA256`\n"
             "- **[02] Optical Face 2FA**: `PBKDF2-HMAC-SHA256` (600k iter) + `PIL 128x128 SHA-256` + `AES-128-EAX`\n"
@@ -958,7 +958,7 @@ def render_blockchain_tab(username: str) -> None:
             metadata = {"latitude": lat, "longitude": lon, "elevation_m": alt, "notes": notes}
         elif asset_type == "Digital Certificate":
             c_ca, c_sn = st.columns(2)
-            ca = c_ca.text_input("Otoritas Penerbit (CA)", value="B.A.G.U.S. Root Cyber CA")
+            ca = c_ca.text_input("Otoritas Penerbit (CA)", value="Krypt Vault Root Cyber CA")
             sn = c_sn.text_input("Nomor Seri Sertifikat", value="CERT-2026-X88")
             thumb = st.text_input("Thumbprint SHA-256 Sertifikat")
             metadata = {"issuer": ca, "serial_number": sn, "thumbprint": thumb}
@@ -1087,7 +1087,7 @@ def main() -> None:
     # GATE 03: Authenticated Vault Core
     username = st.session_state.authenticated_user
     with st.sidebar:
-        st.markdown("## ⚡ B.A.G.U.S. Vault")
+        st.markdown("## ⚡ Krypt Vault")
         st.caption("FORENSIC & INTELLIGENCE EVIDENCE VAULT")
         st.success(f"👤 ANALYST: **{username.upper()}**")
         if st.session_state.auth_similarity is not None:
@@ -1115,7 +1115,7 @@ def main() -> None:
                 st.rerun()
         with c_exit:
             if st.button("🚪 KUNCI VAULT", use_container_width=True):
-                ui_cyberpunk.log_cli("KERNEL", f"Analyst '{username}' locked B.A.G.U.S. Vault session", level="WARN")
+                ui_cyberpunk.log_cli("KERNEL", f"Analyst '{username}' locked Krypt Vault session", level="WARN")
                 st.session_state.authenticated_user = None
                 st.session_state.auth_similarity = None
                 st.rerun()
@@ -1135,7 +1135,7 @@ def main() -> None:
     elif menu.startswith("⛓️"):
         render_blockchain_tab(username)
 
-    ui_cyberpunk.render_cli_console("GATE_03 // B.A.G.U.S. VAULT CRYPTOGRAPHIC OPERATIONS LOG")
+    ui_cyberpunk.render_cli_console("GATE_03 // KRYPT VAULT CRYPTOGRAPHIC OPERATIONS LOG")
 
 
 if __name__ == "__main__":

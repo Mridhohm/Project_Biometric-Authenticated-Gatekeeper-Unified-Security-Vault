@@ -42,9 +42,9 @@ from Crypto.Hash import HMAC, SHA256
 import config
 
 DONGLE_VERSION = 1
-PRODUCT_NAME = "B.A.G.U.S. Vault"
-ACCEPTED_PRODUCTS = ("B.A.G.U.S. Vault", "GeoVault", "BAGUS_OS")
-SUPPORTED_FILENAMES = (config.DONGLE_FILENAME, ".cyberdeck_dongle")
+PRODUCT_NAME = "Krypt Vault"
+ACCEPTED_PRODUCTS = ("Krypt Vault", "B.A.G.U.S. Vault", "GeoVault", "BAGUS_OS")
+SUPPORTED_FILENAMES = (config.DONGLE_FILENAME, ".krypt_dongle", ".cyberdeck_dongle")
 MAX_TOKEN_BYTES = 4096  # refuse to parse oversized files (DoS hardening)
 REQUIRED_FIELDS = ("version", "product", "dongle_id", "label", "issued_at",
                    "expires_at", "volume_serial", "nonce", "signature")

@@ -1,4 +1,4 @@
-# ⚡ B.A.G.U.S. Vault — Biometric-Authenticated Gatekeeper & Unified Security Vault
+# ⚡ Krypt Vault — Biometric-Authenticated Gatekeeper & Unified Security Vault
 > **Sistem Brankas Bukti Forensik Siber & Dokumen Intelijen Strategis**  
 > **Tugas Akhir Mata Kuliah Kriptografi — UPN "Veteran" Yogyakarta**  
 > **Dosen Pengampu: Pak Bagus, S.Kom., M.Cs.**
