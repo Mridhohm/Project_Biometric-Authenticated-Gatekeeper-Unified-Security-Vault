@@ -39,12 +39,9 @@ Sistem ini memenuhi 100% dari 7 kriteria tugas akhir yang disyaratkan:
 
 ```text
 Project_Biometric-Authenticated-Gatekeeper-Unified-Security-Vault-main/
-|-- KryptVault.exe                   <- Aplikasi Desktop Native Windows (1-Klik)
-|-- KryptVault_Native.cs             <- Kode sumber kompilasi C# Win32 winexe
-|-- JALANKAN_KRYPT_VAULT.bat         <- Peluncur batch cerdas dengan auto-installer
-|-- RESET_DATA_FRESH.bat             <- Skrip pembersih basis data ke kondisi fresh pabrik
 |-- README.md                        <- Dokumentasi terpadu dan panduan pengujian
 |-- geovault-crypto-app/             <- Direktori utama aplikasi Krypt Vault
+    |-- .streamlit/config.toml       <- Konfigurasi tema gelap Streamlit
     |-- app.py                       <- Antarmuka utama dan perutean 3-gerbang
     |-- build_exe.bat                <- Skrip kompilasi standalone via PyInstaller
     |-- config.py                    <- Pengaturan jalur penyimpanan dan derivasi HKDF
@@ -52,11 +49,11 @@ Project_Biometric-Authenticated-Gatekeeper-Unified-Security-Vault-main/
     |-- desktop_launcher.py          <- Peluncur jendela desktop PyWebView mandiri
     |-- generate_dongle.py           <- Utilitas pembuatan dan inspeksi token USB
     |-- KryptVault.spec              <- Spesifikasi build PyInstaller
+    |-- requirements.txt             <- Daftar dependensi Python
     |-- reset_fresh.py               <- Utilitas pengembalian ke kondisi fresh
-    |-- run_desktop.bat              <- Peluncur batch desktop via desktop_launcher.py
+    |-- run_desktop.bat              <- Peluncur batch Windows via desktop_launcher.py
     |-- run_desktop.py               <- Peluncur server dan browser app mode
     |-- ui_theme.py                  <- Tema antarmuka Cyberpunk HUD & mode terang
-    |-- requirements.txt             <- Daftar dependensi Python
     |-- modules/                     <- Modul engine kriptografi mandiri
     |   |-- auth_biometric.py        <- Biometrik wajah optik & PBKDF2 + AES-128-EAX
     |   |-- blockchain.py            <- Ledger rantai bukti PoW SHA-256
@@ -69,12 +66,7 @@ Project_Biometric-Authenticated-Gatekeeper-Unified-Security-Vault-main/
     |   |-- ledger.json              <- Ledger blockchain bukti forensik
     |   |-- files/                   <- Berkas biner terenkripsi (.krypt.enc)
     |-- tests/                       <- Suite pengujian unit otomatis
-    |   |-- test_crypto_modules.py   <- Uji kebenaran matematis 7 kriteria kriptografi
-    |-- docs/                        <- Dokumen laporan akademik
-        |-- LAPORAN_AKHIR_KRIPTOGRAFI.docx <- Laporan akhir Word standar akademik UPN
-        |-- LAPORAN_AKHIR_KRIPTOGRAFI.md   <- Naskah laporan format Markdown
-        |-- build_merged_report.py         <- Generator laporan Word otomatis
-        |-- generate_report_docx.py        <- Modul penyusun layout laporan akademik
+        |-- test_crypto_modules.py   <- Uji kebenaran matematis 7 kriteria kriptografi
 ```
 
 ---
@@ -94,33 +86,32 @@ Project_Biometric-Authenticated-Gatekeeper-Unified-Security-Vault-main/
 
 Tersedia tiga cara untuk menjalankan aplikasi sesuai kenyamanan Anda:
 
-### Cara 1: Aplikasi Desktop Native Windows (Paling Praktis)
-Cukup klik ganda (*double-click*) berkas:
+### Cara 1: Batch Launcher Desktop PyWebView (1-Klik via Windows Explorer)
+Buka folder `geovault-crypto-app` dan klik ganda berkas:
 ```text
-KryptVault.exe
+run_desktop.bat
 ```
-- Berkas eksekutabel ini langsung membuka jendela aplikasi desktop tanpa memunculkan jendela konsol hitam (*command prompt*).
-- Menutup jendela aplikasi via tombol [X] akan otomatis menghentikan server latar belakang secara bersih.
+- Skrip ini menjalankan `desktop_launcher.py` untuk mengaktifkan server lokal dan membuka jendela aplikasi desktop mandiri via PyWebView.
+- Menutup jendela aplikasi via tombol [X] akan menghentikan proses server secara otomatis.
 
-### Cara 2: Batch Launcher Cerdas (1-Klik via Windows Explorer)
-Klik ganda berkas:
-```text
-JALANKAN_KRYPT_VAULT.bat
-```
-Peluncur ini secara otomatis akan:
-1. Memeriksa ketersediaan Python pada sistem.
-2. Memeriksa paket dependensi (`streamlit`, `pycryptodome`, `pillow`, `psutil`). Jika ada paket yang belum terpasang, sistem langsung mengunduhnya secara otomatis via `pip`.
-3. Mengaktifkan server lokal dan membuka jendela antarmuka mandiri.
-
-Alternatif lain di dalam subfolder aplikasi: `geovault-crypto-app\run_desktop.bat` (meluncurkan [`desktop_launcher.py`](./geovault-crypto-app/desktop_launcher.py) via PyWebView) atau `geovault-crypto-app\build_exe.bat` untuk kompilasi PyInstaller.
-
-### Cara 3: Eksekusi Manual melalui Terminal
+### Cara 2: Eksekusi Manual melalui Terminal
 Buka PowerShell atau Command Prompt pada folder proyek:
 ```bash
 cd geovault-crypto-app
 pip install -r requirements.txt
+python desktop_launcher.py
+```
+Atau jalankan antarmuka mode browser app / Streamlit langsung:
+```bash
 python run_desktop.py
 ```
+
+### Cara 3: Build Standalone Executable (.exe) dengan PyInstaller
+Masuk ke folder `geovault-crypto-app` dan jalankan:
+```text
+build_exe.bat
+```
+Hasil kompilasi standalone akan tersimpan di `dist\KryptVault\KryptVault.exe`.
 
 ---
 
@@ -200,10 +191,10 @@ Gunakan skenario berikut saat melakukan pengujian dan demonstrasi agar seluruh 7
 
 ## 8. Cara Mengembalikan Data ke Kondisi Fresh Pabrik
 
-Jika Anda atau penguji telah selesai melakukan demonstrasi dan ingin mengosongkan kembali seluruh akun, riwayat laporan, dan berkas ke kondisi awal:
-Cukup klik ganda:
-```text
-RESET_DATA_FRESH.bat
+Jika Anda atau penguji telah selesai melakukan demonstrasi dan ingin mengosongkan kembali seluruh akun, riwayat laporan, dan berkas ke kondisi awal, jalankan skrip berikut dari folder `geovault-crypto-app`:
+```bash
+cd geovault-crypto-app
+python reset_fresh.py
 ```
 Tekan tombol `Y` saat diminta konfirmasi. Skrip akan:
 - Mengosongkan tabel pengguna dan menghapus template biometrik lama.
